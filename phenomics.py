@@ -3,12 +3,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import skimage as ski
 from skimage import io
+from skimage.util import img_as_ubyte
 import math
+from typing import List
 
 from .plotting import *
+from .verbosity import *
 
-# Blob Finder
-
+###################################################
+# ColonyBlobs
+###################################################
 
 class CellBlobsBase:
     '''
@@ -19,11 +23,12 @@ class CellBlobsBase:
     min_sigma = max_sigma = num_sigma = None
     threshold = overlap =  None
 
-
+    verb = None
     def __init__(self, img, blob_detect_method="log",
                  min_sigma=4, max_sigma=40, num_sigma=45,
-                 threshold=0.01, overlap=0.1,
+                 threshold=0.01, overlap=0.1, verbosity = True
                  ):
+        self.verb = Verbosity(verbosity)
         self.min_sigma = min_sigma
         self.max_sigma = max_sigma
         self.num_sigma = num_sigma
@@ -39,6 +44,7 @@ class CellBlobsBase:
             self.search_blobs_LoG(img)
 
     def search_blobs_LoG(self, img):
+        self.verb.start(1, "blob finding using LoG")
         self.table = pd.DataFrame(ski.feature.blob_log(
             ski.color.rgb2gray(img),
             min_sigma=self.min_sigma,
@@ -56,10 +62,13 @@ class CellBlobsBase:
             num_sigma=self.num_sigma,
             threshold=self.threshold,
             overlap=self.overlap
-        ), columns=['y', 'x', 'sigma']) #
+        ), columns=['y', 'x', 'sigma'])
 
 
 class CellBlobsTable(CellBlobsBase):
+    '''
+    Last Updated: 7/8/2024
+    '''
     n_rows = n_cols = None
 
     row_idx = None
@@ -71,11 +80,11 @@ class CellBlobsTable(CellBlobsBase):
     left_bound = right_bound = upper_bound = lower_bound = None
     def __init__(self, img, n_rows=8, n_cols=12, blob_detect_method="log",
                  min_sigma=4, max_sigma=40, num_sigma=45,
-                 threshold=0.01, overlap=0.1,
+                 threshold=0.01, overlap=0.1, verbose = True
                  ):
         super().__init__(img, blob_detect_method,
                          min_sigma, max_sigma, num_sigma,
-                         threshold, overlap)
+                         threshold, overlap, verbose)
         self.n_rows = n_rows
         self.n_cols = n_cols
         self.generate_table()
@@ -129,7 +138,9 @@ class CellBlobsTable(CellBlobsBase):
 
 
 class CellBlobs(CellBlobsTable):
-    # Implement filter to remove noise
+    '''
+    Last Updated: 7/8/2024
+    '''
 
     unfiltered_table = None
 
@@ -137,11 +148,11 @@ class CellBlobs(CellBlobsTable):
     def __init__(self, img, n_rows=8, n_cols=12, blob_detect_method="log",
                  min_sigma=4, max_sigma=40, num_sigma=45,
                  threshold=0.01, overlap=0.1,
-                 min_size=180,
+                 min_size=180, verbose = True
                  ):
         super().__init__(img, n_rows, n_cols, blob_detect_method,
                          min_sigma, max_sigma, num_sigma,
-                         threshold, overlap,
+                         threshold, overlap, verbose
                          )
         self.min_size = min_size
         self.unfiltered_table = self.table.copy()
@@ -154,11 +165,12 @@ class CellBlobs(CellBlobsTable):
         self.table = self.table.reset_index(drop=True)
         self._generate_bins()
 
-
+###################################################
+# Preprocessing
 ###################################################
 class PlateBase:
     '''
-    Last Updated: 7/8/2024
+    Last Updated: 7/9/2024
     '''
     input_img = img = gray_img = None
 
@@ -170,12 +182,14 @@ class PlateBase:
 
     blobs = None
 
+    verb = None
     def __init__(self, img, n_rows=8, n_cols=12,
                  blob_detection_method="log",
                  min_sigma=4, max_sigma=40, num_sigma=45,
                  threshold=0.01, overlap=0.1, min_size=200,
+                 verbose = True
                  ):
-
+        self.verb = Verbosity(verbose)
         self.input_img = img
         self._set_img(img)
         self.blob_detection_method = blob_detection_method
@@ -190,6 +204,8 @@ class PlateBase:
         self.threshold = threshold;
         self.overlap = overlap
 
+        self.verb.start(1, "initial blob search")
+        self.verb.end(2, "initial blob search")
         self._update_blobs()
 
     def _set_img(self, img):
@@ -200,7 +216,7 @@ class PlateBase:
         self.blobs = CellBlobs(
             self.img, self.n_rows, self.n_cols, self.blob_detection_method,
             self.min_sigma, self.max_sigma, self.num_sigma, self.threshold, self.overlap,
-            self.min_size)
+            self.min_size, verbose=False)
 
 
 class PlateAlignment(PlateBase):
@@ -222,10 +238,11 @@ class PlateAlignment(PlateBase):
                  blob_detection_method="log",
                  min_sigma=4, max_sigma=40, num_sigma=45,
                  threshold=0.01, overlap=0.1, min_size=200,
+                 verbose=True
                  ):
         super().__init__(img, n_rows, n_cols, blob_detection_method,
                          min_sigma, max_sigma, num_sigma,
-                         threshold, overlap, min_size)
+                         threshold, overlap, min_size, verbose)
 
         self.unaligned_blobs = self.blobs
         self.align()
@@ -233,6 +250,8 @@ class PlateAlignment(PlateBase):
 
 
     def align(self):
+        self.verb.start(1, "plate alignment")
+
         top_row = self.blobs.rows[0]
 
         m, b = np.polyfit(top_row.x, top_row.y, 1)
@@ -266,9 +285,12 @@ class PlateAlignment(PlateBase):
                 mode='edge'
             )
         )
+        self.verb.body(1, "Updating blobs")
         self._update_blobs()
         self.aligned_blobs = self.blobs
         self.status_alignment = True
+        self.verb.end(2, "plate alignment")
+
 
     def plot_alignment(self):
         if self.status_alignment is False:
@@ -276,21 +298,9 @@ class PlateAlignment(PlateBase):
         with plt.ioff():
             alignFit_fig, alignFit_ax = plt.subplots(nrows=1, ncols=2, figsize=(14, 10),
                                                      tight_layout=True)
-            alignFit_ax[0].grid(False)
-            alignFit_ax[1].grid(False)
 
-            alignFit_ax[0].imshow(self.input_img)
-            alignFit_ax[0].plot(self.input_alignment_vector['x'], self.input_alignment_vector['y'], color='red')
-            alignFit_ax[0].plot(
-                self.alignment_vector['x'], self.alignment_vector['y'], color='white', linestyle='--'
-            )
-            alignFit_ax[0].set_title("Input Alignment Rotation | Red: Original | Yellow: New")
-            for idx, row in self.unaligned_blobs.table.iterrows():
-                c = plt.Circle((row['x'], row['y']), row['radius'], color='red', fill=False)
-                alignFit_ax[0].add_patch(c)
-            for idx, row in self.aligned_blobs.table.iterrows():
-                c = plt.Circle((row['x'], row['y']), row['radius'], color='yellow', alpha=0.8, fill=False)
-                alignFit_ax[0].add_patch(c)
+            self.plotAx_alignment(alignFit_ax[0])
+            alignFit_ax[1].grid(False)
             alignFit_ax[1].imshow(self.img)
             alignFit_ax[1].set_title("Aligned Image")
         return alignFit_fig, alignFit_ax
@@ -319,7 +329,7 @@ class PlateAlignment(PlateBase):
 
 class PlateFit(PlateAlignment):
     '''
-    Last Updated: 7/8/2024
+    Last Updated: 7/9/2024
     '''
     border_padding = None
     padded_img = cropping_rect = None
@@ -331,18 +341,19 @@ class PlateFit(PlateAlignment):
                  blob_detection_method='log',
                  min_sigma=4, max_sigma=40, num_sigma=45,
                  threshold=0.01, overlap=0.1, min_size=200,
-                 border_padding=50
+                 border_padding=50, verbose=True
                  ):
         super().__init__(img, n_rows, n_cols,
                          blob_detection_method,
                          min_sigma, max_sigma, num_sigma,
-                         threshold, overlap, min_size)
+                         threshold, overlap, min_size, verbose)
         self.border_padding = border_padding
         self.fit_plate()
 
     def fit_plate(self):
         if self.status_alignment is False:
             self.align()
+        self.verb.start(1, "plate fitting")
         img = []
         for color_idx in range(3):
             img.append(np.expand_dims(
@@ -365,6 +376,7 @@ class PlateFit(PlateAlignment):
         self._set_img(img)
         self._update_blobs()
         self.status_fitted = True
+        self.verb.end(2, "plate fitting")
 
     def plot_fitting(self):
         if self.status_alignment is False:
@@ -421,7 +433,7 @@ class PlateFit2(PlateAlignment):
                  blob_detection_method='log',
                  min_sigma=4, max_sigma=40, num_sigma=45,
                  threshold=0.01, overlap=0.1, min_size=200,
-                 border_padding=50
+                 border_padding=50, verbose=True
                  ):
         self._set_img(img)
         self.border_padding = border_padding
@@ -437,12 +449,14 @@ class PlateFit2(PlateAlignment):
         super().__init__(self.padded_img, n_rows, n_cols,
                          blob_detection_method,
                          min_sigma, max_sigma, num_sigma,
-                         threshold, overlap, min_size)
+                         threshold, overlap, min_size, verbose)
+
         self.fit_plate()
 
     def fit_plate(self):
         if self.status_alignment is False:
             self.align()
+        self.verb.start(1, "plate fitting")
         bound_L = math.floor(self.blobs.cols[0].x_minus.min() - self.border_padding)
         bound_R = math.ceil(self.blobs.cols[-1].x_plus.max() + self.border_padding)
         bound_T = math.floor(self.blobs.rows[0].y_minus.min() - self.border_padding)
@@ -455,6 +469,7 @@ class PlateFit2(PlateAlignment):
                                                fill=False, edgecolor='white')
         self._update_blobs()
         self.status_fitted = True
+        self.verb.end(2, "plate fitting")
 
     def plot_fitting(self):
         if self.status_alignment is False:
@@ -499,11 +514,12 @@ class PlateFit2(PlateAlignment):
 
 class WellIsolation(PlateFit2):
     '''
-    Last Updated: 7/8/2024
+    Last Updated: 7/9/2024
     '''
     cols_midpoints = rows_midpoints = None
     gridded_fig = gridded_ax = None
     well_imgs = None
+    invalid_wells = []
 
     # Status checks
     status_midpoints = False
@@ -513,19 +529,20 @@ class WellIsolation(PlateFit2):
                  blob_detection_method='log',
                  min_sigma=4, max_sigma=50, num_sigma=30,
                  threshold=0.01, overlap=0.1, min_size=180,
-                 border_padding=50
+                 border_padding=50, verbose=True
                  ):
         super().__init__(
             img, n_rows, n_cols,
             blob_detection_method,
             min_sigma, max_sigma, num_sigma,
             threshold, overlap, min_size,
-            border_padding
+            border_padding, verbose
         )
         self.find_midpoints()
         self.find_wells()
 
     def find_midpoints(self):
+        self.verb.start(1, "finding midpoints")
         if self.status_alignment is False:
             self.align()
         if self.status_fitted is False:
@@ -552,11 +569,12 @@ class WellIsolation(PlateFit2):
         self.rows_midpoints = ((rows_yMinus[1:] - rows_yPlus[:-1])/2) + rows_yPlus[:-1]
         self.cols_midpoints = ((cols_xMinus[1:] - cols_xPlus[:-1])/2) + cols_xPlus[:-1]
         self.status_midpoints = True
+        self.verb.end(2, "finding midpoints")
 
     def find_wells(self):
         if self.status_midpoints is False:
             self.find_midpoints()
-
+        self.verb.start(1, "isolating wells")
         self.well_imgs = []
 
         y_start = np.insert(self.rows_midpoints, 0, 0).round().astype(int)
@@ -573,6 +591,10 @@ class WellIsolation(PlateFit2):
                     ]
                 )
         self.status_wells = True
+        self.verb.end(2, "isolating wells")
+
+    def set_invalid_well(self, invalid_well_idxes:List[int]):
+        self.invalid_wells = self.invalid_wells + invalid_well_idxes
 
     def plot_well_grid(self, figsize=(12, 8)):
         if self.status_wells is False:
@@ -608,38 +630,57 @@ class WellIsolation(PlateFit2):
 
 
 ###################################################
+# Full Wrapper
+###################################################
 
 class Phenomics(WellIsolation): # The parent class will change to the latest endpoint for the pipeline
     '''
-    Last Updated: 7/8/2024
+    Last Updated: 7/9/2024
     '''
     def __init__(self, img, n_rows=8, n_cols=12,
                  blob_detection_method='log',
                  min_sigma=4, max_sigma=50, num_sigma=30,
                  threshold=0.01, overlap=0.1, min_size=180,
-                 border_padding=50
+                 border_padding=50, verbose=True
                  ):
         super().__init__(
             img, n_rows, n_cols,
             blob_detection_method,
             min_sigma, max_sigma, num_sigma,
             threshold, overlap, min_size,
-            border_padding
+            border_padding, verbose
         )
 
     def imsave(self, fname_save):
-        io.imsave(fname_save, self.img, check_contrast=False, quality=100)
+        self.verb.start(1, "Saving Plate Image")
+        io.imsave(fname_save, img_as_ubyte(self.img), check_contrast=False, quality=100)
+        self.verb.end(2, "Saving Plate Image")
 
     def save_operations(self, fname_save):
         '''
         Saves operation figures to fname_save. This function changes depending on the amound of operations from the start to the endpoint
         '''
-
-        fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(20, 20))
+        self.verb.start(1, "saving plate operations")
+        fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(20, 16), tight_layout=True)
         opAx = ax.ravel()
-        opAx[0] = self.plotAx_alignment(opAx[0])
-        opAx[1] = self.plotAx_alignFit(opAx[1])
-        opAx[2] = self.plotAx_well_grid(opAx[2])
-        opAx[3].implot(self.img)
-        fig.savefig(fname_save)
-        fig.close()
+        with plt.ioff():
+            self.plotAx_alignment(opAx[0])
+            self.plotAx_fitting(opAx[1])
+            self.plotAx_well_grid(opAx[2])
+            opAx[3].imshow(self.img)
+            opAx[3].set_title("Final Image")
+            fig.savefig(fname_save)
+        plt.close(fig)
+        self.verb.end(2, "saving plate operations")
+
+    def save_wells(self, fpath_folder, name_prepend="", filetype=".png"):
+        if self.status_wells is False:
+            self.find_wells()
+        self.verb.start(1, "saving isolated well images")
+        for idx, well in enumerate(self.well_imgs):
+            self.verb.body(2, f"saving well: {idx}")
+            io.imsave(
+                f"{fpath_folder}/{name_prepend}well_{idx}{filetype}",
+                img_as_ubyte(well), quality=100, check_contrast=False
+            )
+        self.verb.end(2, "saving isolated well images")
