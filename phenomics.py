@@ -633,7 +633,7 @@ class WellIsolation(PlateFit2):
 # Full Wrapper
 ###################################################
 
-class Phenomics(WellIsolation): # The parent class will change to the latest endpoint for the pipeline
+class AnalyzePhenomics(WellIsolation): # The parent class will change to the latest endpoint for the pipeline
     '''
     Last Updated: 7/9/2024
     '''
