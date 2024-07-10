@@ -641,8 +641,11 @@ class AnalyzePhenomics(WellIsolation): # The parent class will change to the lat
                  blob_detection_method='log',
                  min_sigma=4, max_sigma=50, num_sigma=30,
                  threshold=0.01, overlap=0.1, min_size=180,
-                 border_padding=50, verbose=True
+                 border_padding=50, verbose=True, sample_name=None
                  ):
+        if sample_name is not None:
+            verb = Verbosity(verbose)
+            verb.title(sample_name)
         super().__init__(
             img, n_rows, n_cols,
             blob_detection_method,
