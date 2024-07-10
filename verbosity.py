@@ -25,7 +25,7 @@ class Verbosity:
         now = datetime.now()
         now_str = now.strftime("%d/%m/%Y %H:%M:%S")
         if 1 <= self.verbose_lvl:
-            print(f"\n[{now_str}] title")
+            print(f"\n[{now_str}] {title}")
             print(self.divider)
 
 
