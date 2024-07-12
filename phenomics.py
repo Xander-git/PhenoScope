@@ -283,8 +283,11 @@ class PlateAlignment(PlateBase):
             np.array([x_align, y_align]) - np.array([x0, y0])
         )
         self.degree_of_rotation = (
-                math.acos(adj/hyp)*(180.0/math.pi)*-1.0
+                math.acos(adj/hyp)*(180.0/math.pi)
         )
+        if y1>y_align:
+            self.degree_of_rotation = self.degree_of_rotation * -1
+
         self._set_img(
             ski.transform.rotate(
                 self.input_img,
