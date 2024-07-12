@@ -263,11 +263,11 @@ class PlateAlignment(PlateBase):
 
         m, b = np.polyfit(top_row.x, top_row.y, 1)
 
-        x0 = min(top_row.x);
+        x0 = min(top_row.x)
         y0 = m*x0 + b
-        x1 = max(top_row.x);
+        x1 = max(top_row.x)
         y1 = m*x1 + b
-        x_align = x1;
+        x_align = x1
         y_align = y0
         self.input_alignment_vector = pd.DataFrame({
             'x': np.array([x0, x1]),
@@ -282,11 +282,12 @@ class PlateAlignment(PlateBase):
         adj = np.linalg.norm(
             np.array([x_align, y_align]) - np.array([x0, y0])
         )
-        self.degree_of_rotation = (
-                math.acos(adj/hyp)*(180.0/math.pi)
-        )
-        if y1>y_align:
-            self.degree_of_rotation = self.degree_of_rotation * -1
+
+        if y1 > y_align:
+            self.degree_of_rotation = math.acos(adj/hyp)*(180.0/math.pi)*-1.0
+        else:
+            self.degree_of_rotation = math.acos(adj/hyp)*(180.0/math.pi)
+
 
         self._set_img(
             ski.transform.rotate(
@@ -337,102 +338,8 @@ class PlateAlignment(PlateBase):
         return ax
 
 
+
 class PlateFit(PlateAlignment):
-    '''
-    Last Updated: 7/9/2024
-    '''
-    border_padding = None
-    padded_img = cropping_rect = None
-
-    status_fitted = False
-    status_pad_img = False
-
-    def __init__(self, img, n_rows=8, n_cols=12,
-                 blob_detection_method='log',
-                 min_sigma=4, max_sigma=40, num_sigma=45,
-                 threshold=0.01, overlap=0.1, min_size=200,
-                 border_padding=50, verbose=True
-                 ):
-        super().__init__(img, n_rows, n_cols,
-                         blob_detection_method,
-                         min_sigma, max_sigma, num_sigma,
-                         threshold, overlap, min_size, verbose)
-        self.border_padding = border_padding
-        self.fit_plate()
-
-    def fit_plate(self):
-        if self.status_alignment is False:
-            self.align()
-        self.verb.start("plate fitting")
-        img = []
-        for color_idx in range(3):
-            img.append(np.expand_dims(
-                np.pad(self.img[:, :, color_idx], (self.border_padding,), mode='edge', ), axis=2))
-        img = np.concatenate(img, axis=2)
-
-        self.padded_img = img.copy()
-        self._set_img(img)
-        self._update_blobs()
-        bound_L = math.floor(self.blobs.cols[0].x_minus.min() - self.border_padding)
-        bound_R = math.ceil(self.blobs.cols[-1].x_plus.max() + self.border_padding)
-        bound_T = math.floor(self.blobs.rows[0].y_minus.min() - self.border_padding)
-        bound_B = math.ceil(self.blobs.rows[-1].y_plus.max() + self.border_padding)
-        img = img[bound_T:bound_B, bound_L:bound_R]
-        with plt.ioff():
-            self.cropping_rect = plt.Rectangle((bound_L, bound_T),
-                                               bound_R - bound_L,
-                                               bound_B - bound_T,
-                                               fill=False, edgecolor='white')
-        self._set_img(img)
-        self._update_blobs()
-        self.status_fitted = True
-        self.verb.end("plate fitting")
-
-    def plot_fitting(self):
-        if self.status_alignment is False:
-            self.align()
-        if self.status_fitted is False:
-            self.fit_plate()
-        with plt.ioff():
-            alignFit_fig, alignFit_ax = plt.subplots(nrows=1, ncols=2, figsize=(14, 10),
-                                                     tight_layout=True)
-            alignFit_ax[0].grid(False)
-
-            alignFit_ax[0].imshow(self.padded_img)
-            alignFit_ax[0].add_patch(self.cropping_rect)
-            alignFit_ax[0].set_title("Cropping Outline")
-
-            alignFit_ax[1].imshow(self.img)
-            alignFit_ax[1].set_title("Fitted Image")
-            for idx, row in self.blobs.table.iterrows():
-                c = plt.Circle((row['x'], row['y']), row['radius'], color='green', fill=False)
-                alignFit_ax[1].add_patch(c)
-            alignFit_ax[1].grid(False)
-        return alignFit_fig, alignFit_ax
-
-    def plotAx_alignFit(self, ax: plt.Axes):
-        if self.status_alignment is False:
-            self.align()
-        if self.status_fitted is False:
-            self.fit_plate()
-
-        with plt.ioff():
-            ax.grid(False)
-            ax.imshow(self.padded_img)
-            ax.add_patch(self.cropping_rect)
-            ax.set_title("Cropping Outline")
-        return ax
-
-    def get_fitted_blob_plot(self):
-        with plt.ioff():
-            if self.status_fitted is False:
-                self.fit_plate()
-
-            fig, ax = plot_blobs(self.img, self.blobs.table, grayscale=False)
-        return fig, ax
-
-
-class PlateFit2(PlateAlignment):
     border_padding = None
     padded_img = cropping_rect = None
 
@@ -522,7 +429,7 @@ class PlateFit2(PlateAlignment):
         return fig, ax
 
 
-class WellIsolation(PlateFit2):
+class WellIsolation(PlateFit):
     '''
     Last Updated: 7/9/2024
     '''
