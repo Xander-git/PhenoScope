@@ -44,7 +44,7 @@ class CellBlobsBase:
             self.search_blobs_LoG(img)
 
     def search_blobs_LoG(self, img):
-        self.verb.start(1, "blob finding using LoG")
+        self.verb.start("blob finding using LoG")
         self.table = pd.DataFrame(ski.feature.blob_log(
             ski.color.rgb2gray(img),
             min_sigma=self.min_sigma,
@@ -183,13 +183,14 @@ class PlateBase:
     blobs = None
 
     verb = None
+
     def __init__(self, img, n_rows=8, n_cols=12,
                  blob_detection_method="log",
                  min_sigma=4, max_sigma=40, num_sigma=45,
                  threshold=0.01, overlap=0.1, min_size=200,
-                 verbose = True
+                 verbose=True
                  ):
-        self.verb = Verbosity(verbose)
+        self._set_verbose(verbose)
         self.input_img = img
         self._set_img(img)
         self.blob_detection_method = blob_detection_method
@@ -204,9 +205,15 @@ class PlateBase:
         self.threshold = threshold;
         self.overlap = overlap
 
-        self.verb.start(1, "initial blob search")
-        self.verb.end(2, "initial blob search")
+        self.verb.start("initial blob search")
+        self.verb.end("initial blob search")
         self._update_blobs()
+
+    def _set_verbose(self, verbose=False):
+        if type(verbose) == Verbosity:
+            self.verb = verbose
+        else:
+            self.verb = Verbosity(verbose)
 
     def _set_img(self, img):
         self.img = img
@@ -250,7 +257,7 @@ class PlateAlignment(PlateBase):
 
 
     def align(self):
-        self.verb.start(1, "plate alignment")
+        self.verb.start("plate alignment")
 
         top_row = self.blobs.rows[0]
 
@@ -285,11 +292,11 @@ class PlateAlignment(PlateBase):
                 mode='edge'
             )
         )
-        self.verb.body(1, "Updating blobs")
+        self.verb.body("Updating blobs")
         self._update_blobs()
         self.aligned_blobs = self.blobs
         self.status_alignment = True
-        self.verb.end(2, "plate alignment")
+        self.verb.end("plate alignment")
 
 
     def plot_alignment(self):
@@ -353,7 +360,7 @@ class PlateFit(PlateAlignment):
     def fit_plate(self):
         if self.status_alignment is False:
             self.align()
-        self.verb.start(1, "plate fitting")
+        self.verb.start("plate fitting")
         img = []
         for color_idx in range(3):
             img.append(np.expand_dims(
@@ -376,7 +383,7 @@ class PlateFit(PlateAlignment):
         self._set_img(img)
         self._update_blobs()
         self.status_fitted = True
-        self.verb.end(2, "plate fitting")
+        self.verb.end("plate fitting")
 
     def plot_fitting(self):
         if self.status_alignment is False:
@@ -456,7 +463,7 @@ class PlateFit2(PlateAlignment):
     def fit_plate(self):
         if self.status_alignment is False:
             self.align()
-        self.verb.start(1, "plate fitting")
+        self.verb.start("plate fitting")
         bound_L = math.floor(self.blobs.cols[0].x_minus.min() - self.border_padding)
         bound_R = math.ceil(self.blobs.cols[-1].x_plus.max() + self.border_padding)
         bound_T = math.floor(self.blobs.rows[0].y_minus.min() - self.border_padding)
@@ -469,7 +476,7 @@ class PlateFit2(PlateAlignment):
                                                fill=False, edgecolor='white')
         self._update_blobs()
         self.status_fitted = True
-        self.verb.end(2, "plate fitting")
+        self.verb.end("plate fitting")
 
     def plot_fitting(self):
         if self.status_alignment is False:
@@ -542,7 +549,7 @@ class WellIsolation(PlateFit2):
         self.find_wells()
 
     def find_midpoints(self):
-        self.verb.start(1, "finding midpoints")
+        self.verb.start("finding midpoints")
         if self.status_alignment is False:
             self.align()
         if self.status_fitted is False:
@@ -569,12 +576,12 @@ class WellIsolation(PlateFit2):
         self.rows_midpoints = ((rows_yMinus[1:] - rows_yPlus[:-1])/2) + rows_yPlus[:-1]
         self.cols_midpoints = ((cols_xMinus[1:] - cols_xPlus[:-1])/2) + cols_xPlus[:-1]
         self.status_midpoints = True
-        self.verb.end(2, "finding midpoints")
+        self.verb.end("finding midpoints")
 
     def find_wells(self):
         if self.status_midpoints is False:
             self.find_midpoints()
-        self.verb.start(1, "isolating wells")
+        self.verb.start("isolating wells")
         self.well_imgs = []
 
         y_start = np.insert(self.rows_midpoints, 0, 0).round().astype(int)
@@ -591,7 +598,7 @@ class WellIsolation(PlateFit2):
                     ]
                 )
         self.status_wells = True
-        self.verb.end(2, "isolating wells")
+        self.verb.end("isolating wells")
 
     def set_invalid_well(self, invalid_well_idxes:List[int]):
         self.invalid_wells = self.invalid_wells + invalid_well_idxes
@@ -655,15 +662,15 @@ class AnalyzePhenomics(WellIsolation): # The parent class will change to the lat
         )
 
     def imsave(self, fname_save):
-        self.verb.start(1, "Saving Plate Image")
+        self.verb.start("Saving Plate Image")
         io.imsave(fname_save, img_as_ubyte(self.img), check_contrast=False, quality=100)
-        self.verb.end(2, "Saving Plate Image")
+        self.verb.end("Saving Plate Image")
 
     def save_operations(self, fname_save):
         '''
         Saves operation figures to fname_save. This function changes depending on the amound of operations from the start to the endpoint
         '''
-        self.verb.start(1, "saving plate operations")
+        self.verb.start("saving plate operations")
         fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(20, 16), tight_layout=True)
         opAx = ax.ravel()
         with plt.ioff():
@@ -674,16 +681,16 @@ class AnalyzePhenomics(WellIsolation): # The parent class will change to the lat
             opAx[3].set_title("Final Image")
             fig.savefig(fname_save)
         plt.close(fig)
-        self.verb.end(2, "saving plate operations")
+        self.verb.end("saving plate operations")
 
     def save_wells(self, fpath_folder, name_prepend="", filetype=".png"):
         if self.status_wells is False:
             self.find_wells()
-        self.verb.start(1, "saving isolated well images")
+        self.verb.start("saving isolated well images")
         for idx, well in enumerate(self.well_imgs):
-            self.verb.body(2, f"saving well: {idx}")
+            self.verb.body(f"saving well: {idx}")
             io.imsave(
                 f"{fpath_folder}/{name_prepend}well_{idx}{filetype}",
                 img_as_ubyte(well), quality=100, check_contrast=False
             )
-        self.verb.end(2, "saving isolated well images")
+        self.verb.end("saving isolated well images")
