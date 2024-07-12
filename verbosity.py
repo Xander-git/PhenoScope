@@ -34,7 +34,7 @@ class Verbosity:
             self.verbose_lvl = lvl
 
     def title(self, title):
-        print("")
+        if self.verbose_lvl >= self.lvl_title: print("")
         self._verb_msg(self.lvl_title, f"{title}\n{self.divider}")
 
     def start(self, process_name):
@@ -48,8 +48,7 @@ class Verbosity:
 
     def subprocess(self, msg):
         self._verb_msg(self.lvl_subprocess, f"{self.indent}{self.counter}. {msg}")
-        if self.verbose_lvl >= self.lvl_subprocess:
-            self.counter += 1
+        if self.verbose_lvl >= self.lvl_subprocess: self.counter += 1
 
     def _verb_msg(self, lvl, msg):
         if lvl <= self.verbose_lvl:
