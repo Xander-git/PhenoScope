@@ -283,6 +283,7 @@ class PlateAlignment(PlateBase):
             np.array([x_align, y_align]) - np.array([x0, y0])
         )
 
+        # Image Y-axis goes top to bottom
         if y1 < y_align:
             self.degree_of_rotation = math.acos(adj/hyp)*(180.0/math.pi)*-1.0
         else:
@@ -549,7 +550,7 @@ class WellIsolation(PlateFit):
 # Full Wrapper
 ###################################################
 
-class Phenotype(WellIsolation): # The parent class will change to the latest endpoint for the pipeline
+class PlateNormalize(WellIsolation): # The parent class will change to the latest endpoint for the pipeline
     '''
     Last Updated: 7/9/2024
     '''

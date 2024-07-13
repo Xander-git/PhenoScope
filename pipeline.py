@@ -1,7 +1,7 @@
 import os
 from skimage.io import imread
 
-from .phenomics import Phenotype
+from .phenomics import PlateNormalize
 from .verbosity import Verbosity
 from joblib import Parallel, delayed
 
@@ -28,7 +28,7 @@ def analysis_pipeline(fpath_img_dataset, fpath_output, n_jobs=4 ):
             verb = Verbosity(True)
             verb.start(f"analysis of sample: {sample_name}")
             img = imread(fpath_curr_img)
-            data = Phenotype(img, verbose=False, sample_name=f"{sample_name}")
+            data = PlateNormalize(img, verbose=False, sample_name=f"{sample_name}")
 
             data.imsave(f"{fpath_output}/fitted_imgs/{sample_name}.png")
             data.save_operations(f"{fpath_output}/operations/{sample_name}.png")
