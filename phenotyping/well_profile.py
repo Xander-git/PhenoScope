@@ -1,25 +1,38 @@
+# ----- Imports -----
 import pandas as pd
 import skimage.color as skcolor
 
-import cellprofiler_core as cpc
-import cellprofiler.modules as cpm
+from cellprofiler_core.preferences import set_headless
+from cellprofiler_core.image import ImageSetList, Image
+from cellprofiler_core.object import ObjectSet
+from cellprofiler_core.measurement import Measurements
+from cellprofiler_core.pipeline import Pipeline
+from cellprofiler_core.workspace import Workspace
+from cellprofiler_core.module import Module
 
+from cellprofiler.modules.identifyprimaryobjects import IdentifyPrimaryObjects
+from cellprofiler.modules.splitormergeobjects import SplitOrMergeObjects
 
+set_headless()
+
+# ----- Pkg Relative Import -----
+
+# ----- Main Class Definition -----
 class WellProfile:
     # Inputs
     input_img = gray_img = None
     plate_idx = None
 
-    img_set_list = None
-    img_set = None
+    img_set_list = ImageSetList()
+    img_set = img_set_list.get_image_set(0)
 
-    obj_set = None
-    cpc_measurements = None
-    pipeline = None
+    obj_set = ObjectSet()
+    cpc_measurements = Measurements()
+    pipeline = Pipeline()
 
     img = None
     img_name = None
-    primary_obj_name = "PrimaryObjects"
+    primary_obj_name = None
     colony_obj_name = None
     workspace=None
 
@@ -36,6 +49,7 @@ class WellProfile:
                  merge_option="Distance", relabel_option="Merge",
                  distance_threshold=0, ref_point="Closest Point"):
         self.colony_obj_name = f"{well_name}_colony"
+        self.primary_obj_name = f"{well_name}_PrimaryObjects"
         self._init_workspace()
         self._set_img(well_img, f"{well_name}")
         self._run_id_primary_obj()
@@ -50,17 +64,22 @@ class WellProfile:
     )
 
     def _run_id_primary_obj(self):
-        mod = cpm.identifyprimaryobjects.IdentifyPrimaryObjects()
+        mod = IdentifyPrimaryObjects()
         mod.x_name.value = self.img_name
-        mod.y_name.value = self.primary_obj_name
 
-        self.pipeline.run_module(mod, self.workspace)
+        counter = 2
+        while self.primary_obj_name in self.obj_set.get_object_names():
+            self.primary_obj_name = f"{self.primary_obj_name}_{counter}"
+            counter += 1
+        mod.y_name.value = self.primary_obj_name
+        self.pipeline.add_module(mod)
+        mod.run(self.workspace)
 
     def _run_merge2colony(self, merge_option="Distance",
                           relabel_option="Merge",
                           distance_threshold=0,
                           ref_point="Closest Point"):
-        mod = cpm.splitormergeobjects.SplitOrMergeObjects()
+        mod = SplitOrMergeObjects()
         mod.objects_name.value = self.primary_obj_name
         mod.output_objects_name.value = self.colony_obj_name
         mod.merge_option.value = merge_option
@@ -77,7 +96,7 @@ class WellProfile:
         self.input_img = well_img
         self.img_name = sample_name
         self.gray_img = skcolor.rgb2gray(self.input_img)
-        self.img = cpc.image.Image(self.gray_img)
+        self.img = Image(self.gray_img)
         self.img_set.add(self.img_name, self.img)
 
     def _init_workspace(self):
@@ -85,9 +104,9 @@ class WellProfile:
         ----- Objective -----
         Initialize CellProfiler Workspace and Identifies Primary Object in Images. This has to be done first before running other modules
         '''
-        self.workspace = cpc.workspace.Workspace(
+        self.workspace = Workspace(
             self.pipeline,
-            cpc.module.Module(),
+            Module(),
             self.img_set,
             self.obj_set,
             self.cpc_measurements,
@@ -95,20 +114,3 @@ class WellProfile:
         )
         self.status_workspace = True
 
-    def _init_cpc(self):
-        counter = 0
-        def _sub_init_cpc(counter):
-            try:
-                img_set_list = cpc.image.ImageSetList()
-                img_set = img_set_list.get_image_set(0)
-
-                obj_set = cpc.object.ObjectSet()
-                cpc_measurements = cpc.measurement.Measurements()
-                pipeline = cpc.pipeline.Pipeline()
-            except:
-                if counter<50:
-                    counter+=1
-                    _sub_init_cpc(counter)
-            else:
-                return img_set_list, img_set, obj_set, cpc_measurements, pipeline
-        self.img_set_list, self.img_set, self.obj_set, self.cpc_measurements, self.pipeline = _sub_init_cpc(counter)
