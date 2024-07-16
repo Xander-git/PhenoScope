@@ -1,6 +1,5 @@
 from datetime import datetime
 
-
 class Verbosity:
     '''
     Vebosity Class:
