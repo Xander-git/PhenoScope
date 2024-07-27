@@ -1,0 +1,28 @@
+name: phenomics
+channels:
+  - conda-forge
+  - bioconda
+  - r
+  - defaults
+dependencies:
+  - matplotlib
+  - numpy
+  - pandas
+  - scikit-image
+  - jupyter
+  - joblib
+  - boto3
+  - docutils
+  - h5py
+  - imageio
+  - inflect
+  - mahotas
+  - mysqlclient
+  - psutil
+  - pyzmq
+  - scipy
+  - scyjava
+  - bioconda::centrosome
+  - python=3.10
+  - bioconda::cellprofiler
+  - bioconda::cellprofiler-core

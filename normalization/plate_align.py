@@ -5,6 +5,12 @@ import math
 import skimage as ski
 import matplotlib.pyplot as plt
 
+import os
+import logging
+logger_name = "phenomics-normalization"
+log = logging.getLogger(logger_name)
+logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
+
 # ----- Pkg Relative Import -----
 
 from .plate_base import PlateBase
@@ -22,36 +28,49 @@ class PlateAlignment(PlateBase):
 
     degree_of_rotation = None
 
+    # Setting
+    run_aligment = True
+
     # Process Check
     status_alignment = False
-    status_alignmentPlot = False
 
     # Class Constructor
-    def __init__(self, img, n_rows=8, n_cols=12,
-                 blob_detection_method="log",
-                 min_sigma=4, max_sigma=40, num_sigma=45,
-                 threshold=0.01, overlap=0.1, min_size=200,
-                 verbose=True
-                 ):
-        super().__init__(img, n_rows, n_cols, blob_detection_method,
-                         min_sigma, max_sigma, num_sigma,
-                         threshold, overlap, min_size, verbose)
+    def __init__(self, img, n_rows=8, n_cols=12, align=True):
+        super().__init__(img, n_rows, n_cols)
+        self.run_aligment = align
 
-        self.unaligned_blobs = self.blobs
-        self.align()
-
-
+    def run(self):
+        super().run()
+        try:
+            if self.run_aligment:
+                self.align()
+        except:
+            log.warning("Could not align image")
+            self.status_validity = False
+            self._invalid_op = "Invalid: Alignment"
+            self._invalid_op_img = self.img
+            self._invalid_blobs = self.blobs
 
     def align(self):
-        self.verb.start("plate alignment")
+        log.info("Starting plate alignment")
+        if self.status_initial_blobs is False:
+            self._update_blobs()
+            self.status_initial_blobs = True
+        self.unaligned_blobs = self.blobs
+        max_row = self.blobs.rows[0]
 
-        top_row = self.blobs.rows[0]
+        # Sets normalization algorithm to use row with the most blobs found
+        # Varied performance across different cases
+        #
+        for row in self.blobs.rows[1:]:
+            if len(max_row) < len(row):
+                max_row = row
 
-        m, b = np.polyfit(top_row.x, top_row.y, 1)
+        m, b = np.polyfit(max_row.x, max_row.y, 1)
 
-        x0 = min(top_row.x)
+        x0 = min(max_row.x)
         y0 = m*x0 + b
-        x1 = max(top_row.x)
+        x1 = max(max_row.x)
         y1 = m*x1 + b
         x_align = x1
         y_align = y0
@@ -77,17 +96,15 @@ class PlateAlignment(PlateBase):
 
         self._set_img(
             ski.transform.rotate(
-                self.input_img,
+                self.img,
                 self.degree_of_rotation,
                 mode='edge'
             )
         )
-        self.verb.body("Updating blobs")
+        log.info("Updating blobs after alignment")
         self._update_blobs()
         self.aligned_blobs = self.blobs
         self.status_alignment = True
-        self.verb.end("plate alignment")
-
 
     def plot_alignment(self):
         if self.status_alignment is False:
@@ -102,7 +119,7 @@ class PlateAlignment(PlateBase):
             alignFit_ax[1].set_title("Aligned Image")
         return alignFit_fig, alignFit_ax
 
-    def plotAx_alignment(self, ax: plt.Axes):
+    def plotAx_alignment(self, ax: plt.Axes, fontsize=24):
         if self.status_alignment is False:
             self.align()
         with plt.ioff():
@@ -112,7 +129,7 @@ class PlateAlignment(PlateBase):
             ax.plot(
                 self.alignment_vector['x'], self.alignment_vector['y'], color='white', linestyle='--'
             )
-            ax.set_title(f'Input Alignment Rotation {self.degree_of_rotation} | Red: Original | Yellow: New')
+            ax.set_title(f'Input Alignment Rotation {self.degree_of_rotation:.4f} | Red: Original | Yellow: New',fontsize=fontsize)
             for idx, row in self.unaligned_blobs.table.iterrows():
                 c = plt.Circle((row['x'], row['y']), row['radius'], color='red', fill=False)
                 ax.add_patch(c)

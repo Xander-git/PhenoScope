@@ -1,116 +1,93 @@
-# ----- Imports -----
-import pandas as pd
-import skimage.color as skcolor
+from copy import deepcopy
+import matplotlib.pyplot as plt
+import numpy as np
+import skimage as ski
+from ..cellprofiler_api.cp_api_analysis import CellProfilerApiAnalysis
 
-from cellprofiler_core.preferences import set_headless
-from cellprofiler_core.image import ImageSetList, Image
-from cellprofiler_core.object import ObjectSet
-from cellprofiler_core.measurement import Measurements
-from cellprofiler_core.pipeline import Pipeline
-from cellprofiler_core.workspace import Workspace
-from cellprofiler_core.module import Module
+import os
+import logging
+logger_name = "phenomics-phenotyping"
+log = logging.getLogger(logger_name)
+logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
 
-from cellprofiler.modules.identifyprimaryobjects import IdentifyPrimaryObjects
-from cellprofiler.modules.splitormergeobjects import SplitOrMergeObjects
-
-set_headless()
-
-# ----- Pkg Relative Import -----
-
-# ----- Main Class Definition -----
 class WellProfile:
-    # Inputs
-    input_img = gray_img = None
-    plate_idx = None
+    input_img = None
+    gray_img = None
+    segmentation = None
+    unfiltered_segmentation = None
+    results = None
 
-    img_set_list = ImageSetList()
-    img_set = img_set_list.get_image_set(0)
+    well_name = None
+    primary_name = None
+    merged_name = None
+    filled_name = None
+    colony_name = None
+    noise_name = None
 
-    obj_set = ObjectSet()
-    cpc_measurements = Measurements()
-    pipeline = Pipeline()
+    cp_connection = None
+    status_validity = None
 
-    img = None
-    img_name = None
-    primary_obj_name = None
-    colony_obj_name = None
-    workspace=None
 
-    colony_obj = None
+    def __init__(self, img, sample_name,
+                 auto_run=True):
+        self.input_img = img
+        self.gray_img = ski.color.rgb2gray(img)
 
-    status_analyis=False
-    status_workspace = False
+        self._set_name(sample_name)
+        if auto_run:
+            self.run_analysis()
 
-    # TODO: Integrate a settings option
-    settings = {
+    def run_analysis(self):
+        cp_connection = CellProfilerApiAnalysis(self.input_img, self.well_name)
+        results = cp_connection.run()
+        self.results = results.results
+        self.segmentation = results.segmentation
+        self.unfiltered_segmentation = results.unfiltered_segmentation
+        self.status_validity = deepcopy(results.status_validity)
 
-    }
-    def __init__(self, well_img, well_name,
-                 merge_option="Distance", relabel_option="Merge",
-                 distance_threshold=0, ref_point="Closest Point"):
-        self.colony_obj_name = f"{well_name}_colony"
-        self.primary_obj_name = f"{well_name}_PrimaryObjects"
-        self._init_workspace()
-        self._set_img(well_img, f"{well_name}")
-        self._run_id_primary_obj()
-        self._run_merge2colony(
-            merge_option, relabel_option, distance_threshold, ref_point
-        )
+    def get_results(self):
+        return self.results
 
-    def _get_metric(self, metric_class, metric_name):
-        return self.cpc_measurements.get_measurement(
-            self.colony_obj_name,
-            f"{metric_class}_{metric_name}_{self.img_name}"
-    )
+    def _set_name(self, well_name):
+        self.well_name = well_name
+        self.primary_name = f"{well_name}_PrimaryObjects"
+        self.merged_name = f"{well_name}_MergedObjects"
+        self.filled_name = f"{well_name}_FilledObjects"
+        self.noise_name = f"{well_name}_Noise"
+        self.colony_name = f"{well_name}_Colony"
 
-    def _run_id_primary_obj(self):
-        mod = IdentifyPrimaryObjects()
-        mod.x_name.value = self.img_name
+    def plotAx_colony(self, ax, cmap="viridis"):
+        img = self.input_img[self.segmentation > 0, :]
+        with plt.ioff():
+            ax.imshow(img, cmap=cmap)
+            ax.set_title("Segmented Colony")
 
-        counter = 2
-        while self.primary_obj_name in self.obj_set.get_object_names():
-            self.primary_obj_name = f"{self.primary_obj_name}_{counter}"
-            counter += 1
-        mod.y_name.value = self.primary_obj_name
-        self.pipeline.add_module(mod)
-        mod.run(self.workspace)
+    def plot_colony(self, cmap="viridis"):
+        with plt.ioff():
+            fig, ax = plt.subplots()
+            self.plotAx_colony(ax, cmap)
+        return fig, ax
 
-    def _run_merge2colony(self, merge_option="Distance",
-                          relabel_option="Merge",
-                          distance_threshold=0,
-                          ref_point="Closest Point"):
-        mod = SplitOrMergeObjects()
-        mod.objects_name.value = self.primary_obj_name
-        mod.output_objects_name.value = self.colony_obj_name
-        mod.merge_option.value = merge_option
-        mod.relabel_option.value = relabel_option
-        mod.distance_threshold.value = distance_threshold
-        mod.where_algorithm.value=ref_point
+    def plotAx_segmentation(self, ax, cmap="viridis"):
+        with plt.ioff():
+            if self.status_validity:
+                ax.imshow(self.segmentation, cmap=cmap)
+                ax.set_title("Segmented Colony")
+            else:
+                ax.imshow(self.unfiltered_segmentation, cmap="YlOrRd")
+        return ax
 
-        self.pipeline.run_module(mod, self.workspace)
-        self.colony_obj = self.obj_set.get_objects(
-            self.colony_obj_name
-        )
+    def plotAx_unfiltered(self, ax, unfiltered_img, gray_img ,cmap="viridis"):
+        with plt.ioff():
+            if self.status_validity:
+                ax.imshow(unfiltered_img, cmap=cmap)
+                ax.set_title("Segmented Colony")
+            else:
+                ax.imshow(self.gray_img, cmap="YlOrRd")
+        return ax
 
-    def _set_img(self, well_img, sample_name):
-        self.input_img = well_img
-        self.img_name = sample_name
-        self.gray_img = skcolor.rgb2gray(self.input_img)
-        self.img = Image(self.gray_img)
-        self.img_set.add(self.img_name, self.img)
-
-    def _init_workspace(self):
-        '''
-        ----- Objective -----
-        Initialize CellProfiler Workspace and Identifies Primary Object in Images. This has to be done first before running other modules
-        '''
-        self.workspace = Workspace(
-            self.pipeline,
-            Module(),
-            self.img_set,
-            self.obj_set,
-            self.cpc_measurements,
-            self.img_set_list
-        )
-        self.status_workspace = True
-
+    def plot_segmentation(self, cmap='viridis'):
+        with plt.ioff():
+            fig, ax = plt.subplots()
+            self.plotAx_segmentation(ax, cmap)
+        return fig, ax
