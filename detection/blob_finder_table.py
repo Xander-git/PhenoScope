@@ -20,7 +20,7 @@ class BlobFinderTable(BlobFinderBase):
 
     left_bound = right_bound = upper_bound = lower_bound = None
     def __init__(self, img, n_rows=8, n_cols=12, blob_detect_method="log",
-                 min_sigma=4, max_sigma=40, num_sigma=45,
+                 min_sigma=2, max_sigma=35, num_sigma=45,
                  threshold=0.01, overlap=0.1
                  ):
         super().__init__(img, blob_detect_method,

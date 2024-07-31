@@ -7,11 +7,9 @@ from typing import List
 
 import logging
 
-import os
 import logging
-logger_name = "phenomics-cellprofiler_api"
-log = logging.getLogger(logger_name)
-logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
+log = logging.getLogger(__file__)
+logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|%(name)s] %(message)s')
 # ----- Pkg Relative Import -----
 from .cp_api_measure_texture import CellProfilerApiMeasureTexture
 
@@ -43,22 +41,26 @@ class CellProfilerApiAnalysis(CellProfilerApiMeasureTexture):
 	# 	finally:
 	# 		self.workspace.close()
 
-	def run(self):
-		Results = namedtuple("Results",["results","segmentation", "unfiltered_segmentation", "status_validity"])
-
-		try:
-			self._init_workspace()
-		except:
-			log.warning(f"Could not intitialize workspace for {self.well_name}", exc_info=True)
-			self.status_validity = False
+	def run(self, img, name):
+		Results = namedtuple("Results",["results", "status_validity"])
+		self._set_name(name)
+		self._set_img(img)
+		self.status_validity = True
+		# try:
+		# 	self._init_workspace()
+		# except:
+		# 	log.warning(f"Could not intitialize workspace for {self.well_name}", exc_info=True)
+		# 	self.status_validity = False
 
 		try:
 			if self.status_validity:
 				log.debug(f"Identifying & Filtering Image Objects for {self.well_name}")
 				self._run_id_primary_obj()
 				self._run_merge_obj()
-				filled_segmentation = self._run_fill_obj()
-				segmentation = self._run_filter_obj()
+				self._run_fill_obj()
+				self._run_filter_obj()
+				if self.colony.count>1:
+					self.status_validity = False
 		except:
 			log.warning(f"Could not identify objects and filter colony in {self.well_name}", exc_info=True)
 			self.status_validity = False
@@ -88,20 +90,19 @@ class CellProfilerApiAnalysis(CellProfilerApiMeasureTexture):
 			self.status_validity = False
 
 		try:
+			self.pipeline.end_run()
 			self._compile_results()
-			results = Results(self.results_table.copy(), segmentation, filled_segmentation, self.status_validity)
+			results = Results(self.results_table.copy(),
+							  self.status_validity)
 			# results = {
 			# 	"results"                : self.results_table.copy(),
 			# 	"segmentation"           : segmentation,
 			# 	"unfiltered_segmentation": filled_segmentation,
 			# 	"status_validity"        : self.status_validity
 			# }
-			self.workspace.close()
 			return results
 		except:
 			log.warning(f"Could not compile results for {self.well_name}")
-		finally:
-			self.workspace.close()
 
 
 	def get_results(self):
@@ -111,7 +112,7 @@ class CellProfilerApiAnalysis(CellProfilerApiMeasureTexture):
 	def _compile_results(self):
 		validity = pd.DataFrame({
 			f"{self.colony_name}": self.status_validity,
-		}, index=["status_validity"]
+		}, index=["status_valid_analysis"]
 		).astype(int)
 		self.results_table = pd.concat(
 			self.results.values(), axis=0

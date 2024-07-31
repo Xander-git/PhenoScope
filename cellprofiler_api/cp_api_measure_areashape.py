@@ -41,7 +41,7 @@ class CellProfilerApiMeasureAreaShape(CellProfilerApiFilter):
 		mod = MeasureObjectSizeShape()
 		mod.calculate_advanced.value = calculate_adv
 		mod.calculate_zernikes.value = calculate_zernike
-		mod.objects_list.value = self.colony_name
+		mod.objects_list.value = f"{self.colony_name}"
 		self.pipeline.run_module(mod, self.workspace)
 		keys = self._get_feature_keys(self.colony_name,mod)
 		self.keys[f"{MEASUREMENT_CLASS_LABEL}"]=keys

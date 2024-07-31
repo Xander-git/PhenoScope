@@ -1,6 +1,8 @@
 # ----- Imports -----
+import math
 from skimage.filters import threshold_otsu, threshold_triangle
 from skimage.morphology import white_tophat, disk
+from scipy.ndimage import binary_fill_holes
 # ----- Pkg Relative Import -----
 from .blob_finder_table import BlobFinderTable
 
@@ -11,7 +13,6 @@ class BlobFinder(BlobFinderTable):
     '''
     Last Updated: 7/8/2024
     '''
-
     def __init__(self, gray_img, n_rows=8, n_cols=12, blob_detect_method="log",
                  min_sigma=4, max_sigma=40, num_sigma=45,
                  threshold=0.01, overlap=0.1,
@@ -31,14 +32,25 @@ class BlobFinder(BlobFinderTable):
         self._filter_by_border(gray_img.shape, border_filter)
         self.generate_table()
 
+    def _find_circle_info(self):
+            self.table['radius'] = self.table['sigma']*math.sqrt(2)
+            self.table['radius'] += self.table['radius']*0.15
+            self.table.drop(columns='sigma')
+            self.table['area'] = math.pi*(self.table['radius']*self.table['radius'])
+            self.table = self.table[['x', 'y', 'sigma', 'radius', 'area']].reset_index(drop=True)
+
+
     def _filter_by_threshold(self, gray_img, threshold_method):
-        if threshold_method == "triangle":
+        if threshold_method is None:
+            return gray_img
+        elif threshold_method == "triangle":
             thresh = threshold_triangle(gray_img)
         elif threshold_method == "otsu":
             thresh = threshold_otsu(gray_img)
         else:
             thresh = threshold_triangle(gray_img)
         gray_img = gray_img > thresh
+        gray_img = binary_fill_holes(gray_img)
         return gray_img
 
     def _filter_by_white_tophat(self, gray_img, radius):

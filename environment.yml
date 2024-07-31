@@ -1,4 +1,4 @@
-name: phenomics
+name: phenomics-v0.1.0
 channels:
   - conda-forge
   - bioconda
@@ -12,6 +12,7 @@ dependencies:
   - jupyter
   - joblib
   - boto3
+  - opencv
   - docutils
   - h5py
   - imageio

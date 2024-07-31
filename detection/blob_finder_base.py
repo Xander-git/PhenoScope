@@ -14,21 +14,23 @@ logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file
 class BlobFinderBase:
     '''
     Last Updated: 7/8/2024
+
+    Note: Only works on float values
     '''
     table = None
 
     min_sigma = max_sigma = num_sigma = None
-    threshold = overlap =  None
+    threshold = overlap = None
 
     def __init__(self, gray_img, blob_detect_method="log",
-                 min_sigma=4, max_sigma=40, num_sigma=45,
+                 min_sigma=2, max_sigma=40, num_sigma=30,
                  threshold=0.01, overlap=0.1
                  ):
         self.min_sigma = min_sigma
         self.max_sigma = max_sigma
         self.num_sigma = num_sigma
 
-        self.threshold = threshold;
+        self.threshold = threshold
         self.overlap = overlap
 
         if blob_detect_method == "log":

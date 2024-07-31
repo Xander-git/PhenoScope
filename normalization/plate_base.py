@@ -27,7 +27,7 @@ class PlateBase:
     blobs_overlap = 0.1
     blobs_min_size = 180
     blobs_filter_threshold_method = "triangle"
-    blobs_tophat_radius = 10
+    blobs_tophat_radius = 15
     blobs_border_filter = 50
 
     blobs = None
