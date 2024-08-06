@@ -57,14 +57,14 @@ class PlateAlignment(PlateBase):
             self._update_blobs()
             self.status_initial_blobs = True
         self.unaligned_blobs = self.blobs
-        max_row = self.blobs.rows[0]
+
+        max_row = self.blobs.table.groupby("row_num", observed=True)["mse"].mean()
+        max_row = max_row.idxmin()
 
         # Sets normalization algorithm to use row with the most blobs found
         # Varied performance across different cases
         #
-        for row in self.blobs.rows[1:]:
-            if len(max_row) < len(row):
-                max_row = row
+
 
         m, b = np.polyfit(max_row.x, max_row.y, 1)
 

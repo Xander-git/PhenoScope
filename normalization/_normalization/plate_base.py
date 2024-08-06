@@ -15,10 +15,6 @@ class PlateBase:
     '''
     Last Updated: 7/9/2024
     '''
-    input_img = img = gray_img = None
-
-    n_rows = n_cols = None
-
     blobs_detection_method = "log"
     blobs_min_sigma = 4
     blobs_max_sigma = 40
@@ -35,15 +31,20 @@ class PlateBase:
 
     status_initial_blobs = False
     status_validity = True
+    
     _invalid_op = "Normalization run without any issues"
     _invalid_op_img = None
     _invalid_blobs = None
     def __init__(self, img, n_rows=8, n_cols=12):
         self.input_img = img
-        self._set_img(img)
+        self.img = ski.util.img_as_ubyte(img)
         self.n_rows = n_rows
         self.n_cols = n_cols
         log.debug("Initialized Class and Set Image")
+
+    @property
+    def gray_img(self):
+        return ski.color.rgb2gray(self.img)
 
     def run(self):
         # TODO: Integrate autorun switch
@@ -58,18 +59,22 @@ class PlateBase:
 
     def _set_img(self, img):
         self.img = ski.util.img_as_ubyte(img)
-        self.gray_img = ski.color.rgb2gray(self.img)
 
     def _update_blobs(self):
         self.blobs = BlobFinder(
-            self.gray_img, self.n_rows, self.n_cols, self.blobs_detection_method,
-            self.blobs_min_sigma, self.blobs_max_sigma,
-            self.blobs_num_sigma, self.blobs_threshold,
-            self.blobs_overlap,
-            self.blobs_min_size,
-            self.blobs_filter_threshold_method,
-            self.blobs_tophat_radius,
-            self.blobs_border_filter
+            gray_img=self.gray_img,
+            n_rows=self.n_rows,
+            n_cols=self.n_cols,
+            blob_search_method=self.blobs_detection_method,
+            min_sigma=self.blobs_min_sigma,
+            max_sigma=self.blobs_max_sigma,
+            num_sigma=self.blobs_num_sigma,
+            threshold=self.blobs_threshold,
+            max_overlap=self.blobs_overlap,
+            min_size=self.blobs_min_size,
+            filter_threshold_method= self.blobs_filter_threshold_method,
+            tophat_radius=self.blobs_tophat_radius,
+            border_filter=self.blobs_border_filter
         )
 
     def _plotAx_failed_normalization(self, ax):

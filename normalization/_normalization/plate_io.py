@@ -16,7 +16,7 @@ from .plate_grid import PlateGrid
 # ----- Main Class Definition -----
 
 
-class PlateNormalize(PlateGrid): 
+class PlateIO(PlateGrid):
     '''
     Last Updated: 7/9/2024
     '''

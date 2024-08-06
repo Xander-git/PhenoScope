@@ -24,6 +24,7 @@ dependencies:
   - scipy
   - scyjava
   - bioconda::centrosome
+  - seaborn
   - python=3.10
   - bioconda::cellprofiler
   - bioconda::cellprofiler-core

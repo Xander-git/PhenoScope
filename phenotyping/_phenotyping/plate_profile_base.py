@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from ..normalization.plate_normalize import PlateNormalize
+from ..normalization.plate_normalization import PlateNormalization
 from .colony_profile import ColonyProfile
 
 import logging
@@ -10,7 +10,7 @@ log = logging.getLogger(__file__)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|%(name)s] %(message)s')
 
 
-class PlateProfileBase(PlateNormalize):
+class PlateProfileBase(PlateNormalization):
     # TODO: Change plate to be an image instead and have plate be generated from the image
     def __init__(self, img, sample_name, sampling_day=None, n_rows=8, n_cols=12,
                  align=True, fit=True,
