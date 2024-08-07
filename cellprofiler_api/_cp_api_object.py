@@ -16,7 +16,7 @@ log = logging.getLogger(logger_name)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
 
 
-class CellProfilerApiFilter(CellProfilerApiBase):
+class CellProfilerApiObject(CellProfilerApiBase):
 	merge_option = "Distance"
 	relabel_option = "Merge"
 	distance_threshold = 0

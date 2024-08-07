@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from .plate_series_change_over_time import PlateSeriesChangeOverTime
+from ._plate_series_change_over_time import PlateSeriesChangeOverTime
 
 # TODO: Add module logging
 

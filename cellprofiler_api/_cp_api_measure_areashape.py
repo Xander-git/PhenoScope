@@ -9,7 +9,7 @@ log = logging.getLogger(logger_name)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
 
 # ----- Pkg Relative Import -----
-from .cp_api_filter import CellProfilerApiFilter
+from ._cp_api_object import CellProfilerApiObject
 
 # ----- Global Constants -----
 METRIC_LABEL = "Metric"
@@ -20,7 +20,7 @@ MAIN_METRICS = [
 
 # ----- Main Class Definition -----
 # TODO: Cleanup & optimize setting calls
-class CellProfilerApiMeasureAreaShape(CellProfilerApiFilter):
+class CellProfilerApiMeasureAreaShape(CellProfilerApiObject):
 	status_areashape = True
 	areashape_calculate_adv = False
 	areashape_calculate_zernikes = False

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from .blob_finder_particle_filter import BlobFinderParticleFilter
+from ._blob_finder_particle_filter import BlobFinderParticleFilter
 
 
 class BlobFinderBinMSEFilter(BlobFinderParticleFilter):

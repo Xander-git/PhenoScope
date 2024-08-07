@@ -1,13 +1,13 @@
 from copy import deepcopy
 import matplotlib.pyplot as plt
 import skimage as ski
-from ..cellprofiler_api.cp_api_analysis import CellProfilerApiAnalysis
+from ..cellprofiler_api.cell_profiler_api import CellProfilerApi
 
 import logging
 log = logging.getLogger(__file__)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|%(name)s] %(message)s')
 
-cp_connection = CellProfilerApiAnalysis()
+cp_connection = CellProfilerApi()
 class ColonyProfile:
     def __init__(self, img, sample_name,
                  auto_run=True):

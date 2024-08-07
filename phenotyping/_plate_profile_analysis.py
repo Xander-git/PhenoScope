@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from .plate_profile_base import PlateProfileBase
+from ._plate_profile_base import PlateProfileBase
 
 import logging
 log = logging.getLogger(__file__)

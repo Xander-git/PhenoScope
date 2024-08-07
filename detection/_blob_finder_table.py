@@ -3,7 +3,7 @@ import pandas as pd
 import math
 
 # ----- Pkg Relative Imports -----
-from .blob_finder_base import BlobFinderBase
+from ._blob_finder_base import BlobFinderBase
 
 
 # ------ Main Class Definition -----

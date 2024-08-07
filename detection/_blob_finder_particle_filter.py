@@ -4,7 +4,7 @@ from skimage.filters import threshold_otsu, threshold_triangle
 from skimage.morphology import white_tophat, disk
 from scipy.ndimage import binary_fill_holes
 # ----- Pkg Relative Import -----
-from .blob_finder_table import BlobFinderTable
+from ._blob_finder_table import BlobFinderTable
 
 
 # ----- Main Class Definition -----

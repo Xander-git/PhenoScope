@@ -13,7 +13,7 @@ logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file
 
 # ----- Pkg Relative Import -----
 
-from .plate_base import PlateBase
+from ._plate_base import PlateBase
 
 # ----- Main Class Definition -----
 
@@ -59,7 +59,7 @@ class PlateAlignment(PlateBase):
         self.unaligned_blobs = self.blobs
 
         max_row = self.blobs.table.groupby("row_num", observed=True)["mse"].mean()
-        max_row = max_row.idxmin()
+        max_row = self.blobs.rows[max_row.idxmin()]
 
         # Sets normalization algorithm to use row with the most blobs found
         # Varied performance across different cases

@@ -1,6 +1,6 @@
 from skimage.color import rgb2gray
 
-from .plate_io import PlateIO
+from ._plate_io import PlateIO
 from ..detection.clahe_boost import ClaheBoost
 
 

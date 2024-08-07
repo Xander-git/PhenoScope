@@ -10,7 +10,7 @@ logger_name = "phenomics-normalization"
 log = logging.getLogger(logger_name)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
 # ----- Pkg Relative Import -----
-from .plate_align import PlateAlignment
+from ._plate_align import PlateAlignment
 from ..util.plotting import plot_blobs
 
 

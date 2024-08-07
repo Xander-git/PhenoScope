@@ -11,7 +11,7 @@ log = logging.getLogger(logger_name)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
 
 # ----- Pkg Relative Import -----
-from .plate_grid import PlateGrid
+from ._plate_grid import PlateGrid
 
 # ----- Main Class Definition -----
 
