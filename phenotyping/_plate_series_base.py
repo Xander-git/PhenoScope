@@ -3,19 +3,18 @@ from typing import List
 import numpy as np
 
 from .plate_profile import PlateProfile
-from .colony_profile import cp_connection
 
 import logging
 
 log = logging.getLogger(__file__)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|%(name)s] %(message)s')
 
+
 class PlateSeriesBase:
 
     def __init__(self, imgs: List[np.ndarray], sample_name, day_index=None,
                  n_rows=8, n_cols=12, align=True, fit=True, auto_analyze=True
                  ):
-        cp_connection.refresh()
         self.img_set = imgs
         self.sample_name = sample_name
         self.n_rows = n_rows
@@ -23,7 +22,7 @@ class PlateSeriesBase:
         self.align = align
         self.fit = fit
 
-        self.plates=[]
+        self.plates = []
         self.invalid_imgs = []
 
         self.status_analysis = False
@@ -41,7 +40,7 @@ class PlateSeriesBase:
 
         results = []
         for idx in range(len(self.plates)):
-            _tmp = self.get_plate_results(idx).transpose()
+            _tmp = self.get_plate_results(idx)
             _tmp.index.name = "colony_name"
             results.append(_tmp.reset_index(drop=False))
 
@@ -53,16 +52,15 @@ class PlateSeriesBase:
         for idx, img in enumerate(self.img_set):
             try:
                 log.info(f"Starting plate profiling for plate {idx}")
-                cp_api_naming = f"day({self.day_index[idx]})_{self.sample_name}"
+                cp_api_naming = self._add_day_to_name(day=self.day_index[idx], name=self.sample_name)
                 plate = PlateProfile(
-                    img=img,
-                    sample_name=f"{cp_api_naming}",
-                    sampling_day=self.day_index[idx],
-                    n_rows=self.n_rows, n_cols=self.n_cols,
-                    align=self.align, fit=self.fit,
-                    auto_analyze=True
+                        img=img,
+                        sample_name=f"{cp_api_naming}",
+                        sampling_day=self.day_index[idx],
+                        n_rows=self.n_rows, n_cols=self.n_cols,
+                        align=self.align, fit=self.fit,
+                        auto_analyze=True
                 )
-                plate.add_sampling_day(self.day_index[idx])
                 self.plates.append(plate)
             except:
                 log.warning(f"Could not analyze plate {idx}: {self.sample_name}", exc_info=True)
@@ -72,12 +70,21 @@ class PlateSeriesBase:
     def get_results(self):
         return self.results.copy()
 
-    def get_plate_results(self, plate_idx):
-        def remove_plate_id(label):
-            label = label.split("_")[1:]
-            label = "_".join(label)
-            return label
+    def get_plate_results(self, plate_idx, numeric_only=False, include_adv=False):
+        tmp = self.plates[plate_idx].get_results(
+                numeric_only=numeric_only,
+                include_adv=include_adv
+        )
 
-        tmp = self.plates[plate_idx].get_results()
-        tmp.columns = tmp.columns.map(lambda x: remove_plate_id(x))
+        tmp.index = tmp.index.map(lambda x: self._remove_day_from_name(x))
         return tmp
+
+    @staticmethod
+    def _add_day_to_name(day, name):
+        return f"day({day})_{name}"
+
+    @staticmethod
+    def _remove_day_from_name(dayname):
+        name = dayname.split("_")[1:]
+        name = "_".join(name)
+        return name

@@ -5,6 +5,7 @@ channels:
   - r
   - defaults
 dependencies:
+  - python=3.10
   - matplotlib
   - numpy
   - pandas
@@ -12,7 +13,6 @@ dependencies:
   - jupyter
   - joblib
   - boto3
-  - opencv
   - docutils
   - h5py
   - imageio
@@ -25,6 +25,7 @@ dependencies:
   - scyjava
   - bioconda::centrosome
   - seaborn
-  - python=3.10
   - bioconda::cellprofiler
   - bioconda::cellprofiler-core
+  # Other dependencies:
+  #   Jave Runtime Environment or Java Development Kit

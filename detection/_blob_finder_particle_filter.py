@@ -38,7 +38,7 @@ class BlobFinderParticleFilter(BlobFinderTable):
         self._table['radius'] = self._table['sigma'] * math.sqrt(2)
         self._table.drop(columns='sigma')
         self._table['area'] = math.pi * (self._table['radius'] * self._table['radius'])
-        self._table["radius"] = self._table["radius"] + self._table["radius"]*0.05
+        # self._table["radius"] = self._table["radius"] + self._table["radius"]*0.05
 
         if "id" not in self._table.columns:
             self._table = self._table.reset_index(drop=False).rename(columns={

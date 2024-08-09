@@ -4,14 +4,18 @@ import matplotlib.pyplot as plt
 import skimage.io as io
 from skimage.util import img_as_ubyte
 
-import os
 import logging
-logger_name = "phenomics-normalization"
-log = logging.getLogger(logger_name)
-logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
+
+formatter = logging.Formatter(fmt=f'[%(asctime)s|%(name)s] %(levelname)s - %(message)s',
+                              datefmt='%m/%d/%Y %I:%M:%S')
+console_handler = logging.StreamHandler()
+log = logging.getLogger(__name__)
+log.addHandler(console_handler)
+console_handler.setFormatter(formatter)
 
 # ----- Pkg Relative Import -----
 from ._plate_grid import PlateGrid
+
 
 # ----- Main Class Definition -----
 
@@ -20,6 +24,7 @@ class PlateIO(PlateGrid):
     '''
     Last Updated: 7/9/2024
     '''
+
     def __init__(self, img, n_rows=8, n_cols=12,
                  align=True, fit=True,
                  auto_run=True
@@ -55,7 +60,7 @@ class PlateIO(PlateGrid):
             fig.savefig(fname_split[0] + "_invalid_normalizaton" + fname_split[1])
         plt.close(fig)
 
-    def plot_ops(self, figsize=(18, 14), tight_layout=True, fontsize=24, plate_name = None):
+    def plot_ops(self, figsize=(18, 14), tight_layout=True, fontsize=24, plate_name=None):
         with plt.ioff():
             fig, ax = plt.subplots(nrows=2, ncols=2, figsize=figsize, tight_layout=tight_layout)
             opAx = ax.ravel()

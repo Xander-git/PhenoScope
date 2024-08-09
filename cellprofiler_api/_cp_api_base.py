@@ -1,7 +1,5 @@
 # ----- Imports -----
-import numpy as np
-import skimage.color
-import skimage.color as skcolor
+from skimage.color import rgb2gray
 import pandas as pd
 
 from cellprofiler_core.preferences import set_headless
@@ -26,38 +24,20 @@ set_headless()
 
 
 class CellProfilerApiBase:
-    # Inputs
-    input_img = None
-    plate_idx = None
-    img_set_list_idx = None
-    img_set_list = None
-    img_set = None
-
-    img = None
-
-    well_name = None
-
-    obj_set = None
-    cpc_measurements = None
-    pipeline = None
-    workspace = None
-
-    colony = None
-
-    keys = {}
-    results = {}
-    results_table = None
-
-    status_validity = True
-
-    status_workspace = False
-
-    # TODO: Integrate a settings option
-    settings = {
-
-    }
-
     def __init__(self):
+        self.input_img = None
+        self.image_name = None
+
+        self.cp_img = None
+        self.obj_set = None
+        self.cpc_measurements = None
+        self.pipeline = None
+        self.workspace = None
+        self.results_table = None
+
+        self.status_validity = True
+        self.keys = {}
+        self.results = {}
         self.img_set_list = ImageSetList()
         self.img_set_list_idx = self.img_set_list.count()
         self.img_set = self.img_set_list.get_image_set(
@@ -67,27 +47,16 @@ class CellProfilerApiBase:
 
     @property
     def gray_img(self):
-        return skimage.color.rgb2gray(self.input_img)
-
-    @property
-    def primary_name(self):
-        return f"{self.well_name}_PrimaryObjects"
-
-    @property
-    def merged_name(self):
-        return f"{self.well_name}_MergedObjects"
-
-    @property
-    def filled_name(self):
-        return f"{self.well_name}_FilledObjects"
-
-    @property
-    def noise_name(self):
-        return f"{self.well_name}_Noise"
+        if len(self.input_img.shape)==3:
+            return rgb2gray(self.input_img)
+        elif len(self.input_img.shape)==2:
+            return self.input_img
+        else:
+            raise ValueError('Input image is not grayscale or RGB')
 
     @property
     def colony_name(self):
-        return f"{self.well_name}_Colony"
+        return f"{self.image_name}_Colony"
 
     def run(self, img, name):
         self._set_name(name)
@@ -96,15 +65,15 @@ class CellProfilerApiBase:
     def refresh(self):
         self._init_workspace()
 
-    def _set_name(self, well_name):
-        self.well_name = well_name
+    def _set_name(self, image_name):
+        self.image_name = image_name
         self.status_validity = True
 
     def _set_img(self, well_img):
         self.input_img = well_img
 
-        self.img = Image(self.gray_img)
-        self.img_set.add(self.well_name, self.img)
+        self.cp_img = Image(self.gray_img)
+        self.img_set.add(self.image_name, self.cp_img)
 
     def _init_workspace(self):
         '''
@@ -112,7 +81,7 @@ class CellProfilerApiBase:
         Initialize CellProfiler Workspace and Identifies Primary Object in Images. This has to be done first before running other modules
         '''
 
-        self.obj_set = ObjectSet(can_overwrite=False)  # Results work when true, mask segmentation does not
+        self.obj_set = ObjectSet(can_overwrite=True)  # Results work when true, mask segmentation does not
 
         self.cpc_measurements = Measurements(
             mode="memory",
@@ -131,14 +100,13 @@ class CellProfilerApiBase:
             self.cpc_measurements,
             self.img_set_list
         )
-        self.status_workspace = True
 
     def _get_feature_keys(self, obj_name, module):
         cpc_metric_cols = pd.DataFrame(
             module.get_measurement_columns(self.pipeline),
             columns=["source", "keys", "dtype"]
         )
-        keys = cpc_metric_cols[cpc_metric_cols["source"] == obj_name]
+        keys = cpc_metric_cols[cpc_metric_cols["source"]==obj_name]
         return keys.loc[:, "keys"]
 
     def _get_results(self, obj_name, feature_keys):
@@ -148,7 +116,7 @@ class CellProfilerApiBase:
                 obj_name,
                 key
             )
-            assert (len(curr_result) == 1), "Too many objects"
+            assert (len(curr_result)==1), "Too many objects"
             results.append(curr_result[0])
         results = pd.DataFrame(
             list(zip(feature_keys, results)),

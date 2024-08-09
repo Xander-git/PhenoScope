@@ -1,4 +1,5 @@
-from ._phenotyping.plate_series_analysis import PlateSeriesAnalysis
+from ._plate_series_io import PlateSeriesIO
 
-class PlateSeries(PlateSeriesAnalysis):
+
+class PlateSeries(PlateSeriesIO):
     pass

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from ..detection.blob_finder import BlobFinder
 
 
 def plot_blobs(img, blobs, ax=None, set_axis=False, grayscale=False):
@@ -27,6 +28,7 @@ def plot_blobs(img, blobs, ax=None, set_axis=False, grayscale=False):
         else:
             return (blobs_ax)
 
+
 def plotAx_blobs(img, blobs, ax: plt.Axes, grayscale=False):
     with plt.ioff():
         if grayscale is True:
@@ -39,6 +41,7 @@ def plotAx_blobs(img, blobs, ax: plt.Axes, grayscale=False):
             ax.add_patch(c)
         ax.grid(False)
     return ax
+
 
 def plot_blobs_by_label(img, blobs, ax=None, set_axis=False, grayscale=False):
     with plt.ioff():
@@ -94,9 +97,9 @@ def plot_plate_rows(img, blobs_class, ax=None, set_axis=False, grayscale=False):
             blobs_ax.set_axis_off()
 
         if ax is None:
-            return (blobs_fig, blobs_ax)
+            return blobs_fig, blobs_ax
         else:
-            return (blobs_ax)
+            return blobs_ax
 
 
 def plot_plate_cols(img, blobs_class, ax=None, set_axis=False, grayscale=False):
@@ -126,6 +129,11 @@ def plot_plate_cols(img, blobs_class, ax=None, set_axis=False, grayscale=False):
             blobs_ax.set_axis_off()
 
         if ax is None:
-            return (blobs_fig, blobs_ax)
+            return blobs_fig, blobs_ax
         else:
-            return (blobs_ax)
+            return blobs_ax
+
+
+def plotAx_find_blobs(ax, img):
+    blobs = BlobFinder(img)
+    plot_plate_rows(img=img, blobs_class=blobs, ax=ax)

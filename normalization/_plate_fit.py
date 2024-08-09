@@ -39,19 +39,6 @@ class PlateFit(PlateAlignment):
                 for color_channel in range(3):
                     tmp_img = self.img[:, :, color_channel]
 
-                    # TODO: edge_correction protocol
-                    # x_min_edge_median = np.median(tmp_img[:, :self.edge_correction_sz])
-                    # tmp_img[:, :self.edge_correction_sz] = x_min_edge_median
-                    #
-                    # x_plus_edge_median = np.median(tmp_img[:, :-self.edge_correction_sz])
-                    # tmp_img[:, :-self.edge_correction_sz] = x_plus_edge_median
-                    #
-                    # y_min_edge_median = np.median(tmp_img[:self.edge_correction_sz, :])
-                    # tmp_img[:self.edge_correction_sz, :] = y_min_edge_median
-                    #
-                    # y_plus_edge_median = np.median(tmp_img[:-self.edge_correction_sz, :])
-                    # tmp_img[:-self.edge_correction_sz, :] = y_plus_edge_median
-
                     padded_img.append(
                         np.expand_dims(
                             np.pad(tmp_img, self.border_padding, mode='edge'),

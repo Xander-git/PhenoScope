@@ -1,4 +1,4 @@
-from ._normalization.plate_boost import PlateBoost
+from ._plate_boost import PlateBoost
 
 
 class PlateNormalization(PlateBoost):

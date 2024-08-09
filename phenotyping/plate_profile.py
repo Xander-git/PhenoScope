@@ -1,5 +1,4 @@
-from ._phenotyping.plate_profile_analysis import PlateProfileAnalysis
+from ._plate_profile_plotting import PlateProfilePlotting
 
-
-class PlateProfile(PlateProfileAnalysis):
+class PlateProfile(PlateProfilePlotting):
     pass

@@ -1,14 +1,20 @@
+import logging
+formatter = logging.Formatter(fmt=f'[%(asctime)s|%(name)s] %(levelname)s - %(message)s',
+							  datefmt='%m/%d/%Y %I:%M:%S')
+console_handler = logging.StreamHandler()
+log = logging.getLogger(__name__)
+log.addHandler(console_handler)
+console_handler.setFormatter(formatter)
+
+# ----- Module Import -----
+
 import pandas as pd
 
 from cellprofiler.modules.measureobjectintensity import MeasureObjectIntensity
 
-import os
-import logging
-logger_name = "phenomics-cellprofiler_api"
-log = logging.getLogger(logger_name)
-logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
+
 # ----- Pkg Relative Import -----
-from .cp_api_measure_areashape import CellProfilerApiMeasureAreaShape
+from ._cp_api_measure_areashape import CellProfilerApiMeasureAreaShape
 
 # ----- Global Constants -----
 INTEGRATED_INTENSITY = "IntegratedIntensity"
@@ -29,33 +35,35 @@ METRIC_LABEL = "Metric"
 class CellProfilerApiMeasureIntensity(CellProfilerApiMeasureAreaShape):
 	status_intensity = True
 
-	def run(self):
-		super().run()
+	def measure_intensity(self, object_name=None):
 		try:
-			if self.status_validity and self.status_intensity:
-				log.debug(f"Measuring intensity for {self.colony_name}")
-				self.measure_intensity()
+			return self._measure_intensity(object_name=object_name)
+		except KeyboardInterrupt:
+			raise KeyboardInterrupt
 		except:
-			log.warning(f"Could not measure intensity for {self.well_name}", exc_info=True)
+			log.warning(f"Could not measure intensity for {self.image_name}", exc_info=True)
 			self.status_validity = False
+			return None
 
-	def measure_intensity(self):
+	def _measure_intensity(self, object_name=None):
 		'''
 		:return:
 		'''
+		if object_name is None:
+			object_name = self.colony_name
 		MEASUREMENT_CLASS_LABEL = "Intensity"
 		mod = MeasureObjectIntensity()
-		mod.images_list.value = self.well_name
-		mod.objects_list.value = self.colony_name
+		mod.images_list.value = self.image_name
+		mod.objects_list.value = object_name
 		self.pipeline.add_module(mod)
 		mod.run(self.workspace)
-		keys = self._get_feature_keys(self.colony_name,mod)
+		keys = self._get_feature_keys(object_name,mod)
 		self.keys[f"{MEASUREMENT_CLASS_LABEL}"] = keys
 		results = self._get_results(
-			self.colony_name, keys
+			object_name, keys
 		).reset_index(drop=False)
 
-		metadata = results["Metric"].str.replace(self.well_name, "source")
+		metadata = results["Metric"].str.replace(self.image_name, "source")
 		metadata = metadata.str.split("_", expand=True)
 		metadata = metadata.rename(
 			columns={
