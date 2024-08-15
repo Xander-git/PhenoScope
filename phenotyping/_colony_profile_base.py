@@ -39,8 +39,8 @@ class ColonyProfileBase:
         return f"{self.sample_name}_Colony"
 
     @property
-    def bg_name(self):
-        return f"{self.sample_name}_background"
+    def background_name(self):
+        return f"{self.sample_name}_Background"
 
     @property
     def gray_img(self):
@@ -60,12 +60,6 @@ class ColonyProfileBase:
         if self.status_validity is False:
             results.loc["status_valid_analysis"] = 0
         return results
-        # else:
-        #     return pd.Series(
-        #         data=[False],
-        #         index=["status_valid_analysis"],
-        #         name=f"{self.colony_name}"
-        #     )
 
     @property
     def _results(self):

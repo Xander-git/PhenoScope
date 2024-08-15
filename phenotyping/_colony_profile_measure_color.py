@@ -19,3 +19,5 @@ class ColonyProfileMeasureColor(ColonyProfileMeasureBase):
         self._measurements["Intensity_BackgroundIntegratedColorIntensityRed"] = colony[:, :, 0].sum()
         self._measurements["Intensity_BackgroundIntegratedColorIntensityGreen"] = colony[:, :, 1].sum()
         self._measurements["Intensity_BackgroundIntegratedColorIntensityBlue"] = colony[:, :, 2].sum()
+
+        

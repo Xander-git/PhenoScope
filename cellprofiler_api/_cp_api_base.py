@@ -65,6 +65,12 @@ class CellProfilerApiBase:
     def refresh(self):
         self._init_workspace()
 
+    def add_img(self, gray_img, name):
+        if len(gray_img.shape)==3:
+            gray_img = rgb2gray(gray_img)
+        cp_img = Image(gray_img)
+        self.img_set.add(name, cp_img)
+
     def _set_name(self, image_name):
         self.image_name = image_name
         self.status_validity = True
@@ -118,10 +124,16 @@ class CellProfilerApiBase:
             )
             assert (len(curr_result)==1), "Too many objects"
             results.append(curr_result[0])
-        results = pd.DataFrame(
-            list(zip(feature_keys, results)),
-            columns=["Metric", obj_name]
-        ).set_index("Metric").copy(deep=True)
+        # results = pd.DataFrame(
+        #     list(zip(feature_keys, results)),
+        #     columns=["Metric", obj_name]
+        # ).set_index("Metric").copy(deep=True)
+        results = pd.Series(
+                data=results,
+                index=feature_keys,
+                name=obj_name
+        )
+        results.index.name="Metric"
         log.debug(f"Got results for {obj_name} resulting shape: {results.shape}")
         return results
 

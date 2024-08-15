@@ -44,16 +44,50 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasure):
 
     def run_cp_analysis(self):
         if self.status_validity:
-            try:
-                results = cp_connection.run(self)
-                self._cp_results = results.results
-                self.status_validity = deepcopy(results.status_validity)
-                self.status_analysis = True
-            except KeyboardInterrupt:
-                sys.exit("User exited with keyboard interrupt\n")
-            except:
-                log.warning(f"Failed to analyze {self.sample_name}")
-                self.status_validity = False
+            # TODO: FINISH THIS FUNCTION
+            object_measurements = []
+            bg_measurements = []
+            cp_connection.add_img(self.gray_img, self.sample_name)
+
+            cp_connection.add_object(self.colony_mask, self.colony_name, self.sample_name)
+            object_measurements.append(cp_connection.measure_areashape(self.colony_name))
+            object_measurements.append(cp_connection.measure_intensity(
+                    object_name=self.colony_name,
+                    image_name=self.sample_name
+            ))
+            object_measurements.append(cp_connection.measure_texture(
+                    object_name=self.colony_name,
+                    image_name=self.sample_name
+            ))
+
+            cp_connection.add_object(self.background_mask, self.background_name, self.sample_name)
+            bg_measurements.append(cp_connection.measure_areashape(self.background_name))
+            bg_measurements.append(cp_connection.measure_intensity(
+                    object_name=self.background_name,
+                    image_name=self.sample_name
+            ))
+            bg_measurements.append(cp_connection.measure_texture(
+                    object_name=self.background_name,
+                    image_name=self.sample_name
+            ))
+            bg_series = pd.concat(bg_measurements,axis=0)
+            bg_series = bg_series.rename(columns={
+                f"{self.background_name}": f"{self.colony_name}",
+            })
+
+            def add_bg_name(name):
+                split = name.split("_")
+                split[1] = f"Background{split[1]}"
+                return "_".join(split)
+
+            bg_series.index=bg_series.index.map(lambda x: add_bg_name(x))
+
+            cp_connection.pipeline.end_run()
+            validity = pd.DataFrame({
+                f"{self.colony_name}": self.status_validity,
+            }, index=["status_valid_analysis"]
+            ).astype(int)
+            self._cp_results = pd.concat([validity, *object_measurements, bg_series], axis=0)
         else:
             log.info(f"Did not analyze {self.sample_name} because of invalid status")
 

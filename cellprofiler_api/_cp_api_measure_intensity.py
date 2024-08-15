@@ -35,9 +35,9 @@ METRIC_LABEL = "Metric"
 class CellProfilerApiMeasureIntensity(CellProfilerApiMeasureAreaShape):
 	status_intensity = True
 
-	def measure_intensity(self, object_name=None):
+	def measure_intensity(self, object_name=None, image_name=None):
 		try:
-			return self._measure_intensity(object_name=object_name)
+			return self._measure_intensity(object_name=object_name, image_name=image_name)
 		except KeyboardInterrupt:
 			raise KeyboardInterrupt
 		except:
@@ -45,15 +45,18 @@ class CellProfilerApiMeasureIntensity(CellProfilerApiMeasureAreaShape):
 			self.status_validity = False
 			return None
 
-	def _measure_intensity(self, object_name=None):
+	def _measure_intensity(self, object_name=None, image_name=None):
 		'''
 		:return:
 		'''
 		if object_name is None:
 			object_name = self.colony_name
+
+		if image_name is None:
+			image_name = self.image_name
 		MEASUREMENT_CLASS_LABEL = "Intensity"
 		mod = MeasureObjectIntensity()
-		mod.images_list.value = self.image_name
+		mod.images_list.value = image_name
 		mod.objects_list.value = object_name
 		self.pipeline.add_module(mod)
 		mod.run(self.workspace)
@@ -63,7 +66,7 @@ class CellProfilerApiMeasureIntensity(CellProfilerApiMeasureAreaShape):
 			object_name, keys
 		).reset_index(drop=False)
 
-		metadata = results["Metric"].str.replace(self.image_name, "source")
+		metadata = results["Metric"].str.replace(image_name, "source")
 		metadata = metadata.str.split("_", expand=True)
 		metadata = metadata.rename(
 			columns={

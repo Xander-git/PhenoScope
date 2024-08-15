@@ -23,9 +23,9 @@ METRIC_LABEL = "Metric"
 # ----- Main Class Definition -----
 # TODO: Cleanup & optimize setting calls
 class CellProfilerApiMeasureTexture(CellProfilerApiMeasureIntensity):
-    def measure_texture(self, object_name=None, texture_scale: iterable = None, gray_levels: int = 256):
+    def measure_texture(self, object_name=None, image_name=None,texture_scale: iterable = None, gray_levels: int = 256):
         try:
-            return self._measure_texture(object_name=object_name, texture_scale=texture_scale, gray_levels=gray_levels)
+            return self._measure_texture(object_name=object_name, image_name=image_name,texture_scale=texture_scale, gray_levels=gray_levels)
         except KeyboardInterrupt:
             raise KeyboardInterrupt
         except:
@@ -33,7 +33,7 @@ class CellProfilerApiMeasureTexture(CellProfilerApiMeasureIntensity):
             self.status_validity = False
             return None
 
-    def _measure_texture(self, object_name=None, texture_scale: iterable = None, gray_levels: int = 256):
+    def _measure_texture(self, object_name=None, image_name=None, texture_scale: iterable = None, gray_levels: int = 256):
         """
         :param scale:
         :param gray_levels:
@@ -51,6 +51,8 @@ class CellProfilerApiMeasureTexture(CellProfilerApiMeasureIntensity):
         MEASUREMENT_CLASS_LABEL = "Texture"
         if object_name is None:
             object_name = self.colony_name
+        if image_name is None:
+            image_name=self.image_name
         if texture_scale is None:
             scale = [5]
         else:
@@ -64,7 +66,7 @@ class CellProfilerApiMeasureTexture(CellProfilerApiMeasureIntensity):
         mod = MeasureTexture()
         mod.gray_levels.value = gray_levels
         mod.images_or_objects.value = "Objects"
-        mod.images_list.value = self.image_name
+        mod.images_list.value = image_name
         mod.objects_list.value = object_name
         # May potentially integrate image or object switch in future versions
         for s in scale:
@@ -78,7 +80,7 @@ class CellProfilerApiMeasureTexture(CellProfilerApiMeasureIntensity):
         results = self._get_results(
             object_name, keys
         ).reset_index(drop=False)
-        metadata = results["Metric"].str.replace(self.image_name, "source")
+        metadata = results["Metric"].str.replace(image_name, "source")
 
         metadata = metadata.str.split("_", expand=True).rename(
             columns={

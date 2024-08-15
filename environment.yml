@@ -1,4 +1,4 @@
-name: phenomics-v0.1.0
+name: phenomics
 channels:
   - conda-forge
   - bioconda
@@ -10,6 +10,8 @@ dependencies:
   - numpy
   - pandas
   - scikit-image
+  - scikit-learn
+  - lazypredict
   - jupyter
   - joblib
   - boto3

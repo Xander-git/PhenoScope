@@ -32,26 +32,9 @@ PHENOMICS_MEASUREMENTS = [
 ]
 
 BASIC_CP_API_MEASUREMENT_LABELS = [
-    "AreaShape_Area",
-    "AreaShape_Perimeter",
-    "AreaShape_FormFactor",
-    "AreaShape_Compactness",
-    "AreaShape_Extent",
-    "AreaShape_Eccentricity",
-    "AreaShape_MaximumRadius",
-    "AreaShape_Orientation",
-    "Intensity_IntegratedIntensity",
-    "Intensity_MeanIntensity",
-    "Intensity_MaxIntensity",
-    "Intensity_MinIntensity",
-]
-
-TEXTURE_LABELS = [
-    "Texture_Contrast",
-    "Texture_Correlation",
-    "Texture_Variance",
-    "Texture_AngularSecondMoment",
-    "Texture_Entropy"
+    "AreaShape",
+    "Intensity",
+    "Texture"
 ]
 
 
@@ -111,23 +94,21 @@ class PlateProfileBase(PlateNormalization):
         if include_adv:
             return self._results
         else:
-            measurement_labels = NUMERIC_METADATA_LABELS \
-                                 + BASIC_CP_API_MEASUREMENT_LABELS \
-                                 + PHENOMICS_MEASUREMENTS
+            measurement_labels = NUMERIC_METADATA_LABELS
             if numeric_only is False:
                 measurement_labels = METADATA_LABELS + measurement_labels
             if self.sampling_day is None:
                 measurement_labels.remove(f"{SAMPLING_DAY_LABEL}")
-                
-            basic_table = [self._results.loc[measurement_labels, :]]
 
-            texture_table_set = []
-            for metric in TEXTURE_LABELS:
-                texture_table_set.append(
+            measurement_table = self._results.loc[measurement_labels,:]
+
+            basic_table = []
+            for metric in BASIC_CP_API_MEASUREMENT_LABELS:
+                basic_table.append(
                     self._results[self._results.index.to_series().str.contains(metric)]
                 )
 
-            results = pd.concat(basic_table + texture_table_set, axis=0).transpose()
+            results = pd.concat([measurement_table, *basic_table], axis=0).transpose()
             if numeric_only is False:
                 results.loc[:, f"{STATUS_VALIDITY_LABEL}"] = results.loc[:, f"{STATUS_VALIDITY_LABEL}"].astype(bool)
 

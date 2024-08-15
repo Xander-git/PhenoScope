@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import sys
 
 from ._plate_series_plotting import PlateSeriesPlotting
 
@@ -17,11 +18,17 @@ class PlateSeriesIO(PlateSeriesPlotting):
 
     def save_colony_segmentation(self, dirpath, figsize=(16, 24)):
         for plate in self.plates:
-            fig, ax = plate.plot_colony_segmentation(
-                figsize=figsize
-            )
-            fig.savefig(f"{dirpath}{plate.sample_name}.png")
-            plt.close(fig)
+            try:
+                fig, ax = plate.plot_colony_segmentation(
+                    figsize=figsize
+                )
+                fig.savefig(f"{dirpath}{plate.sample_name}.png")
+                plt.close(fig)
+            except KeyboardInterrupt:
+                sys.exit()
+            except:
+                pass
+
 
     def save_plate_gridding_op(self, dirpath, figsize=(12, 8)):
         for plate in self.plates:
