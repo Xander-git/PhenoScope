@@ -1,3 +1,4 @@
+import sys
 import logging
 
 formatter = logging.Formatter(
@@ -41,6 +42,8 @@ class ColonyProfileMeasureBase(ColonyProfilePlotObject):
         if self.status_validity:
             try:
                 self._measure_colony()
+            except KeyboardInterrupt:
+                sys.exit("...User terminated program")
             except:
                 log.warning(f"could not measure colony for sample: {self.sample_name}")
                 self.status_validity = False

@@ -44,6 +44,11 @@ class ColonyProfileObject(ColonyProfileBase):
         return ClaheBoost(self.gray_img, kernel_size=None, footprint_radius=5).get_boosted_img()
 
     @property
+    def background_mask(self):
+        if self.status_object is False or self.colony_mask is None: self.find_colony()
+        return np.invert(self.colony_mask)
+
+    @property
     def masked_img(self):
         if self.status_object is False or self.colony_mask is None: self.find_colony()
         dim3_mask = np.expand_dims(np.invert(self.colony_mask), axis=2)
@@ -53,7 +58,19 @@ class ColonyProfileObject(ColonyProfileBase):
     @property
     def masked_gray_img(self):
         if self.status_object is False or self.colony_mask is None: self.find_colony()
-        return ma.array(self.input_img, mask=np.invert(self.colony_mask))
+        return ma.array(data=self.gray_img, mask=np.invert(self.colony_mask))
+
+    @property
+    def background_img(self):
+        if self.status_object is False or self.colony_mask is None: self.find_colony()
+        dim3_mask = np.expand_dims(np.invert(self.background_mask), axis=2)
+        dim3_mask = np.repeat(dim3_mask, 3, axis=2)
+        return ma.array(data=self.input_img, mask=dim3_mask)
+
+    @property
+    def background_gray_img(self):
+        if self.status_object is False or self.colony_mask is None: self.find_colony()
+        return ma.array(data=self.gray_img, mask=np.invert(self.background_mask))
 
     def find_colony(self, threshold_method="otsu", use_boosted=True,
                     filter_property="distance_from_center", filter_type="min",

@@ -3,10 +3,14 @@ from numpy import iterable
 
 import os
 import logging
-
-logger_name = "phenomics-cellprofiler_api"
-log = logging.getLogger(logger_name)
-logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
+formatter = logging.Formatter(
+        fmt=f'[%(asctime)s|%(name)s] %(levelname)s - %(message)s',
+        datefmt='%m/%d/%Y %I:%M:%S'
+)
+console_handler = logging.StreamHandler()
+log = logging.getLogger(__name__)
+log.addHandler(console_handler)
+console_handler.setFormatter(formatter)
 
 # ----- Pkg Relative Import -----
 from ._cp_api_measure_intensity import CellProfilerApiMeasureIntensity

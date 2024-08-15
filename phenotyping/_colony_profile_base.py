@@ -2,8 +2,8 @@ import logging
 import pandas as pd
 
 formatter = logging.Formatter(
-    fmt=f'[%(asctime)s|%(name)s] %(levelname)s - %(message)s',
-    datefmt='%m/%d/%Y %I:%M:%S'
+        fmt=f'[%(asctime)s|%(name)s] %(levelname)s - %(message)s',
+        datefmt='%m/%d/%Y %I:%M:%S'
 )
 console_handler = logging.StreamHandler()
 log = logging.getLogger(__name__)
@@ -39,10 +39,14 @@ class ColonyProfileBase:
         return f"{self.sample_name}_Colony"
 
     @property
+    def bg_name(self):
+        return f"{self.sample_name}_background"
+
+    @property
     def gray_img(self):
-        if len(self.input_img.shape)==3:
+        if len(self.input_img.shape) == 3:
             return rgb2gray(self.input_img)
-        elif len(self.input_img.shape)==2:
+        elif len(self.input_img.shape) == 2:
             return self.input_img
         else:
             raise ValueError('Input image is not grayscale or RGB')
@@ -51,18 +55,25 @@ class ColonyProfileBase:
     def results(self):
         if self.status_analysis is False:
             self.run_analysis()
-        if self.status_validity is True:
-            return self._results.copy()
-        else:
-            return pd.Series(
-                data=[False],
-                index=["status_valid_analysis"],
-                name=f"{self.colony_name}"
-            )
+        # if self.status_validity is True:
+        results = self._results
+        if self.status_validity is False:
+            results.loc["status_valid_analysis"] = 0
+        return results
+        # else:
+        #     return pd.Series(
+        #         data=[False],
+        #         index=["status_valid_analysis"],
+        #         name=f"{self.colony_name}"
+        #     )
 
     @property
     def _results(self):
-        pass
+        """
+        Placeholder for future work
+        :return:
+        """
+        return None
 
     def run_analysis(self):
         pass
