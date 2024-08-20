@@ -8,17 +8,18 @@ from ._blob_finder_base import BlobFinderBase
 
 # ------ Main Class Definition -----
 class BlobFinderTable(BlobFinderBase):
-    def __init__(self, gray_img, n_rows=8, n_cols=12, blob_search_method="log",
+    def __init__(self, n_rows=8, n_cols=12,
+                 blob_search_method="log",
                  min_sigma=2, max_sigma=35, num_sigma=45,
                  threshold=0.01, max_overlap=0.1
                  ):
         self.n_rows = n_rows
         self.n_cols = n_cols
         self.left_bound = self.right_bound = self.upper_bound = self.lower_bound = None
-        super().__init__(gray_img, blob_search_method=blob_search_method,
+
+        super().__init__(blob_search_method=blob_search_method,
                          min_sigma=min_sigma, max_sigma=max_sigma, num_sigma=num_sigma,
                          threshold=threshold, max_overlap=max_overlap)
-        self.generate_table()
 
     @property
     def row_idx(self):
@@ -49,6 +50,11 @@ class BlobFinderTable(BlobFinderBase):
                 ]
             )
         return cols
+
+    def find_blobs(self, img):
+        super().find_blobs(img)
+        self.generate_table()
+        return self.table
 
     def generate_table(self):
         assert self._table is not None or len(self._table)!=0, "No blobs found in Image"

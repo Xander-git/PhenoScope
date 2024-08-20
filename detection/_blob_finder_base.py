@@ -14,7 +14,7 @@ from ..util import check_grayscale
 
 # ------ Main Class Definition -----
 class BlobFinderBase:
-    def __init__(self, gray_img, blob_search_method="log",
+    def __init__(self, blob_search_method="log",
                  min_sigma=2, max_sigma=40, num_sigma=30,
                  threshold=0.01, max_overlap=0.1
                  ):
@@ -28,19 +28,16 @@ class BlobFinderBase:
         self.threshold = threshold
         self.max_overlap = max_overlap
 
-        gray_img = check_grayscale(gray_img)
-        self.search_blobs(gray_img, method=self.blob_search_method)
 
     @property
     def table(self):
         return self._table.copy()
 
-    @staticmethod
-    def check_grayscale(img):
-        return check_grayscale(img)
+    def find_blobs(self, img):
+        img = check_grayscale(img)
+        self._search_blobs(img, method=self.blob_search_method)
 
-    def search_blobs(self, gray_img, method):
-        gray_img = check_grayscale(gray_img)
+    def _search_blobs(self, gray_img, method):
         if method == "log":
             self._search_blobs_LoG(gray_img)
         elif method == "dog":

@@ -108,7 +108,7 @@ class PlateProfilePlotting(PlateProfileBase):
 
                 else:
                     ax.set_title(f"Invalid: {idx}", fontsize=fontsize_subtitle, weight='bold')
-                    colony_img = self.wells[idx].input_img
+                    colony_img = self.wells[idx].labeled_segmentation
                     ax.get_xaxis().set_visible(False)
                     ax.get_yaxis().set_visible(False)
                     ax.spines['bottom'].set(color="red", linewidth=5)
