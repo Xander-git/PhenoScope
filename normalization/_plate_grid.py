@@ -5,7 +5,6 @@ from typing import List
 
 import os
 import logging
-
 logger_name = "phenomics-normalization"
 log = logging.getLogger(logger_name)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
@@ -15,30 +14,24 @@ from ..util.plotting import plot_plate_rows
 
 
 # ----- Main Class Definition -----
+
+
 class PlateGrid(PlateFit):
     '''
     Last Updated: 7/15/2024
     '''
+    cols_midpoints = rows_midpoints = None
+    gridded_fig = gridded_ax = None
+    invalid_wells = []
 
-    def __init__(self, img: np.ndarray, n_rows: int = 8, n_cols: int = 12,
-                 align: bool = True, fit: bool = True, **kwargs
-                 ):
+    # Status checks
+    status_midpoints = False
 
-        self.cols_midpoints = None
-        self.rows_midpoints = None
-        self.gridded_fig = None
-        self.gridded_ax = None
-
-        self.status_midpoints = False
-
+    def __init__(self, img, n_rows=8, n_cols=12,
+                 align=True, fit=True):
         super().__init__(
-                img=img,
-                border_padding=kwargs.get("border_padding", 50),
-                n_rows=n_rows,
-                n_cols=n_cols,
-                align=align,
-                fit=fit,
-                **kwargs
+            img, n_rows, n_cols,
+            align, fit
         )
 
     def run(self):
@@ -46,7 +39,7 @@ class PlateGrid(PlateFit):
         try:
             self.find_midpoints()
         except:
-            log.warning("Could not find midpoints of image blobs", exc_info=True)
+            log.warning("Could not find midpoints of image blobs")
             self.status_validity = False
             self._invalid_op = "Invalid: Finding Midpoints"
             self._invalid_op_img = self.img
@@ -73,8 +66,8 @@ class PlateGrid(PlateFit):
         cols_xMinus = np.array(cols_xMinus)
         cols_xPlus = np.array(cols_xPlus)
 
-        self.rows_midpoints = ((rows_yMinus[1:] - rows_yPlus[:-1]) / 2) + rows_yPlus[:-1]
-        self.cols_midpoints = ((cols_xMinus[1:] - cols_xPlus[:-1]) / 2) + cols_xPlus[:-1]
+        self.rows_midpoints = ((rows_yMinus[1:] - rows_yPlus[:-1])/2) + rows_yPlus[:-1]
+        self.cols_midpoints = ((cols_xMinus[1:] - cols_xPlus[:-1])/2) + cols_xPlus[:-1]
         self.status_midpoints = True
 
     def get_well_imgs(self):
@@ -91,10 +84,10 @@ class PlateGrid(PlateFit):
         for row_idx in range(self.n_rows):
             for col_idx in range(self.n_cols):
                 well_imgs.append(
-                        self.img[
+                    self.img[
                         y_start[row_idx]:y_end[row_idx],
                         x_start[col_idx]:x_end[col_idx]
-                        ]
+                    ]
                 )
         return well_imgs
 

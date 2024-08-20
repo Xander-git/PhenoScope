@@ -1,7 +1,7 @@
 # ----- Imports -----
 import math
 from skimage.filters import threshold_otsu, threshold_triangle
-from skimage.morphology import white_tophat, disk, square
+from skimage.morphology import white_tophat, disk
 from scipy.ndimage import binary_fill_holes
 # ----- Pkg Relative Import -----
 from ._blob_finder_table import BlobFinderTable
@@ -10,42 +10,29 @@ from ._blob_finder_table import BlobFinderTable
 # ----- Main Class Definition -----
 # TODO: Add more filters?
 class BlobFinderParticleFilter(BlobFinderTable):
-    def __init__(self, gray_img, n_rows: int = 8, n_cols: str = 12, blob_search_method: str = "log",
-                 min_sigma: int = 4, max_sigma: int = 40, num_sigma: int = 45,
-                 threshold: float = 0.01, max_overlap: float = 0.1,
+    '''
+    Last Updated: 7/8/2024
+    '''
+    def __init__(self, gray_img, n_rows=8, n_cols=12, blob_search_method="log",
+                 min_sigma=4, max_sigma=40, num_sigma=45,
+                 threshold=0.01, max_overlap=0.1,
                  min_size: int = 180,
-                 filter_threshold_method: str = "triangle",
-                 tophat_shape: str = "square",
-                 tophat_radius: int = 12,
+                 filter_threshold_method="triangle",
+                 tophat_radius=15,
                  border_filter: int = 50
                  ):
-        gray_img = self.check_grayscale(gray_img)
-        self.filter_threshold_method = filter_threshold_method
-        self.tophat_shape = tophat_shape
-        self.tophat_radius = tophat_radius
-
-        super().__init__(gray_img=gray_img,
-                         n_rows=n_rows,
-                         n_cols=n_cols,
-                         blob_search_method=blob_search_method,
-                         min_sigma=min_sigma,
-                         max_sigma=max_sigma,
-                         num_sigma=num_sigma,
-                         threshold=threshold,
-                         max_overlap=max_overlap
+        if filter_threshold_method is None:
+            pass
+        else:
+            gray_img = self._filter_by_threshold(gray_img, filter_threshold_method)
+            gray_img = self._filter_by_white_tophat(gray_img, tophat_radius)
+        super().__init__(gray_img, n_rows, n_cols, blob_search_method,
+                         min_sigma, max_sigma, num_sigma,
+                         threshold, max_overlap
                          )
         self._filter_by_size(min_size)
         self._filter_by_border(gray_img.shape, border_filter)
         self.generate_table()
-
-    def search_blobs(self, gray_img, method):
-        if self.filter_threshold_method is None:
-            pass
-        else:
-            gray_img = self._filter_by_threshold(gray_img, self.filter_threshold_method)
-            gray_img = self._filter_by_white_tophat(gray_img, shape=self.tophat_shape, radius=self.tophat_radius)
-
-        super().search_blobs(gray_img=gray_img, method=method)
 
     def _find_circle_info(self):
         self._table['radius'] = self._table['sigma'] * math.sqrt(2)
@@ -74,14 +61,9 @@ class BlobFinderParticleFilter(BlobFinderTable):
         return gray_img
 
     @staticmethod
-    def _filter_by_white_tophat(gray_img, shape, radius):
-        if shape == "disk":
-            footprint = disk(radius)
-        elif shape == "square":
-            footprint = square(radius * 2)
-        else:
-            footprint = disk(radius)
-        res = white_tophat(image=gray_img, footprint=footprint)
+    def _filter_by_white_tophat(gray_img, radius):
+        footprint = disk(radius)
+        res = white_tophat(gray_img, footprint)
         gray_img = gray_img & ~res
         return gray_img
 

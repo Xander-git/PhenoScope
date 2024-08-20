@@ -18,26 +18,36 @@ from ..util.plotting import plot_blobs
 
 
 class PlateFit(PlateAlignment):
-    def __init__(self, img,
-                 n_rows=8, n_cols=12,
-                 border_padding=50,
-                 align=True,
-                 fit=True,
-                 **kwargs
-                 ):
+    border_padding = 50
+    edge_correction_sz = 10
+    padded_img = cropping_rect = None
 
-        self.padded_img = self.cropping_rect = None
-        self.border_padding = border_padding
+    run_fitting = True
+    run_edge_correction = True
+
+    status_fitted = False
+    status_pad_img = False
+
+    def __init__(self, img, n_rows=8, n_cols=12, align=True, fit=True):
+        super().__init__(img, n_rows, n_cols, align)
         self.run_fitting = fit
-
-        self.status_fitted = False
-        self.status_pad_img = False
-        super().__init__(img, n_rows, n_cols, align, **kwargs)
 
     def run(self):
         try:
             if self.run_fitting:
-                self._pad_input_img()
+                padded_img = []
+                for color_channel in range(3):
+                    tmp_img = self.img[:, :, color_channel]
+
+                    padded_img.append(
+                        np.expand_dims(
+                            np.pad(tmp_img, self.border_padding, mode='edge'),
+                            axis=2
+                        )
+                    )
+                self.padded_img = np.concatenate(padded_img, axis=2)
+                self.input_img = self.padded_img
+                self._set_img(self.padded_img)
                 super().run()
                 self.fit_plate()
             else:
@@ -48,23 +58,6 @@ class PlateFit(PlateAlignment):
             self._invalid_op = "Invalid: Fitting"
             self._invalid_op_img = self.img
             self._invalid_blobs = self.blobs
-
-    def _pad_input_img(self):
-        self.padded_img = []
-        for color_channel in range(3):
-            tmp_img = self.img[:, :, color_channel]
-            self.padded_img.append(
-                    np.expand_dims(
-                            np.pad(
-                                    array=tmp_img,
-                                    pad_width=self.border_padding,
-                                    mode='edge'
-                            ), axis=2
-                    )
-            )
-        self.padded_img = np.concatenate(arrays=self.padded_img, axis=2)
-        self.input_img = self.padded_img
-        self._set_img(self.padded_img)
 
     def fit_plate(self):
         if self.status_alignment is False:

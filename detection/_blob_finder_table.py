@@ -8,16 +8,20 @@ from ._blob_finder_base import BlobFinderBase
 
 # ------ Main Class Definition -----
 class BlobFinderTable(BlobFinderBase):
-    def __init__(self, gray_img, n_rows=8, n_cols=12, blob_search_method="log",
+    '''
+    Last Updated: 7/8/2024
+    '''
+    left_bound = right_bound = upper_bound = lower_bound = None
+
+    def __init__(self, img, n_rows=8, n_cols=12, blob_search_method="log",
                  min_sigma=2, max_sigma=35, num_sigma=45,
                  threshold=0.01, max_overlap=0.1
                  ):
+        super().__init__(img, blob_search_method,
+                         min_sigma, max_sigma, num_sigma,
+                         threshold, max_overlap)
         self.n_rows = n_rows
         self.n_cols = n_cols
-        self.left_bound = self.right_bound = self.upper_bound = self.lower_bound = None
-        super().__init__(gray_img, blob_search_method=blob_search_method,
-                         min_sigma=min_sigma, max_sigma=max_sigma, num_sigma=num_sigma,
-                         threshold=threshold, max_overlap=max_overlap)
         self.generate_table()
 
     @property
@@ -51,7 +55,6 @@ class BlobFinderTable(BlobFinderBase):
         return cols
 
     def generate_table(self):
-        assert self._table is not None or len(self._table)!=0, "No blobs found in Image"
         self._find_circle_info()
         self._cell_bounds_search()
         self._generate_bins()

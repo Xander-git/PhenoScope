@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 
 import os
 import logging
-
 logger_name = "phenomics-normalization"
 log = logging.getLogger(logger_name)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
@@ -16,30 +15,34 @@ logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file
 
 from ._plate_base import PlateBase
 
-
 # ----- Main Class Definition -----
 
 
 class PlateAlignment(PlateBase):
-    def __init__(self, img, n_rows=8, n_cols=12, align=True, **kwargs):
-        self.unaligned_blobs = None
-        self.aligned_blobs = None
-        self.input_alignment_vector = None
-        self.alignment_vector = None
-        self.degree_of_rotation = None
+    '''
+    Last Updated: 7/8/2024
+    '''
+    unaligned_blobs = aligned_blobs = None
 
-        # usage check
-        self.run_alignment = align
+    input_alignment_vector = alignment_vector = None
 
-        # execution check
-        self.status_alignment = False
+    degree_of_rotation = None
 
-        super().__init__(img, n_rows, n_cols, **kwargs)
+    # Setting
+    run_aligment = True
+
+    # Process Check
+    status_alignment = False
+
+    # Class Constructor
+    def __init__(self, img, n_rows=8, n_cols=12, align=True):
+        super().__init__(img, n_rows, n_cols)
+        self.run_aligment = align
 
     def run(self):
         super().run()
         try:
-            if self.run_alignment:
+            if self.run_aligment:
                 self.align()
         except:
             log.warning("Could not align image")
@@ -62,12 +65,13 @@ class PlateAlignment(PlateBase):
         # Varied performance across different cases
         #
 
+
         m, b = np.polyfit(max_row.x, max_row.y, 1)
 
         x0 = min(max_row.x)
-        y0 = m * x0 + b
+        y0 = m*x0 + b
         x1 = max(max_row.x)
-        y1 = m * x1 + b
+        y1 = m*x1 + b
         x_align = x1
         y_align = y0
         self.input_alignment_vector = pd.DataFrame({
@@ -81,21 +85,21 @@ class PlateAlignment(PlateBase):
 
         hyp = np.linalg.norm(np.array([x1, y1]) - np.array([x0, y0]))
         adj = np.linalg.norm(
-                np.array([x_align, y_align]) - np.array([x0, y0])
+            np.array([x_align, y_align]) - np.array([x0, y0])
         )
 
         # Image Y-axis goes top to bottom
         if y1 < y_align:
-            self.degree_of_rotation = math.acos(adj / hyp) * (180.0 / math.pi) * -1.0
+            self.degree_of_rotation = math.acos(adj/hyp)*(180.0/math.pi)*-1.0
         else:
-            self.degree_of_rotation = math.acos(adj / hyp) * (180.0 / math.pi)
+            self.degree_of_rotation = math.acos(adj/hyp)*(180.0/math.pi)
 
         self._set_img(
-                ski.transform.rotate(
-                        self.img,
-                        self.degree_of_rotation,
-                        mode='edge'
-                )
+            ski.transform.rotate(
+                self.img,
+                self.degree_of_rotation,
+                mode='edge'
+            )
         )
         log.info("Updating blobs after alignment")
         self._update_blobs()
@@ -123,15 +127,15 @@ class PlateAlignment(PlateBase):
             ax.imshow(self.input_img)
             ax.plot(self.input_alignment_vector['x'], self.input_alignment_vector['y'], color='red')
             ax.plot(
-                    self.alignment_vector['x'], self.alignment_vector['y'], color='white', linestyle='--'
+                self.alignment_vector['x'], self.alignment_vector['y'], color='white', linestyle='--'
             )
-            ax.set_title(f'Input Alignment Rotation {self.degree_of_rotation:.4f} | Red: Original | Yellow: New', fontsize=fontsize)
+            ax.set_title(f'Input Alignment Rotation {self.degree_of_rotation:.4f} | Red: Original | Yellow: New',fontsize=fontsize)
             for idx, row in self.unaligned_blobs.table.iterrows():
                 c = plt.Circle((row['x'], row['y']), row['radius'], color='red', fill=False)
                 ax.add_patch(c)
             for idx, row in self.aligned_blobs.table.iterrows():
                 c = plt.Circle(
-                        (row['x'], row['y']), row['radius'], color='yellow', alpha=0.8, fill=False
+                    (row['x'], row['y']), row['radius'], color='yellow', alpha=0.8, fill=False
                 )
                 ax.add_patch(c)
         return ax
