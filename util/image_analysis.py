@@ -1,5 +1,15 @@
 from seaborn import histplot
+from skimage.color import rgb2gray
+import numpy as np
 import matplotlib.pyplot as plt
+
+def check_grayscale(img:np.ndarray):
+    if len(img.shape) == 3:
+        return rgb2gray(img)
+    elif len(img.shape) == 2:
+        return img
+    else:
+        raise ValueError('Image must be grayscale or RGB')
 
 
 def plotAx_histogram(
@@ -41,11 +51,12 @@ def compare_hist(img_one, img_two, figsize=(12, 8)):
     return fig, axes
 
 
-def view_img_hist(img, stat="count", bins=256, sharey=False, sharex=False, figsize=(14, 8)):
+def view_img_info(img, stat="count", bins=256, sharey=False, sharex=False, figsize=(14, 8)):
     if len(img.shape) == 2:
         with plt.ioff():
             fig, axes = plt.subplots(ncols=2, figsize=figsize)
             axes[0].imshow(img)
+            axes[0].grid(False)
             axes[0].set_title("Image")
             histplot(img.ravel(),
                      stat=stat, bins=bins, ax=axes[1])
@@ -54,6 +65,7 @@ def view_img_hist(img, stat="count", bins=256, sharey=False, sharex=False, figsi
             fig, axes = plt.subplots(ncols=2, nrows=2, figsize=figsize)
             ax = axes.ravel()
             ax[0].imshow(img)
+            ax[0].grid(False)
             ax[0].set_title("Image")
             channel = ["Red", "Green", "Blue"]
             ylims = []
@@ -66,13 +78,13 @@ def view_img_hist(img, stat="count", bins=256, sharey=False, sharex=False, figsi
                 xlims.append(_ax.get_xlim()[1])
 
             if sharey:
-                yax = ax[1:]
+                yax = ax[1:].tolist()
                 max_yax = yax.pop(ylims.index(max(ylims)))
                 for _ax in yax:
                     _ax.sharey(max_yax)
 
             if sharex:
-                xax = ax[1:]
+                xax = ax[1:].tolist()
                 max_xax = xax.pop(xlims.index(max(xlims)))
                 for _ax in xax:
                     _ax.sharex(max_xax)

@@ -18,20 +18,19 @@ from ._plate_grid import PlateGrid
 
 
 # ----- Main Class Definition -----
-
-
 class PlateIO(PlateGrid):
-    '''
-    Last Updated: 7/9/2024
-    '''
-
     def __init__(self, img, n_rows=8, n_cols=12,
                  align=True, fit=True,
-                 auto_run=True
+                 auto_run=True,
+                 **kwargs
                  ):
         super().__init__(
-            img, n_rows, n_cols,
-            align, fit
+                img=img,
+                n_rows=n_rows,
+                n_cols=n_cols,
+                align=align,
+                fit=fit,
+                **kwargs
         )
         if auto_run:
             self.run()
@@ -48,7 +47,7 @@ class PlateIO(PlateGrid):
 
     def save_ops(self, fname_save):
         '''
-        Saves operation figures to fname_save. This function changes depending on the amound of operations from the start to the endpoint
+        Saves operation figures to fname_save. This function changes depending on the amount of operations from the start to the endpoint
         '''
         log.info(f"Saving plate normalization operations to {fname_save}")
         if self.status_validity:
@@ -60,7 +59,7 @@ class PlateIO(PlateGrid):
             fig.savefig(fname_split[0] + "_invalid_normalizaton" + fname_split[1])
         plt.close(fig)
 
-    def plot_ops(self, figsize=(18, 14), tight_layout=True, fontsize=24, plate_name=None):
+    def plot_ops(self, figsize=(18, 14), tight_layout=True, fontsize=16, plate_name=None):
         with plt.ioff():
             fig, ax = plt.subplots(nrows=2, ncols=2, figsize=figsize, tight_layout=tight_layout)
             opAx = ax.ravel()
@@ -80,11 +79,11 @@ class PlateIO(PlateGrid):
         for idx, well in enumerate(well_imgs):
             try:
                 io.imsave(
-                    f"{dirpath_folder}{name_prepend}well({idx:03d}){filetype}",
-                    img_as_ubyte(well), quality=100, check_contrast=False
+                        f"{dirpath_folder}{name_prepend}well({idx:03d}){filetype}",
+                        img_as_ubyte(well), quality=100, check_contrast=False
                 )
             except:
-                log.warning(f"Could not save well {idx}")
+                log.warning(f"Could not save well {idx}", exc_info=True)
                 self.invalid_wells.append(idx)
 
     def _plot_invalid(self):

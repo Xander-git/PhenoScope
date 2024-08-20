@@ -1,5 +1,3 @@
-import matplotlib.pyplot as plt
-
 from ._plate_series_change_over_time import PlateSeriesChangeOverTime
 
 # TODO: Add module logging
@@ -21,7 +19,7 @@ class PlateSeriesPlotting(PlateSeriesChangeOverTime):
         )
         return fig, ax
 
-    def plot_plate_colony_segmentation(self, plate_idx, figsize=(16, 24)):
+    def plot_plate_colony_segmentation(self, plate_idx, figsize=(16,8)):
         fig, ax = self.plates[plate_idx].plot_colony_segmentation(
             figsize=figsize
         )

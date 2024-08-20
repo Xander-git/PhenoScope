@@ -45,7 +45,7 @@ class ColonyProfileMeasureBase(ColonyProfilePlotObject):
             except KeyboardInterrupt:
                 sys.exit("...User terminated program")
             except:
-                log.warning(f"could not measure colony for sample: {self.sample_name}")
+                log.warning(f"could not measure colony for sample: {self.sample_name}", exc_info=True)
                 self.status_validity = False
         else:
             log.info(f"Did not measure colony due to invalid analysis: {self.sample_name}")
@@ -56,4 +56,9 @@ class ColonyProfileMeasureBase(ColonyProfilePlotObject):
         change this class when adding new measurements to maintain intended exception handling protocol
         :return:
         """
-        pass
+        self._measure_img_dims()
+
+    def _measure_img_dims(self):
+        img_height, img_width, img_channel = self.input_img.shape
+        self._measurements["ImgHeight"] = img_height
+        self._measurements["ImgWidth"] = img_width

@@ -16,7 +16,7 @@ class PlateSeriesIO(PlateSeriesPlotting):
             fig.savefig(f"{dirpath}{plate.sample_name}.png")
             plt.close(fig)
 
-    def save_colony_segmentation(self, dirpath, figsize=(16, 24)):
+    def save_colony_segmentation(self, dirpath, figsize=(16, 12)):
         for plate in self.plates:
             try:
                 fig, ax = plate.plot_colony_segmentation(

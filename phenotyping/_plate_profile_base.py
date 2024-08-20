@@ -1,8 +1,8 @@
 import logging
 
 formatter = logging.Formatter(
-    fmt=f'[%(asctime)s|%(name)s] %(levelname)s - %(message)s',
-    datefmt='%m/%d/%Y %I:%M:%S'
+        fmt=f'[%(asctime)s|%(name)s] %(levelname)s - %(message)s',
+        datefmt='%m/%d/%Y %I:%M:%S'
 )
 console_handler = logging.StreamHandler()
 log = logging.getLogger(__name__)
@@ -29,6 +29,8 @@ PHENOMICS_MEASUREMENTS = [
     "Intensity_IntegratedColorIntensityRed",
     "Intensity_IntegratedColorIntensityGreen",
     "Intensity_IntegratedColorIntensityBlue",
+    "ImgHeight",
+    "ImgWidth"
 ]
 
 BASIC_CP_API_MEASUREMENT_LABELS = [
@@ -37,27 +39,28 @@ BASIC_CP_API_MEASUREMENT_LABELS = [
     "Texture"
 ]
 
-
+# ----- Main Class Definition -----
 class PlateProfileBase(PlateNormalization):
     # TODO: Change plate to be an image instead and have plate be generated from the image
-    def __init__(self, img, sample_name, sampling_day=None, n_rows=8, n_cols=12,
+    def __init__(self, img: np.ndarray, sample_name: str,
+                 sampling_day: int = np.nan,
+                 n_rows=8, n_cols=12,
                  align=True, fit=True, use_boost=True,
-                 auto_analyze: bool = False
+                 auto_analyze: bool = False,
+                 **kwargs
                  ):
-        super().__init__(img=img, n_rows=n_rows, n_cols=n_cols,
-                         align=align, fit=fit, use_boost=use_boost, auto_run=auto_analyze)
+
         self.__sample_name = sample_name
         self.wells = []
-        self.well_names = []
-        self.bad_well_img_idxs = []
+        self.measurement_results = None
+        self.sampling_day = sampling_day
 
         self.cp_connnection = CellProfilerApiConnection()
         self.status_well_analysis = False
 
-        if sampling_day is not None:
-            self.sampling_day = sampling_day
-        else:
-            self.sampling_day = None
+        super().__init__(img=img, n_rows=n_rows, n_cols=n_cols,
+                         align=align, fit=fit, use_boost=use_boost, auto_run=auto_analyze,
+                         **kwargs)
 
         if auto_analyze:
             self.generate_well_profiles()
@@ -66,18 +69,30 @@ class PlateProfileBase(PlateNormalization):
     def sample_name(self):
         return self.__sample_name
 
+    @property
+    def results(self):
+        """
+        Convenience function
+        :return: self.get_results()
+        """
+        return self.get_results()
+
     def generate_well_profiles(self):
         if self.status_well_analysis is False:
             well_imgs = self.get_well_imgs()
             self.cp_connnection.refresh()
 
+            self.measurement_results = []
             for idx, well_img in enumerate(well_imgs):
                 log.debug(f"Starting well analysis for {self.sample_name}_well({idx:03d})")
                 tmp_well_name = f"{self.sample_name}_well({idx:03d})"
                 well_profile = ColonyProfile(
-                    well_img, tmp_well_name, auto_run=True
+                        well_img, tmp_well_name, auto_run=True
                 )
+                self.measurement_results.append(well_profile.get_results())
                 self.wells.append(well_profile)
+            self.measurement_results = pd.concat(self.measurement_results, axis=1)
+            self.measurement_results = self.measurement_results.loc[:, ~self.measurement_results.columns.duplicated()]
 
             self.status_well_analysis = True
             log.info("Finished generating well profiles")
@@ -91,21 +106,22 @@ class PlateProfileBase(PlateNormalization):
         :param include_adv:
         :return:
         """
+        if self.status_well_analysis is False:
+            self.generate_well_profiles()
+
         if include_adv:
             return self._results
         else:
             measurement_labels = NUMERIC_METADATA_LABELS
             if numeric_only is False:
                 measurement_labels = METADATA_LABELS + measurement_labels
-            if self.sampling_day is None:
-                measurement_labels.remove(f"{SAMPLING_DAY_LABEL}")
 
-            measurement_table = self._results.loc[measurement_labels,:]
+            measurement_table = self._results.loc[measurement_labels, :]
 
             basic_table = []
             for metric in BASIC_CP_API_MEASUREMENT_LABELS:
                 basic_table.append(
-                    self._results[self._results.index.to_series().str.contains(metric)]
+                        self._results.loc[self._results.index.to_series().str.contains(metric), :]
                 )
 
             results = pd.concat([measurement_table, *basic_table], axis=0).transpose()
@@ -118,36 +134,23 @@ class PlateProfileBase(PlateNormalization):
         self.sampling_day = sampling_day
 
     def get_valid_count(self):
-        return self.raw_results.loc[:, [f"{STATUS_VALIDITY_LABEL}"]].value_counts()
+        return self.measurement_results.loc[:, [f"{STATUS_VALIDITY_LABEL}"]].value_counts()
 
     def set_invalid_well(self, well_idxs: List[int]):
         for well_idx in well_idxs:
             self.wells[well_idx].status_validity = False
 
     @property
-    def raw_results(self):
-        if self.status_well_analysis is False:
-            self.generate_well_results()
-
-        results = []
-        for well in self.wells:
-            results.append(well.get_results())
-        results = pd.concat(results, axis=1)
-        results = results.loc[:, ~results.columns.duplicated()]
-        return results
-
-    @property
     def _metadata(self):
         metadata = []
-        col_idx = self.raw_results.columns
+        col_idx = self.measurement_results.columns
 
-        if self.sampling_day is not None:
-            day = np.full(shape=len(col_idx),
-                          fill_value=self.sampling_day)
-            day = pd.DataFrame({
-                f"{SAMPLING_DAY_LABEL}": day
-            }, index=col_idx).transpose()
-            metadata.append(day)
+        day = np.full(shape=len(col_idx),
+                      fill_value=self.sampling_day)
+        day = pd.DataFrame({
+            f"{SAMPLING_DAY_LABEL}": day
+        }, index=col_idx).transpose()
+        metadata.append(day)
 
         origin_plate_id = np.full(shape=len(col_idx),
                                   fill_value=self.sample_name)
@@ -162,5 +165,5 @@ class PlateProfileBase(PlateNormalization):
     def _results(self):
         if self.status_well_analysis is False:
             self.generate_well_profiles()
-        results = pd.concat([self._metadata, self.raw_results], axis=0)
+        results = pd.concat([self._metadata, self.measurement_results], axis=0)
         return results

@@ -80,7 +80,9 @@ class PlateProfilePlotting(PlateProfileBase):
                 count += 1
         return fig, ax
 
-    def plot_colony_segmentation(self, figsize=(18, 26), buffer_width=5,fontsize_title=26, fontsize_subtitle=14):
+    def plot_colony_segmentation(self, figsize=(16, 8),
+                                 buffer_width=5,
+                                 fontsize_title=26, fontsize_subtitle=14):
         if fontsize_subtitle > 2:
             fontsize_pass = fontsize_subtitle - 2
         else:
@@ -94,7 +96,7 @@ class PlateProfilePlotting(PlateProfileBase):
                 sharex=True,
                 tight_layout=False
             )
-            fig.suptitle(f"Plate Name: {self.sample_name}")
+            fig.suptitle(f"Plate Name: {self.sample_name}", fontsize=fontsize_title)
             # self.validate_well_names()
             for idx, ax in enumerate(axes.ravel()):
                 img = self.wells[idx].input_img

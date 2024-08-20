@@ -66,10 +66,7 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasure):
                     object_name=self.background_name,
                     image_name=self.sample_name
             ))
-            bg_measurements.append(cp_connection.measure_texture(
-                    object_name=self.background_name,
-                    image_name=self.sample_name
-            ))
+
             bg_series = pd.concat(bg_measurements,axis=0)
             bg_series = bg_series.rename(columns={
                 f"{self.background_name}": f"{self.colony_name}",
