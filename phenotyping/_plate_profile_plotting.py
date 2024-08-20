@@ -42,7 +42,7 @@ class PlateProfilePlotting(PlateProfileBase):
             fig.suptitle(self.sample_name, fontsize=fontsize)
         return fig, axes
 
-    def plot_analysis_segmentation(self, figsize=(18, 26), fontsize_title=26, fontsize_subtitle=16):
+    def plot_analysis_segmentation(self, figsize=(18, 10), fontsize_title=26, fontsize_subtitle=16):
         with plt.ioff():
             fig, axes = plt.subplots(
                 nrows=(self.n_rows * 2) + 1,
@@ -80,7 +80,7 @@ class PlateProfilePlotting(PlateProfileBase):
                 count += 1
         return fig, ax
 
-    def plot_colony_segmentation(self, figsize=(18, 26), buffer_width=5,fontsize_title=26, fontsize_subtitle=14):
+    def plot_colony_segmentation(self, figsize=(18, 10), buffer_width=5,fontsize_title=26, fontsize_subtitle=14):
         if fontsize_subtitle > 2:
             fontsize_pass = fontsize_subtitle - 2
         else:
@@ -106,7 +106,7 @@ class PlateProfilePlotting(PlateProfileBase):
 
                 else:
                     ax.set_title(f"Invalid: {idx}", fontsize=fontsize_subtitle, weight='bold')
-                    colony_img = self.wells[idx].input_img
+                    colony_img = self.wells[idx].labeled_segmentation
                     ax.get_xaxis().set_visible(False)
                     ax.get_yaxis().set_visible(False)
                     ax.spines['bottom'].set(color="red", linewidth=5)
