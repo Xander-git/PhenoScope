@@ -2,10 +2,12 @@
 
 ---
 ## v0.3.0 (Planned)
-1. User Feature Additions
+1. Feature Additions
    1. Ability to save/load plate data
    2. Parallel Processing (Maybe)
-2. Internal Changes
+2. Feature Changes
+   1. Change BlobFinder class to be able to update and increase reusability
+3. Backend Changes
    1. Remove dependence on CellProfilerApi for measurements. Create subclass of CellProfiler Workspace, Pipeline, & Measurement objects 
 
 ---

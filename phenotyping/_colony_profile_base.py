@@ -1,4 +1,6 @@
 import logging
+
+import numpy as np
 import pandas as pd
 
 formatter = logging.Formatter(
@@ -15,11 +17,11 @@ from skimage.color import rgb2gray
 
 
 class ColonyProfileBase:
-    def __init__(self, img, sample_name,
-                 auto_run=True
+    def __init__(self, img: np.ndarray, sample_name: str,
+                 auto_run: bool = True
                  ):
-        self._input_img = (img, None)
-        self._sample_name = (sample_name, None)
+        self.__input_img = img
+        self.__sample_name = sample_name
 
         self.status_validity = True
         self.status_analysis = False
@@ -28,11 +30,11 @@ class ColonyProfileBase:
 
     @property
     def input_img(self):
-        return self._input_img[0]
+        return self.__input_img
 
     @property
     def sample_name(self):
-        return self._sample_name[0]
+        return self.__sample_name
 
     @property
     def colony_name(self):

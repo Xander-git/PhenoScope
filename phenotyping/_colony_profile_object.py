@@ -1,8 +1,8 @@
 import logging
 
 formatter = logging.Formatter(
-    fmt=f'[%(asctime)s|%(name)s] %(levelname)s - %(message)s',
-    datefmt='%m/%d/%Y %I:%M:%S'
+        fmt=f'[%(asctime)s|%(name)s] %(levelname)s - %(message)s',
+        datefmt='%m/%d/%Y %I:%M:%S'
 )
 console_handler = logging.StreamHandler()
 log = logging.getLogger(__name__)
@@ -22,17 +22,26 @@ from ..detection import ClaheBoost
 
 
 class ColonyProfileObject(ColonyProfileBase):
-    def __init__(self, img, sample_name, auto_run=True):
+    def __init__(self, img: np.ndarray, sample_name: str,
+                 auto_run: bool = True,
+                 use_boosted_mask: bool = True,
+                 boost_kernel_size: bool = None,
+                 boost_footprint_radius: bool = 5
+                 ):
+        self.use_boost = use_boosted_mask
+        self.boost_kernel_size = boost_kernel_size
+        self.boost_footprint_radius = boost_footprint_radius
+
+        # Inititialize Params
         self.thresh = None
         self.segmentation = None
         self.labeled_segmentation = None
         self.colony_mask = None
         self.segment_properties = None
-        
+
         self.colony = None
         self.status_object = False
         super().__init__(img=img, sample_name=sample_name, auto_run=auto_run)
-
 
     # TODO: Add a way to finetune boosted_img parameters
     @property
@@ -41,7 +50,9 @@ class ColonyProfileObject(ColonyProfileBase):
         ClaheBoost parameters are optimized for an image of a single well
         :return:
         """
-        return ClaheBoost(self.gray_img, kernel_size=None, footprint_radius=5).get_boosted_img()
+        return ClaheBoost(self.gray_img,
+                          kernel_size=self.boost_kernel_size,
+                          footprint_radius=self.boost_footprint_radius).get_boosted_img()
 
     @property
     def background_mask(self):
@@ -85,18 +96,17 @@ class ColonyProfileObject(ColonyProfileBase):
                 log.warning(f"Failed to find colony for {self.sample_name}")
                 self.status_validity = False
 
-
     def _find_colony(self, threshold_method="otsu", use_boosted=True,
-                    filter_property="distance_from_center", filter_type="min",
-                    **kwargs
-                    ):
+                     filter_property="distance_from_center", filter_type="min",
+                     **kwargs
+                     ):
 
         self.find_objects(threshold_method=threshold_method, use_boosted=use_boosted)
         self.fill_object_holes(
-            hole_radius=kwargs.get("hole_radius", 10)
+                hole_radius=kwargs.get("hole_radius", 10)
         )
         self.filter_particles(
-            particle_radius=kwargs.get("particle_radius", None)
+                particle_radius=kwargs.get("particle_radius", None)
         )
         self.filter_properties(property=filter_property, filter_type=filter_type)
 
@@ -111,14 +121,14 @@ class ColonyProfileObject(ColonyProfileBase):
         else:
             img = self.gray_img
 
-        if threshold_method=="otsu":
+        if threshold_method == "otsu":
             self.thresh = threshold_otsu(img)
-        elif threshold_method=="triangle":
+        elif threshold_method == "triangle":
             self.thresh = threshold_triangle(img)
         else:
             raise ValueError("Unknown threshold method for finding objects")
 
-        self.segmentation = img>self.thresh
+        self.segmentation = img > self.thresh
         self.status_object = True
 
     def fill_object_holes(self, hole_radius=10):
@@ -150,24 +160,23 @@ class ColonyProfileObject(ColonyProfileBase):
         """
         self.labeled_segmentation = label(self.segmentation)
         self.segment_properties = pd.DataFrame(
-            regionprops_table(label_image=self.labeled_segmentation,
-                              intensity_image=self.input_img,
-                              properties=[
-                                  "label",
-                                  "area",
-                                  "centroid"
-                              ])
+                regionprops_table(label_image=self.labeled_segmentation,
+                                  intensity_image=self.input_img,
+                                  properties=[
+                                      "label",
+                                      "area",
+                                      "centroid"
+                                  ])
         )
         self.segment_properties = self.segment_properties.set_index("label")
         center_row = self.labeled_segmentation.shape[0] / 2
         center_col = self.labeled_segmentation.shape[1] / 2
         self.segment_properties["distance_from_center"] = np.sqrt(
-            (self.segment_properties["centroid-0"] - center_row) ** 2 + (self.segment_properties["centroid-1"] - center_col) ** 2
+                (self.segment_properties["centroid-0"] - center_row) ** 2 + (self.segment_properties["centroid-1"] - center_col) ** 2
         )
-        if filter_type=="min":
-            self.colony_mask = self.labeled_segmentation==self.segment_properties[f"{property}"].idxmin()
-        elif filter_type=="max":
-            self.colony_mask = self.labeled_segmentation==self.segment_properties[f"{property}"].idxmax()
+        if filter_type == "min":
+            self.colony_mask = self.labeled_segmentation == self.segment_properties[f"{property}"].idxmin()
+        elif filter_type == "max":
+            self.colony_mask = self.labeled_segmentation == self.segment_properties[f"{property}"].idxmax()
         else:
             raise ValueError("Invalid filter_type. Currently implemented filter types are 'min' or 'max'")
-

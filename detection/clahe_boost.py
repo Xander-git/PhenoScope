@@ -3,6 +3,7 @@ from skimage.exposure import equalize_adapthist
 from skimage.morphology import white_tophat, disk, square
 from skimage.util import img_as_ubyte
 
+from ..util import check_grayscale
 
 class ClaheBoost:
     """
@@ -12,10 +13,7 @@ class ClaheBoost:
     def __init__(self, img, footprint_shape="disk",
                  footprint_radius=15,
                  kernel_size=96):
-        if len(img.shape) > 2: #2D Check
-            self.img = rgb2gray(img)
-        else:
-            self.img = img
+        self.img = check_grayscale(img)
 
         if footprint_shape == "square":
             self.footprint = square(footprint_radius*2)
