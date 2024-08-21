@@ -3,7 +3,7 @@ import pandas as pd
 import warnings
 
 from ._blob_finder_particle_filter import BlobFinderParticleFilter
-from ..util import check_grayscale
+from ..util.image_analysis import check_grayscale
 
 class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
     def __init__(self, n_rows: int = 8, n_cols: int = 12,

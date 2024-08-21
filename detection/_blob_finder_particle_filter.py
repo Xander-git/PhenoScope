@@ -5,7 +5,7 @@ from skimage.morphology import white_tophat, disk, square
 from scipy.ndimage import binary_fill_holes
 # ----- Pkg Relative Import -----
 from ._blob_finder_table import BlobFinderTable
-from ..util import check_grayscale
+from ..util.image_analysis import check_grayscale
 
 
 # ----- Main Class Definition -----

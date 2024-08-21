@@ -9,7 +9,7 @@ log = logging.getLogger(logger_name)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
 
 # ----- Pkg Relative Import -----
-from ..util import check_grayscale
+from ..util.image_analysis import check_grayscale
 
 
 # ------ Main Class Definition -----
