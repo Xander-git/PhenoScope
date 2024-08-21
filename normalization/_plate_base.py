@@ -25,6 +25,7 @@ class PlateBase:
         self.n_cols = n_cols
         self._set_img(self.input_img)
 
+        # Assign individual properties so blob finding can be redone. May remove in later iterations
         self.blobs_detection_method = kwargs.get("blobs_detection_method", "log")
         self.blobs_min_sigma = kwargs.get("blobs_min_sigma", 4)
         self.blobs_max_sigma = kwargs.get("blobs_max_sigma", 40)
@@ -36,7 +37,20 @@ class PlateBase:
         self.blobs_tophat_radius = kwargs.get("blobs_tophat_radius", 15)
         self.blobs_border_filter = kwargs.get("blobs_border_filter", 50)
 
-        self.blobs = None
+        self.blobs = BlobFinder(
+                n_rows=self.n_rows,
+                n_cols=self.n_cols,
+                blob_search_method=self.blobs_detection_method,
+                min_sigma=self.blobs_min_sigma,
+                max_sigma=self.blobs_max_sigma,
+                num_sigma=self.blobs_num_sigma,
+                threshold=self.blobs_threshold,
+                max_overlap=self.blobs_overlap,
+                min_size=self.blobs_min_size,
+                filter_threshold_method=self.blobs_filter_threshold_method,
+                tophat_radius=self.blobs_tophat_radius,
+                border_filter=self.blobs_border_filter
+        )
 
         self.status_initial_blobs = False
         self.status_validity = True
@@ -56,15 +70,6 @@ class PlateBase:
         self._update_blobs()
         self.status_initial_blobs = True
 
-        # try:
-        #     log.info("Starting initial blob search")
-        #     self._update_blobs()
-        #     self.status_initial_blobs = True
-        # except:
-        #     self.status_validity = False
-        #     self._invalid_op = "Initial Blob Search"
-        #     self._invalid_op_img = self.img
-
     def _set_img(self, img):
         self.img = ski.util.img_as_ubyte(img)
 
@@ -74,21 +79,7 @@ class PlateBase:
         self._invalid_blobs = op_blobs
 
     def _update_blobs(self):
-        self.blobs = BlobFinder(
-                gray_img=self.gray_img,
-                n_rows=self.n_rows,
-                n_cols=self.n_cols,
-                blob_search_method=self.blobs_detection_method,
-                min_sigma=self.blobs_min_sigma,
-                max_sigma=self.blobs_max_sigma,
-                num_sigma=self.blobs_num_sigma,
-                threshold=self.blobs_threshold,
-                max_overlap=self.blobs_overlap,
-                min_size=self.blobs_min_size,
-                filter_threshold_method=self.blobs_filter_threshold_method,
-                tophat_radius=self.blobs_tophat_radius,
-                border_filter=self.blobs_border_filter
-        )
+        self.blobs.find_blobs(self.img)
 
     def _plotAx_failed_normalization(self, ax):
         if self._invalid_blobs is not None:

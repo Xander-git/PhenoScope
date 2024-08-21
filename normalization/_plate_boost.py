@@ -36,18 +36,4 @@ class PlateBoost(PlateIO):
             img = self.boosted_img
         else:
             img = self.gray_img
-        self.blobs = BlobFinder(
-            gray_img=img,
-            n_rows=self.n_rows,
-            n_cols=self.n_cols,
-            blob_search_method=self.blobs_detection_method,
-            min_sigma=self.blobs_min_sigma,
-            max_sigma=self.blobs_max_sigma,
-            num_sigma=self.blobs_num_sigma,
-            threshold=self.blobs_threshold,
-            max_overlap=self.blobs_overlap,
-            min_size=self.blobs_min_size,
-            filter_threshold_method=self.blobs_filter_threshold_method,
-            tophat_radius=self.blobs_tophat_radius,
-            border_filter=self.blobs_border_filter
-        )
+        self.blobs.find_blobs(img)

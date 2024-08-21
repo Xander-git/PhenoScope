@@ -3,28 +3,31 @@ import pandas as pd
 import warnings
 
 from ._blob_finder_particle_filter import BlobFinderParticleFilter
-
+from ..util import check_grayscale
 
 class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
-    def __init__(self, gray_img, n_rows=8, n_cols=12,
-                 bin_filter_method="mse",
+    def __init__(self, n_rows: int = 8, n_cols: int = 12,
                  blob_search_method="log",
                  filter_threshold_method="triangle",
+                 bin_filter_method: str = "mse",
+                 tophat_shape="square",
+                 tophat_radius=12,
+                 min_area=180,
                  **kwargs
                  ):
         super().__init__(
-                gray_img=gray_img,
                 n_rows=n_rows, n_cols=n_cols,
+                min_area=min_area,
+                filter_threshold_method=filter_threshold_method,
+                tophat_shape=tophat_shape,
+                tophat_radius=tophat_radius,
+                border_filter=kwargs.get("border_filter", 50),
                 blob_search_method=blob_search_method,
                 min_sigma=kwargs.get("min_sigma", 4),
                 max_sigma=kwargs.get("max_sigma", 40),
                 num_sigma=kwargs.get("num_sigma", 45),
-                threshold=kwargs.get("threshold", 0.01),
-                min_size=kwargs.get("min_size", 180),
-                filter_threshold_method=filter_threshold_method,
-                tophat_shape=kwargs.get("tophat_shape", "disk"),
-                tophat_radius=kwargs.get("tophat_radius", 12),
-                border_filter=kwargs.get("border_filter", 50)
+                search_threshold=kwargs.get("search_threshold", 0.01),
+
         )
         self.bin_filter_method = bin_filter_method
         self.__status_initial_mse = False
@@ -42,6 +45,13 @@ class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
         err = self.table["mse"]
         err = np.sum(err ** 2) / len(err)
         return err
+
+    def find_blobs(self, img):
+        self.__status_initial_mse = False
+        self.__status_update_mse = False
+        img = check_grayscale(img)
+        super().find_blobs(img)
+        self._calculate_bin_mse()
 
     def _calculate_bin_mse(self):
         if (

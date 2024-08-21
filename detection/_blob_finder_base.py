@@ -14,23 +14,24 @@ from ..util import check_grayscale
 
 # ------ Main Class Definition -----
 class BlobFinderBase:
-    def __init__(self, blob_search_method="log",
-                 min_sigma=2, max_sigma=40, num_sigma=30,
-                 threshold=0.01, max_overlap=0.1
+    def __init__(self,
+                 blob_search_method: str = "log",
+                 min_sigma: int = 2, max_sigma: int = 40, num_sigma: int = 30,
+                 search_threshold: float = 0.01, max_overlap: float = 0.1
                  ):
-        self._table = None
+        self._table = pd.DataFrame({"Blank": []})
 
         self.blob_search_method = blob_search_method
         self.min_sigma = min_sigma
         self.max_sigma = max_sigma
         self.num_sigma = num_sigma
 
-        self.threshold = threshold
+        self.search_threshold = search_threshold
         self.max_overlap = max_overlap
-
 
     @property
     def table(self):
+        assert (self._table.empty is True) or len(self._table) != 0, "No blobs found in Image"
         return self._table.copy()
 
     def find_blobs(self, img):
@@ -55,7 +56,7 @@ class BlobFinderBase:
                 min_sigma=self.min_sigma,
                 max_sigma=self.max_sigma,
                 num_sigma=self.num_sigma,
-                threshold=self.threshold,
+                threshold=self.search_threshold,
                 overlap=self.max_overlap
         ), columns=['y', 'x', 'sigma'])
         if self._table is None or len(self._table) == 0:
@@ -68,7 +69,7 @@ class BlobFinderBase:
                 image=gray_img,
                 min_sigma=self.min_sigma,
                 max_sigma=self.max_sigma,
-                threshold=self.threshold,
+                threshold=self.search_threshold,
                 overlap=self.max_overlap
         ), columns=["y", 'x', 'sigma'])
         if self._table is None or len(self._table) == 0:
@@ -82,7 +83,7 @@ class BlobFinderBase:
                 min_sigma=self.min_sigma,
                 max_sigma=self.max_sigma,
                 num_sigma=self.num_sigma,
-                threshold=self.threshold,
+                threshold=self.search_threshold,
                 overlap=self.max_overlap
         ), columns=['y', 'x', 'sigma'])
         if self._table is None or len(self._table) == 0:

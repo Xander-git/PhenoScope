@@ -8,18 +8,17 @@ from ._blob_finder_base import BlobFinderBase
 
 # ------ Main Class Definition -----
 class BlobFinderTable(BlobFinderBase):
-    def __init__(self, n_rows=8, n_cols=12,
-                 blob_search_method="log",
-                 min_sigma=2, max_sigma=35, num_sigma=45,
-                 threshold=0.01, max_overlap=0.1
+    def __init__(self, n_rows: int = 8, n_cols: int = 12,
+                 blob_search_method: str = "log",
+                 min_sigma: int = 2, max_sigma: int = 35, num_sigma: int = 45,
+                 search_threshold: float = 0.01, max_overlap: float = 0.1
                  ):
         self.n_rows = n_rows
         self.n_cols = n_cols
-        self.left_bound = self.right_bound = self.upper_bound = self.lower_bound = None
 
         super().__init__(blob_search_method=blob_search_method,
                          min_sigma=min_sigma, max_sigma=max_sigma, num_sigma=num_sigma,
-                         threshold=threshold, max_overlap=max_overlap)
+                         search_threshold=search_threshold, max_overlap=max_overlap)
 
     @property
     def row_idx(self):
@@ -34,9 +33,9 @@ class BlobFinderTable(BlobFinderBase):
         rows = []
         for i in self.row_idx:
             rows.append(
-                self.table.loc[
-                lambda row: row["row_num"] == i, :
-                ]
+                    self.table.loc[
+                    lambda row: row["row_num"] == i, :
+                    ]
             )
         return rows
 
@@ -45,9 +44,9 @@ class BlobFinderTable(BlobFinderBase):
         cols = []
         for i in self.col_idx:
             cols.append(
-                self.table.loc[
-                lambda row: row["col_num"] == i, :
-                ]
+                    self.table.loc[
+                    lambda row: row["col_num"] == i, :
+                    ]
             )
         return cols
 
@@ -57,7 +56,7 @@ class BlobFinderTable(BlobFinderBase):
         return self.table
 
     def generate_table(self):
-        assert self._table is not None or len(self._table)!=0, "No blobs found in Image"
+        assert self._table is not None or len(self._table) != 0, "No blobs found in Image"
         self._find_circle_info()
         self._cell_bounds_search()
         self._generate_bins()
@@ -80,15 +79,15 @@ class BlobFinderTable(BlobFinderBase):
 
     def _generate_bins(self):
         self._table.loc[:, 'row_num'] = pd.cut(
-            self._table['y'],
-            bins=self.n_rows,
-            labels=self.row_idx
+                self._table['y'],
+                bins=self.n_rows,
+                labels=self.row_idx
         )
         self._table.loc[:, 'col_num'] = pd.cut(
-            self._table['x'],
-            bins=self.n_cols,
-            labels=self.col_idx
+                self._table['x'],
+                bins=self.n_cols,
+                labels=self.col_idx
         )
         self._table['bin_set'] = "row" + self._table["row_num"].astype(str) \
-                                + "_" \
-                                + "col" + self._table["col_num"].astype(str)
+                                 + "_" \
+                                 + "col" + self._table["col_num"].astype(str)
