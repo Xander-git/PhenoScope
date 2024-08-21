@@ -13,7 +13,6 @@ console_handler.setFormatter(formatter)
 import skimage as ski
 
 # ----- Pkg Relative Import -----
-from ..detection.blob_finder import BlobFinder
 from ..util.plotting import plot_plate_rows
 
 

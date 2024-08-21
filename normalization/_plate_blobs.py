@@ -61,10 +61,6 @@ class PlateBlobs(PlateBase):
 
         log.debug("Initialized Class and Set Image")
 
-    @property
-    def gray_img(self):
-        return ski.color.rgb2gray(self.img)
-
     def run(self):
         # TODO: Integrate autorun
         super().run()

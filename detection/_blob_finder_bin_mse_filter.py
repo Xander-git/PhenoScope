@@ -32,7 +32,6 @@ class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
         self.bin_filter_method = bin_filter_method
         self.__status_initial_mse = False
         self.__status_update_mse = False
-        self._calculate_bin_mse()
 
     @property
     def table(self):

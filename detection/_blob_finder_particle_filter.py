@@ -81,16 +81,16 @@ class BlobFinderParticleFilter(BlobFinderTable):
         return gray_img
 
     @staticmethod
-    def _filter_by_white_tophat(gray_img, shape, radius):
+    def _filter_by_white_tophat(binary_img, shape, radius):
         if shape == "disk":
             footprint = disk(radius)
         elif shape == "square":
             footprint = square(radius * 2)
         else:
             footprint = disk(radius)
-        res = white_tophat(image=gray_img, footprint=footprint)
-        gray_img = gray_img & ~res
-        return gray_img
+        res = white_tophat(image=binary_img, footprint=footprint)
+        binary_img = binary_img & ~res
+        return binary_img
 
     def _filter_by_size(self, min_size):
         self._table = self._table[self._table['area'] >= min_size]
