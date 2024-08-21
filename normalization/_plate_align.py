@@ -14,13 +14,13 @@ logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file
 
 # ----- Pkg Relative Import -----
 
-from ._plate_base import PlateBase
+from ._plate_blobs import PlateBlobs
 
 
 # ----- Main Class Definition -----
 
 
-class PlateAlignment(PlateBase):
+class PlateAlignment(PlateBlobs):
     def __init__(self, img, n_rows=8, n_cols=12, align=True, **kwargs):
         self.unaligned_blobs = None
         self.aligned_blobs = None
