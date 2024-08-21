@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from ..detection.blob_finder import BlobFinder
 
 
 def plot_blobs(img, blobs, ax=None, set_axis=False, grayscale=False):
@@ -132,8 +131,3 @@ def plot_plate_cols(img, blobs_class, ax=None, set_axis=False, grayscale=False):
             return blobs_fig, blobs_ax
         else:
             return blobs_ax
-
-
-def plotAx_find_blobs(ax, img):
-    blobs = BlobFinder(img)
-    plot_plate_rows(img=img, blobs_class=blobs, ax=ax)
