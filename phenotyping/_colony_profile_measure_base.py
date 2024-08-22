@@ -33,10 +33,10 @@ class ColonyProfileMeasureBase(ColonyProfilePlotObject):
                 boost_footprint_radius=boost_footprint_radius
         )
 
-    def run_analysis(self,
-                     threshold_method="otsu", use_boosted=True,
-                     filter_property="distance_from_center", filter_type="min"
-                     ):
+    def run(self,
+            threshold_method="otsu", use_boosted=True,
+            filter_property="distance_from_center", filter_type="min"
+            ):
         self.find_colony(threshold_method=threshold_method, use_boosted=use_boosted,
                          filter_property=filter_property, filter_type=filter_type)
         self.measure_colony()
@@ -52,14 +52,13 @@ class ColonyProfileMeasureBase(ColonyProfilePlotObject):
                          name=self.colony_name)
 
     def measure_colony(self):
-        if self.status_validity:
-            try:
-                self._measure_colony()
-            except KeyboardInterrupt:
-                sys.exit("...User terminated program")
-            except:
-                log.warning(f"could not measure colony for sample: {self.sample_name}", exc_info=True)
-                self.status_validity = False
+        try:
+            self._measure_colony()
+        except KeyboardInterrupt:
+            sys.exit("...User terminated program")
+        except:
+            log.warning(f"could not measure colony for sample: {self.sample_name}", exc_info=True)
+            self.status_validity = False
         else:
             log.info(f"Did not measure colony due to invalid analysis: {self.sample_name}")
 

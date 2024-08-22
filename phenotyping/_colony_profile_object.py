@@ -84,23 +84,18 @@ class ColonyProfileObject(ColonyProfileBase):
         return ma.array(data=self.gray_img, mask=np.invert(self.background_mask))
 
     def find_colony(self, threshold_method="otsu", use_boosted=True,
-                    filter_property="distance_from_center", filter_type="min",
-                    **kwargs
-                    ):
-        if self.status_validity:
-            try:
-                self._find_colony(threshold_method=threshold_method, use_boosted=use_boosted,
-                                  filter_property=filter_property, filter_type=filter_type,
-                                  kwargs=kwargs)
-            except:
-                log.warning(f"Failed to find colony for {self.sample_name}")
-                self.status_validity = False
-
-    def _find_colony(self, threshold_method="otsu", use_boosted=True,
                      filter_property="distance_from_center", filter_type="min",
                      **kwargs
                      ):
-
+        """
+        Function implementation of find colony algorithm
+        :param threshold_method:
+        :param use_boosted:
+        :param filter_property:
+        :param filter_type:
+        :param kwargs:
+        :return:
+        """
         self.find_objects(threshold_method=threshold_method, use_boosted=use_boosted)
         self.fill_object_holes(
                 hole_radius=kwargs.get("hole_radius", 10)

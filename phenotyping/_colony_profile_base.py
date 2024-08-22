@@ -26,7 +26,7 @@ class ColonyProfileBase:
         self.status_validity = True
         self.status_analysis = False
         if auto_run:
-            self.run_analysis()
+            self.run()
 
     @property
     def input_img(self):
@@ -56,7 +56,7 @@ class ColonyProfileBase:
     @property
     def results(self):
         if self.status_analysis is False:
-            self.run_analysis()
+            self.run()
         # if self.status_validity is True:
         results = self._results
         if self.status_validity is False:
@@ -71,12 +71,12 @@ class ColonyProfileBase:
         """
         return None
 
-    def run_analysis(self):
+    def run(self):
         pass
 
     def get_results(self):
         """
         Convienence method for accessing the results table of the colony profile
-        :return: self.results
+        :return: pd.DataFrame
         """
         return self.results
