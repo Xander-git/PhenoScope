@@ -19,7 +19,7 @@ class PlateSeriesPlotting(PlateSeriesChangeOverTime):
         )
         return fig, ax
 
-    def plot_plate_colony_segmentation(self, plate_idx, figsize=(16,8)):
+    def plot_plate_colony_segmentation(self, plate_idx, figsize=(18,8)):
         fig, ax = self.plates[plate_idx].plot_colony_segmentation(
             figsize=figsize
         )
