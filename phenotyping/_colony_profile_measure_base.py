@@ -59,8 +59,6 @@ class ColonyProfileMeasureBase(ColonyProfilePlotObject):
         except:
             log.warning(f"could not measure colony for sample: {self.sample_name}", exc_info=True)
             self.status_validity = False
-        else:
-            log.info(f"Did not measure colony due to invalid analysis: {self.sample_name}")
 
     def _measure_colony(self):
         """
@@ -71,6 +69,11 @@ class ColonyProfileMeasureBase(ColonyProfilePlotObject):
         self._measure_img_dims()
 
     def _measure_img_dims(self):
-        img_height, img_width, img_channel = self.input_img.shape
+        if len(self.input_img.shape)==3:
+            img_height, img_width, _ = self.input_img.shape
+        elif len(self.input_img.shape)==2:
+            img_height, img_width = self.input_img.shape
+        else:
+            raise ValueError("Invalid image input")
         self._measurements["ImgHeight"] = img_height
         self._measurements["ImgWidth"] = img_width

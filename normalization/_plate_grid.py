@@ -16,12 +16,11 @@ from ..util.plotting import plot_plate_rows
 
 # ----- Main Class Definition -----
 class PlateGrid(PlateFit):
-    '''
-    Last Updated: 7/15/2024
-    '''
-
-    def __init__(self, img: np.ndarray, n_rows: int = 8, n_cols: int = 12,
-                 align: bool = True, fit: bool = True, **kwargs
+    def __init__(self, img: np.ndarray,
+                 n_rows: int = 8,
+                 n_cols: int = 12,
+                 border_padding: int = 50,
+                 **kwargs
                  ):
 
         self.cols_midpoints = None
@@ -33,26 +32,23 @@ class PlateGrid(PlateFit):
 
         super().__init__(
                 img=img,
-                border_padding=kwargs.get("border_padding", 50),
                 n_rows=n_rows,
                 n_cols=n_cols,
-                align=align,
-                fit=fit,
+                border_padding=border_padding,
                 **kwargs
         )
 
-    def run(self):
-        super().run()
-        try:
-            self.find_midpoints()
-        except:
-            log.warning("Could not find midpoints of image blobs", exc_info=True)
-            self.status_validity = False
-            self._invalid_op = "Invalid: Finding Midpoints"
-            self._invalid_op_img = self.img
-            self._invalid_blobs = self.blobs
+    def run(self, align=True, fit=True):
+        self.normalize(align=align, fit=fit)
+
+    def normalize(self, align=True, fit=True):
+        super().normalize(align=align, fit=fit)
+        self.find_midpoints()
 
     def find_midpoints(self):
+        if self.blobs.empty: self._update_blobs()
+        assert self.blobs.empty is False, "No blobs were found in the image"
+
         log.info("Starting calculation for blob edge midpoints")
         rows = self.blobs.rows
         cols = self.blobs.cols
@@ -78,8 +74,7 @@ class PlateGrid(PlateFit):
         self.status_midpoints = True
 
     def get_well_imgs(self):
-        if self.status_midpoints is False:
-            self.find_midpoints()
+        if self.status_midpoints is False: self.find_midpoints()
         log.info(f"Getting well images from plate")
         well_imgs = []
 

@@ -18,38 +18,28 @@ from ..util.plotting import plot_blobs
 
 
 class PlateFit(PlateAlignment):
-    def __init__(self, img,
-                 n_rows=8, n_cols=12,
-                 border_padding=50,
-                 align=True,
-                 fit=True,
+    def __init__(self, img: np.ndarray,
+                 n_rows: int = 8, n_cols: int = 12,
+                 border_padding: int = 50,
                  **kwargs
                  ):
 
-        self.padded_img = self.cropping_rect = None
+        self.padded_img = None
+        self.cropping_rect = None
         self.border_padding = border_padding
-        self.run_fitting = fit
 
-        self.status_fitted = False
-        self.status_pad_img = False
-        super().__init__(img, n_rows, n_cols, align, **kwargs)
+        self._status_fitted = False
+        self._status_pad_img = False
+        super().__init__(img=img,
+                         n_rows=n_rows,
+                         n_cols=n_cols, **kwargs)
 
-    def run(self):
-        try:
-            if self.run_fitting:
-                self._pad_input_img()
-                super().run()
-                self.fit_plate()
-            else:
-                super().run()
-        except:
-            log.warning("Could not fit image")
-            self.status_validity = False
-            self._invalid_op = "Invalid: Fitting"
-            self._invalid_op_img = self.img
-            self._invalid_blobs = self.blobs
+    def normalize(self, align=True, fit=True):
+        if fit: self._pad_img()
+        super().normalize(align=align)
+        if fit: self.fit_plate()
 
-    def _pad_input_img(self):
+    def _pad_img(self):
         self.padded_img = []
         for color_channel in range(3):
             tmp_img = self.img[:, :, color_channel]
@@ -63,12 +53,12 @@ class PlateFit(PlateAlignment):
                     )
             )
         self.padded_img = np.concatenate(arrays=self.padded_img, axis=2)
-        self.input_img = self.padded_img
         self._set_img(self.padded_img)
 
     def fit_plate(self):
-        if self.status_alignment is False:
-            self.align()
+        if self.blobs.empty: self._update_blobs()
+        assert self.blobs.empty is False, "No blobs were found in the image"
+
         log.info("Starting plate fitting")
         bound_L = math.floor(self.blobs.cols[0].x_minus.min() - self.border_padding)
         bound_R = math.ceil(self.blobs.cols[-1].x_plus.max() + self.border_padding)
@@ -82,12 +72,12 @@ class PlateFit(PlateAlignment):
                                                fill=False, edgecolor='white')
         log.info("Updating blobs after fitting")
         self._update_blobs()
-        self.status_fitted = True
+        self._status_fitted = True
 
     def plot_fitting(self):
-        if self.status_alignment is False:
+        if self._status_alignment is False:
             self.align()
-        if self.status_fitted is False:
+        if self._status_fitted is False:
             self.fit_plate()
         with plt.ioff():
             alignFit_fig, alignFit_ax = plt.subplots(nrows=1, ncols=2, figsize=(14, 10),
@@ -103,9 +93,9 @@ class PlateFit(PlateAlignment):
         return alignFit_fig, alignFit_ax
 
     def plotAx_fitting(self, ax: plt.Axes, fontsize=24):
-        if self.status_alignment is False:
+        if self._status_alignment is False:
             self.align()
-        if self.status_fitted is False:
+        if self._status_fitted is False:
             self.fit_plate()
 
         with plt.ioff():
@@ -117,7 +107,7 @@ class PlateFit(PlateAlignment):
 
     def get_fitted_blob_plot(self):
         with plt.ioff():
-            if self.status_fitted is False:
+            if self._status_fitted is False:
                 self.fit_plate()
 
             fig, ax = plot_blobs(self.img, self.blobs.table, grayscale=False)

@@ -19,7 +19,7 @@ class BlobFinderBase:
                  min_sigma: int = 2, max_sigma: int = 40, num_sigma: int = 30,
                  search_threshold: float = 0.01, max_overlap: float = 0.1
                  ):
-        self._table = pd.DataFrame({"Blank": []})
+        self._table = pd.DataFrame()
 
         self.blob_search_method = blob_search_method
         self.min_sigma = min_sigma
@@ -33,6 +33,10 @@ class BlobFinderBase:
     def table(self):
         assert (self._table.empty is True) or len(self._table) != 0, "No blobs found in Image"
         return self._table.copy()
+
+    @property
+    def empty(self):
+        return self._table.empty
 
     def find_blobs(self, img):
         img = check_grayscale(img)

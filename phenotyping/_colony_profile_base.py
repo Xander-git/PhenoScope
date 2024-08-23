@@ -69,7 +69,7 @@ class ColonyProfileBase:
         Placeholder for future work
         :return:
         """
-        return None
+        return pd.Series()
 
     def run(self):
         pass

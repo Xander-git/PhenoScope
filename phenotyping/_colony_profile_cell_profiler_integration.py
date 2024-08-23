@@ -15,18 +15,19 @@ import pandas as pd
 import numpy as np
 
 from ..cellprofiler_api import CellProfilerApi
-from ._colony_profile_measure import ColonyProfileMeasure
+from ._colony_profile_measure_color import ColonyProfileMeasureColor
 
 ##############################################################################
 cp_connection = CellProfilerApi()
 
 
-class ColonyProfileCellProfilerIntegration(ColonyProfileMeasure):
+class ColonyProfileCellProfilerIntegration(ColonyProfileMeasureColor):
     """
     Due to how the API works, this class should be the 2nd to last endpoint for the ColonyProfile Class
     """
 
-    def __init__(self, img: np.ndarray, sample_name: str,
+    def __init__(self, img: np.ndarray,
+                 sample_name: str,
                  auto_run: bool = True,
                  use_boosted_mask: bool = True,
                  boost_kernel_size: bool = None,
@@ -44,7 +45,10 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasure):
 
     @property
     def _results(self):
-        return pd.concat([self._cp_results, self.measurements], axis=0)
+        return pd.concat(
+                objs=[self._cp_results, self.measurements],
+                axis=0
+        )
 
     def run(self,
             threshold_method="otsu", use_boosted=True,
@@ -85,19 +89,22 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasure):
             f"{self.background_name}": f"{self.colony_name}",
         })
 
-        def add_bg_name(name):
+        def add_background_label(name):
             split = name.split("_")
             split[1] = f"Background{split[1]}"
             return "_".join(split)
 
-        bg_series.index = bg_series.index.map(lambda x: add_bg_name(x))
+        bg_series.index = bg_series.index.map(lambda x: add_background_label(x))
 
         cp_connection.pipeline.end_run()
         validity = pd.DataFrame({
             f"{self.colony_name}": self.status_validity,
         }, index=["status_valid_analysis"]
         ).astype(int)
-        self._cp_results = pd.concat([validity, *object_measurements, bg_series], axis=0)
+        self._cp_results = pd.concat(
+                objs=[validity, *object_measurements, bg_series],
+                axis=0
+        )
 
 
 class CellProfilerApiConnection:

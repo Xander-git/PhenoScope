@@ -1,6 +1,6 @@
 # ----- Imports -----
+import numpy as np
 import matplotlib.pyplot as plt
-
 import skimage.io as io
 from skimage.util import img_as_ubyte
 
@@ -19,17 +19,18 @@ from ._plate_grid import PlateGrid
 
 # ----- Main Class Definition -----
 class PlateIO(PlateGrid):
-    def __init__(self, img, n_rows=8, n_cols=12,
-                 align=True, fit=True,
-                 auto_run=True,
+    def __init__(self, img: np.ndarray,
+                 n_rows: int = 8,
+                 n_cols: int = 12,
+                 border_padding: int = 50,
+                 auto_run: bool = True,
                  **kwargs
                  ):
         super().__init__(
                 img=img,
                 n_rows=n_rows,
                 n_cols=n_cols,
-                align=align,
-                fit=fit,
+                border_padding=border_padding,
                 **kwargs
         )
         if auto_run:
@@ -61,11 +62,14 @@ class PlateIO(PlateGrid):
 
     def plot_ops(self, figsize=(18, 14), tight_layout=True, fontsize=16, plate_name=None):
         with plt.ioff():
-            fig, ax = plt.subplots(nrows=2, ncols=2, figsize=figsize, tight_layout=tight_layout)
+            fig, ax = plt.subplots(
+                    nrows=2, ncols=2,
+                    figsize=figsize, tight_layout=tight_layout
+            )
             opAx = ax.ravel()
-            self.plotAx_alignment(opAx[0], fontsize)
-            self.plotAx_fitting(opAx[1], fontsize)
-            self.plotAx_well_grid(opAx[2], fontsize)
+            self.plotAx_alignment(ax=opAx[0], fontsize=fontsize)
+            self.plotAx_fitting(ax=opAx[1], fontsize=fontsize)
+            self.plotAx_well_grid(ax=opAx[2], fontsize=fontsize)
             opAx[3].imshow(self.img)
             opAx[3].set_title("Final Image", fontsize=fontsize)
             opAx[3].grid(False)
@@ -79,12 +83,13 @@ class PlateIO(PlateGrid):
         for idx, well in enumerate(well_imgs):
             try:
                 io.imsave(
-                        f"{dirpath_folder}{name_prepend}well({idx:03d}){filetype}",
-                        img_as_ubyte(well), quality=100, check_contrast=False
+                        fname=f"{dirpath_folder}{name_prepend}well({idx:03d}){filetype}",
+                        arr=img_as_ubyte(well),
+                        quality=100,
+                        check_contrast=False
                 )
             except:
                 log.warning(f"Could not save well {idx}", exc_info=True)
-                self.invalid_wells.append(idx)
 
     def _plot_invalid(self):
         with plt.ioff():

@@ -10,7 +10,6 @@ log = logging.getLogger(__name__)
 log.addHandler(console_handler)
 console_handler.setFormatter(formatter)
 # ----- Imports -----
-import skimage as ski
 
 # ----- Pkg Relative Import -----
 from ._plate_base import PlateBase
@@ -64,9 +63,9 @@ class PlateBlobs(PlateBase):
     def run(self):
         # TODO: Integrate autorun
         super().run()
-        log.info("Starting initial blob search")
+
+    def normalize(self):
         self._update_blobs()
-        self.status_initial_blobs = True
 
     def _set_op(self, op_name, op_img, op_blobs):
         self._invalid_op = op_name
@@ -75,10 +74,15 @@ class PlateBlobs(PlateBase):
 
     def _update_blobs(self):
         self.blobs.find_blobs(self.img)
+        if self.status_initial_blobs is False:
+            log.info("Performing initial blob search")
+            self.status_initial_blobs = True
 
     def _plotAx_failed_normalization(self, ax):
         if self._invalid_blobs is not None:
-            plot_plate_rows(self._invalid_op_img, self._invalid_blobs, ax)
+            plot_plate_rows(self._invalid_op_img,
+                            self._invalid_blobs,
+                            ax)
             ax.set_title(self._invalid_op)
         else:
             ax.imshow(self._invalid_op_img)

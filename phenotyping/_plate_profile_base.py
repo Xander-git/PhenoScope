@@ -42,14 +42,14 @@ BASIC_CP_API_MEASUREMENT_LABELS = [
     "Texture"
 ]
 
+
 # ----- Main Class Definition -----
 class PlateProfileBase(PlateNormalization):
     # TODO: Change plate to be an image instead and have plate be generated from the image
     def __init__(self, img: np.ndarray, plate_name: str,
                  sampling_day: int = np.nan,
-                 n_rows=8, n_cols=12,
-                 align=True, fit=True, use_boost=True,
-                 auto_analyze: bool = False,
+                 n_rows: int = 8, n_cols: int = 12,
+                 use_boost: bool = True,
                  **kwargs
                  ):
 
@@ -61,12 +61,13 @@ class PlateProfileBase(PlateNormalization):
         self.cp_connnection = CellProfilerApiConnection()
         self.status_well_analysis = False
 
-        super().__init__(img=img, n_rows=n_rows, n_cols=n_cols,
-                         align=align, fit=fit, use_boost=use_boost, auto_run=auto_analyze,
+        super().__init__(img=img,
+                         n_rows=n_rows,
+                         n_cols=n_cols,
+                         use_boost=use_boost,
                          **kwargs)
 
-        if auto_analyze:
-            self.generate_well_profiles()
+        self._generate_well_profiles()
 
     @property
     def plate_name(self):
@@ -80,42 +81,18 @@ class PlateProfileBase(PlateNormalization):
         """
         return self.get_results()
 
-    def generate_well_profiles(self):
-        if self.status_well_analysis is False:
-            well_imgs = self.get_well_imgs()
-            self.cp_connnection.refresh()
+    def measure(self):
+        self._generate_well_profiles()
 
-            self.measurement_results = []
-            for idx, well_img in enumerate(well_imgs):
-                try:
-                    log.debug(f"Starting well analysis for {self.plate_name}_well({idx:03d})")
-                    tmp_well_name = f"{self.plate_name}_well({idx:03d})"
-                    well_profile = ColonyProfile(
-                            well_img, tmp_well_name, auto_run=True
-                    )
-                    self.measurement_results.append(well_profile.get_results())
-                    self.wells.append(well_profile)
-                except KeyboardInterrupt:
-                    sys.quit()
-                except:
-                    log.warning(f"Failed to analyze well {idx} for plate {self.plate_name}")
-            self.measurement_results = pd.concat(self.measurement_results, axis=1)
-            self.measurement_results = self.measurement_results.loc[:, ~self.measurement_results.columns.duplicated()]
-
-            self.status_well_analysis = True
-            log.info("Finished generating well profiles")
-        else:
-            log.info("Status well analysis already generated")
-
-    def get_results(self, numeric_only=False, include_adv: bool = False):
+    def get_results(self, numeric_only: bool = False, include_adv: bool = False):
         """
         Returns the results of the CellProfiler Analysis from the API. The results have the measurements row-wise,
         and the plate colonies column-wise.
-        :param include_adv:
+        :param numeric_only:bool, include_adv: bool
         :return:
         """
         if self.status_well_analysis is False:
-            self.generate_well_profiles()
+            self._generate_well_profiles()
 
         if include_adv:
             return self._results
@@ -148,6 +125,33 @@ class PlateProfileBase(PlateNormalization):
         for well_idx in well_idxs:
             self.wells[well_idx].status_validity = False
 
+    def _generate_well_profiles(self):
+        if self.status_well_analysis is False:
+            well_imgs = self.get_well_imgs()
+            self.cp_connnection.refresh()
+
+            self.measurement_results = []
+            for idx, well_img in enumerate(well_imgs):
+                try:
+                    log.debug(f"Starting well analysis for {self.plate_name}_well({idx:03d})")
+                    tmp_well_name = f"{self.plate_name}_well({idx:03d})"
+                    well_profile = ColonyProfile(
+                            well_img, tmp_well_name, auto_run=True
+                    )
+                    self.measurement_results.append(well_profile.get_results())
+                    self.wells.append(well_profile)
+                except KeyboardInterrupt:
+                    sys.exit()
+                except:
+                    log.warning(f"Failed to analyze well {idx} for plate {self.plate_name}")
+            self.measurement_results = pd.concat(self.measurement_results, axis=1)
+            self.measurement_results = self.measurement_results.loc[:, ~self.measurement_results.columns.duplicated()]
+
+            self.status_well_analysis = True
+            log.info("Finished generating well profiles")
+        else:
+            log.info("Status well analysis already generated")
+
     @property
     def _metadata(self):
         metadata = []
@@ -171,7 +175,6 @@ class PlateProfileBase(PlateNormalization):
 
     @property
     def _results(self):
-        if self.status_well_analysis is False:
-            self.generate_well_profiles()
+        if self.status_well_analysis is False: self.measure()
         results = pd.concat([self._metadata, self.measurement_results], axis=0)
         return results

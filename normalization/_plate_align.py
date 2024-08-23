@@ -1,3 +1,14 @@
+# ----- Logger ------
+import logging
+
+formatter = logging.Formatter(
+        fmt=f'[%(asctime)s|%(name)s] %(levelname)s - %(message)s',
+        datefmt='%m/%d/%Y %I:%M:%S'
+)
+console_handler = logging.StreamHandler()
+log = logging.getLogger(__name__)
+log.addHandler(console_handler)
+console_handler.setFormatter(formatter)
 # ----- Imports -----
 import pandas as pd
 import numpy as np
@@ -5,54 +16,37 @@ import math
 import skimage as ski
 import matplotlib.pyplot as plt
 
-import os
-import logging
-
-logger_name = "phenomics-normalization"
-log = logging.getLogger(logger_name)
-logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
-
 # ----- Pkg Relative Import -----
-
 from ._plate_blobs import PlateBlobs
 
 
 # ----- Main Class Definition -----
-
-
 class PlateAlignment(PlateBlobs):
-    def __init__(self, img, n_rows=8, n_cols=12, align=True, **kwargs):
+    def __init__(self, img: np.ndarray,
+                 n_rows: int = 8,
+                 n_cols: int = 12,
+                 **kwargs
+                 ):
         self.unaligned_blobs = None
         self.aligned_blobs = None
         self.input_alignment_vector = None
         self.alignment_vector = None
         self.degree_of_rotation = None
 
-        # usage check
-        self.run_alignment = align
-
         # execution check
-        self.status_alignment = False
+        self._status_alignment = False
 
         super().__init__(img, n_rows, n_cols, **kwargs)
 
-    def run(self):
-        super().run()
-        try:
-            if self.run_alignment:
-                self.align()
-        except:
-            log.warning("Could not align image")
-            self.status_validity = False
-            self._invalid_op = "Invalid: Alignment"
-            self._invalid_op_img = self.img
-            self._invalid_blobs = self.blobs
+    def normalize(self, align=True):
+        super().normalize()
+        if align:
+            self.align()
 
     def align(self):
+        if self.blobs.empty: self._update_blobs()
+        assert self.blobs.empty is False, "No blobs were found in the image"
         log.info("Starting plate alignment")
-        if self.status_initial_blobs is False:
-            self._update_blobs()
-            self.status_initial_blobs = True
         self.unaligned_blobs = self.blobs
 
         max_row = self.blobs.table.groupby("row_num", observed=True)["mse"].mean()
@@ -99,10 +93,10 @@ class PlateAlignment(PlateBlobs):
         log.info("Updating blobs after alignment")
         self._update_blobs()
         self.aligned_blobs = self.blobs
-        self.status_alignment = True
+        self._status_alignment = True
 
     def plot_alignment(self):
-        if self.status_alignment is False:
+        if self._status_alignment is False:
             self.align()
         with plt.ioff():
             alignFit_fig, alignFit_ax = plt.subplots(nrows=1, ncols=2, figsize=(14, 10),
@@ -115,7 +109,7 @@ class PlateAlignment(PlateBlobs):
         return alignFit_fig, alignFit_ax
 
     def plotAx_alignment(self, ax: plt.Axes, fontsize=24):
-        if self.status_alignment is False:
+        if self._status_alignment is False:
             self.align()
         with plt.ioff():
             ax.grid(False)

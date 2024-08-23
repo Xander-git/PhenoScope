@@ -36,6 +36,9 @@ class PlateBase:
         return ski.color.rgb2gray(self.img)
 
     def run(self):
+        self.normalize()
+
+    def normalize(self):
         pass
 
     def _set_img(self, img):
