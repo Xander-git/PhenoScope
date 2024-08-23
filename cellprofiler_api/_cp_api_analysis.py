@@ -31,9 +31,9 @@ class CellProfilerApiAnalysis(CellProfilerApiMeasureTexture):
 
     def run(self, colony_profile, **kwargs):
         Results = namedtuple("Results", ["results", "status_validity"])
-        self._set_name(colony_profile.sample_name)
+        self._set_name(colony_profile.plate_name)
         self._set_img(colony_profile.input_img)
-        self.add_object(np.copy(colony_profile.colony_mask), colony_profile.colony_name, colony_profile.sample_name)
+        self.add_object(np.copy(colony_profile.colony_mask), colony_profile.colony_name, colony_profile.plate_name)
         self.status_validity = colony_profile.status_validity
 
         if self.status_validity:
@@ -58,7 +58,7 @@ class CellProfilerApiAnalysis(CellProfilerApiMeasureTexture):
                               self.status_validity)
             return results
         except:
-            log.warning(f"Could not compile results for {colony_profile.sample_name}")
+            log.warning(f"Could not compile results for {colony_profile.plate_name}")
 
     def get_results(self):
         # Deprecated when module was converted to an API instead of integration

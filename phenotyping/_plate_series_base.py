@@ -12,7 +12,7 @@ logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|%(name)s] %(message)s')
 
 class PlateSeriesBase:
 
-    def __init__(self, imgs: List[np.ndarray], sample_name, day_index=None,
+    def __init__(self, imgs: List[np.ndarray], sample_name: List[str], day_index: List[int] = None,
                  n_rows=8, n_cols=12, align=True, fit=True, auto_analyze=True
                  ):
         self.img_set = imgs
@@ -55,7 +55,7 @@ class PlateSeriesBase:
                 cp_api_naming = self._add_day_to_name(day=self.day_index[idx], name=self.sample_name)
                 plate = PlateProfile(
                         img=img,
-                        sample_name=f"{cp_api_naming}",
+                        plate_name=f"{cp_api_naming}",
                         sampling_day=self.day_index[idx],
                         n_rows=self.n_rows, n_cols=self.n_cols,
                         align=self.align, fit=self.fit,
@@ -68,7 +68,7 @@ class PlateSeriesBase:
         self.status_analysis = True
 
     def get_results(self):
-        return self.results.copy()
+        return self.results
 
     def get_plate_results(self, plate_idx, numeric_only=False, include_adv=False):
         tmp = self.plates[plate_idx].get_results(

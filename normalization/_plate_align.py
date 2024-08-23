@@ -60,7 +60,6 @@ class PlateAlignment(PlateBlobs):
 
         # Sets normalization algorithm to use row with the most blobs found
         # Varied performance across different cases
-        #
 
         m, b = np.polyfit(max_row.x, max_row.y, 1)
 

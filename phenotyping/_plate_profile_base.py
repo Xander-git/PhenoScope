@@ -1,3 +1,4 @@
+# ----- Logger Setup -----
 import logging
 
 formatter = logging.Formatter(
@@ -8,7 +9,9 @@ console_handler = logging.StreamHandler()
 log = logging.getLogger(__name__)
 log.addHandler(console_handler)
 console_handler.setFormatter(formatter)
+# ----- Imports -----
 
+import sys
 import pandas as pd
 import numpy as np
 from typing import List
@@ -42,7 +45,7 @@ BASIC_CP_API_MEASUREMENT_LABELS = [
 # ----- Main Class Definition -----
 class PlateProfileBase(PlateNormalization):
     # TODO: Change plate to be an image instead and have plate be generated from the image
-    def __init__(self, img: np.ndarray, sample_name: str,
+    def __init__(self, img: np.ndarray, plate_name: str,
                  sampling_day: int = np.nan,
                  n_rows=8, n_cols=12,
                  align=True, fit=True, use_boost=True,
@@ -50,7 +53,7 @@ class PlateProfileBase(PlateNormalization):
                  **kwargs
                  ):
 
-        self.__sample_name = sample_name
+        self.__plate_name = plate_name
         self.wells = []
         self.measurement_results = None
         self.sampling_day = sampling_day
@@ -66,8 +69,8 @@ class PlateProfileBase(PlateNormalization):
             self.generate_well_profiles()
 
     @property
-    def sample_name(self):
-        return self.__sample_name
+    def plate_name(self):
+        return self.__plate_name
 
     @property
     def results(self):
@@ -84,13 +87,18 @@ class PlateProfileBase(PlateNormalization):
 
             self.measurement_results = []
             for idx, well_img in enumerate(well_imgs):
-                log.debug(f"Starting well analysis for {self.sample_name}_well({idx:03d})")
-                tmp_well_name = f"{self.sample_name}_well({idx:03d})"
-                well_profile = ColonyProfile(
-                        well_img, tmp_well_name, auto_run=True
-                )
-                self.measurement_results.append(well_profile.get_results())
-                self.wells.append(well_profile)
+                try:
+                    log.debug(f"Starting well analysis for {self.plate_name}_well({idx:03d})")
+                    tmp_well_name = f"{self.plate_name}_well({idx:03d})"
+                    well_profile = ColonyProfile(
+                            well_img, tmp_well_name, auto_run=True
+                    )
+                    self.measurement_results.append(well_profile.get_results())
+                    self.wells.append(well_profile)
+                except KeyboardInterrupt:
+                    sys.quit()
+                except:
+                    log.warning(f"Failed to analyze well {idx} for plate {self.plate_name}")
             self.measurement_results = pd.concat(self.measurement_results, axis=1)
             self.measurement_results = self.measurement_results.loc[:, ~self.measurement_results.columns.duplicated()]
 
@@ -153,7 +161,7 @@ class PlateProfileBase(PlateNormalization):
         metadata.append(day)
 
         origin_plate_id = np.full(shape=len(col_idx),
-                                  fill_value=self.sample_name)
+                                  fill_value=self.plate_name)
         origin_plate_id = pd.DataFrame({
             f"{ORIGIN_PLATE_ID_LABEL}": origin_plate_id
         }, index=col_idx).transpose()

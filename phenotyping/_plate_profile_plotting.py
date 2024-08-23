@@ -22,8 +22,8 @@ class PlateProfilePlotting(PlateProfileBase):
                 # else:
                 #     ax.imshow(self.gray_imgs[idx], cmap="gray")
                 ax.set_axis_off()
-                ax.set_title(f"{self.wells[idx].sample_name}")
-            fig.suptitle(self.sample_name, fontsize=fontsize)
+                ax.set_title(f"{self.wells[idx].plate_name}")
+            fig.suptitle(self.plate_name, fontsize=fontsize)
         return fig, axes
 
     def plot_unfiltered(self, fontsize=18):
@@ -39,7 +39,7 @@ class PlateProfilePlotting(PlateProfileBase):
                 #     ax.imshow(self.gray_imgs[idx], cmap="gray")
                 ax.set_axis_off()
                 ax.set_title(f"well({idx})")
-            fig.suptitle(self.sample_name, fontsize=fontsize)
+            fig.suptitle(self.plate_name, fontsize=fontsize)
         return fig, axes
 
     def plot_analysis_segmentation(self, figsize=(18, 26), fontsize_title=26, fontsize_subtitle=16):
@@ -65,7 +65,7 @@ class PlateProfilePlotting(PlateProfileBase):
             for idx in range(self.n_cols):
                 ax = ax_ravel[count]
                 if idx==0:
-                    msg = f"Plate Name: {self.sample_name}"
+                    msg = f"Plate Name: {self.plate_name}"
                     xlim = ax.get_xlim()
                     ylim = ax.get_ylim()
                     mid_y = ylim[0] + (ylim[1] - ylim[0]) / 2
@@ -96,7 +96,7 @@ class PlateProfilePlotting(PlateProfileBase):
                 sharex=True,
                 tight_layout = True
             )
-            fig.suptitle(f"Plate Name: {self.sample_name}", fontsize=fontsize_title)
+            fig.suptitle(f"Plate Name: {self.plate_name}", fontsize=fontsize_title)
             # self.validate_well_names()
             for idx, ax in enumerate(axes.ravel()):
                 img = self.wells[idx].input_img
