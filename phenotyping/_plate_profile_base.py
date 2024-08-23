@@ -73,7 +73,7 @@ class PlateProfileBase(PlateNormalization):
     def results(self):
         """
         Convenience function
-        :return: self.get_results()
+        :return: pd.DataFrame
         """
         return self.get_results()
 

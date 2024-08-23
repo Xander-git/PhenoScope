@@ -30,7 +30,8 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasure):
                  auto_run: bool = True,
                  use_boosted_mask: bool = True,
                  boost_kernel_size: bool = None,
-                 boost_footprint_radius: bool = 5):
+                 boost_footprint_radius: bool = 5
+                 ):
         self._cp_results = None
         super().__init__(
                 img=img,
@@ -79,7 +80,7 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasure):
                 image_name=self.sample_name
         ))
 
-        bg_series = pd.concat(bg_measurements,axis=0)
+        bg_series = pd.concat(bg_measurements, axis=0)
         bg_series = bg_series.rename(columns={
             f"{self.background_name}": f"{self.colony_name}",
         })
@@ -89,7 +90,7 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasure):
             split[1] = f"Background{split[1]}"
             return "_".join(split)
 
-        bg_series.index=bg_series.index.map(lambda x: add_bg_name(x))
+        bg_series.index = bg_series.index.map(lambda x: add_bg_name(x))
 
         cp_connection.pipeline.end_run()
         validity = pd.DataFrame({
