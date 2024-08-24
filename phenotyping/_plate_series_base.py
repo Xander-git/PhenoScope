@@ -25,6 +25,7 @@ class PlateSeriesBase:
 
     @property
     def results(self):
+        # TODO: Finish how results are collected
         if self.status_analysis is False: self.run_analysis()
 
         results = []
