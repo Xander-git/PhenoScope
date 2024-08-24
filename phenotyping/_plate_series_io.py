@@ -9,7 +9,7 @@ class PlateSeriesIO(PlateSeriesPlotting):
         self.results.to_csv(filepath)
 
     def save_analysis_segmentation(self, dirpath, figsize=(16, 24)):
-        for plate in self.plates:
+        for plate in self._plates:
             fig, ax = plate.plot_analysis_segmentation(
                 figsize=figsize
             )
@@ -17,7 +17,7 @@ class PlateSeriesIO(PlateSeriesPlotting):
             plt.close(fig)
 
     def save_colony_segmentation(self, dirpath, figsize=(16, 12)):
-        for plate in self.plates:
+        for plate in self._plates:
             try:
                 fig, ax = plate.plot_colony_segmentation(
                     figsize=figsize
@@ -31,7 +31,7 @@ class PlateSeriesIO(PlateSeriesPlotting):
 
 
     def save_plate_gridding_op(self, dirpath, figsize=(12, 8)):
-        for plate in self.plates:
+        for plate in self._plates:
             fig, ax = plate.plot_well_grid(figsize=figsize)
             ax.set_title(f"{plate.plate_name}")
             fig.savefig(f"{dirpath}{plate.plate_name}.png")

@@ -23,10 +23,9 @@ class PlateFit(PlateAlignment):
                  border_padding: int = 50,
                  **kwargs
                  ):
-
+        self.border_padding = border_padding
         self.padded_img = None
         self.cropping_rect = None
-        self.border_padding = border_padding
 
         self._status_fitted = False
         self._status_pad_img = False
@@ -34,9 +33,13 @@ class PlateFit(PlateAlignment):
                          n_rows=n_rows,
                          n_cols=n_cols, **kwargs)
 
-    def normalize(self, align=True, fit=True):
+    def normalize(self, align: bool = True, fit: bool = True):
+        self._normalize(align=align, fit=fit)
+        self._status_normalization = True
+
+    def _normalize(self, align: bool = True, fit: bool = True):
         if fit: self._pad_img()
-        super().normalize(align=align)
+        super()._normalize(align=align)
         if fit: self.fit_plate()
 
     def _pad_img(self):

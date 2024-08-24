@@ -19,9 +19,9 @@ from ._plate_series_base import PlateSeriesBase
 
 class PlateSeriesChangeOverTime(PlateSeriesBase):
     def get_change_over_time(self):
-        if len(self.plates) > 1:
+        if len(self._plates) > 1:
             deltaMetric = []
-            for idx in range(len(self.plates) - 1):
+            for idx in range(len(self._plates) - 1):
                 data_zero = self.get_plate_results(
                         plate_idx=idx,
                         numeric_only=True
@@ -50,7 +50,7 @@ class PlateSeriesChangeOverTime(PlateSeriesBase):
             return deltaMetric.sort_index()
 
     def get_avg_change_over_time(self):
-        if len(self.plates) > 1:
+        if len(self._plates) > 1:
             deltaMetric = self.get_change_over_time()
             avg_change = deltaMetric.groupby("colony_name").mean()
             avg_change.columns = avg_change.columns.map(lambda x: f"avg_{x}")

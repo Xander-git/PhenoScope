@@ -41,8 +41,8 @@ class PlateGrid(PlateFit):
     def run(self, align=True, fit=True):
         self.normalize(align=align, fit=fit)
 
-    def normalize(self, align=True, fit=True):
-        super().normalize(align=align, fit=fit)
+    def _normalize(self, align=True, fit=True):
+        super()._normalize(align=align, fit=fit)
         self.find_midpoints()
 
     def find_midpoints(self):

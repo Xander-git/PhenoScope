@@ -56,10 +56,11 @@ class PlateProfileBase(PlateNormalization):
         self.__plate_name = plate_name
         self.wells = []
         self.measurement_results = None
-        self.sampling_day = sampling_day
+        self._sampling_day = sampling_day
 
         self.cp_connnection = CellProfilerApiConnection()
         self.status_well_analysis = False
+        self.status_measure = False
 
         super().__init__(img=img,
                          n_rows=n_rows,
@@ -81,14 +82,23 @@ class PlateProfileBase(PlateNormalization):
         """
         return self.get_results()
 
+    def run(self, align=True, fit=True):
+        super().run(align=align, fit=fit)
+        self.measure()
+
     def measure(self):
+        self._measure()
+        self.status_measure = True
+
+    def _measure(self):
         self._generate_well_profiles()
 
     def get_results(self, numeric_only: bool = False, include_adv: bool = False):
         """
         Returns the results of the CellProfiler Analysis from the API. The results have the measurements row-wise,
         and the plate colonies column-wise.
-        :param numeric_only:bool, include_adv: bool
+        :param numeric_only: whether to return only the numer results or not
+        :param include_adv: whether to include the advanced measurements taken by cellprofiler as well
         :return:
         """
         if self.status_well_analysis is False:
@@ -115,8 +125,8 @@ class PlateProfileBase(PlateNormalization):
 
             return results
 
-    def add_sampling_day(self, sampling_day: int):
-        self.sampling_day = sampling_day
+    def set_sampling_day(self, sampling_day: int):
+        self._sampling_day = sampling_day
 
     def get_valid_count(self):
         return self.measurement_results.loc[:, [f"{STATUS_VALIDITY_LABEL}"]].value_counts()
@@ -158,7 +168,7 @@ class PlateProfileBase(PlateNormalization):
         col_idx = self.measurement_results.columns
 
         day = np.full(shape=len(col_idx),
-                      fill_value=self.sampling_day)
+                      fill_value=self._sampling_day)
         day = pd.DataFrame({
             f"{SAMPLING_DAY_LABEL}": day
         }, index=col_idx).transpose()

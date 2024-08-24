@@ -27,8 +27,8 @@ class PlateAlignment(PlateBlobs):
                  n_cols: int = 12,
                  **kwargs
                  ):
-        self.unaligned_blobs = None
-        self.aligned_blobs = None
+        self._unaligned_blobs = None
+        self._aligned_blobs = None
         self.input_alignment_vector = None
         self.alignment_vector = None
         self.degree_of_rotation = None
@@ -39,7 +39,11 @@ class PlateAlignment(PlateBlobs):
         super().__init__(img, n_rows, n_cols, **kwargs)
 
     def normalize(self, align=True):
-        super().normalize()
+        self._normalize(align)
+        self._status_normalization = True
+
+    def _normalize(self, align=True):
+        super()._normalize()
         if align:
             self.align()
 
@@ -47,7 +51,7 @@ class PlateAlignment(PlateBlobs):
         if self.blobs.empty: self._update_blobs()
         assert self.blobs.empty is False, "No blobs were found in the image"
         log.info("Starting plate alignment")
-        self.unaligned_blobs = self.blobs
+        self._unaligned_blobs = self.blobs
 
         max_row = self.blobs.table.groupby("row_num", observed=True)["mse"].mean()
         max_row = self.blobs.rows[max_row.idxmin()]
@@ -85,14 +89,14 @@ class PlateAlignment(PlateBlobs):
 
         self._set_img(
                 ski.transform.rotate(
-                        self.img,
-                        self.degree_of_rotation,
+                        image=self.img,
+                        angle=self.degree_of_rotation,
                         mode='edge'
                 )
         )
         log.info("Updating blobs after alignment")
         self._update_blobs()
-        self.aligned_blobs = self.blobs
+        self._aligned_blobs = self.blobs
         self._status_alignment = True
 
     def plot_alignment(self):
@@ -119,10 +123,10 @@ class PlateAlignment(PlateBlobs):
                     self.alignment_vector['x'], self.alignment_vector['y'], color='white', linestyle='--'
             )
             ax.set_title(f'Input Alignment Rotation {self.degree_of_rotation:.4f} | Red: Original | Yellow: New', fontsize=fontsize)
-            for idx, row in self.unaligned_blobs.table.iterrows():
+            for idx, row in self._unaligned_blobs.table.iterrows():
                 c = plt.Circle((row['x'], row['y']), row['radius'], color='red', fill=False)
                 ax.add_patch(c)
-            for idx, row in self.aligned_blobs.table.iterrows():
+            for idx, row in self._aligned_blobs.table.iterrows():
                 c = plt.Circle(
                         (row['x'], row['y']), row['radius'], color='yellow', alpha=0.8, fill=False
                 )

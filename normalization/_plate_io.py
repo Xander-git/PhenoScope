@@ -60,7 +60,7 @@ class PlateIO(PlateGrid):
             fig.savefig(fname_split[0] + "_invalid_normalizaton" + fname_split[1])
         plt.close(fig)
 
-    def plot_ops(self, figsize=(18, 14), tight_layout=True, fontsize=16, plate_name=None):
+    def plot_ops(self, plate_name=None, figsize=(18, 14), tight_layout=True, fontsize=16):
         with plt.ioff():
             fig, ax = plt.subplots(
                     nrows=2, ncols=2,
@@ -78,12 +78,13 @@ class PlateIO(PlateGrid):
         return fig, ax
 
     def save_wells(self, dirpath_folder, name_prepend="", filetype=".png"):
+        if dirpath_folder[-1] == "/": dirpath_folder = dirpath_folder[:-1]
         well_imgs = self.get_well_imgs()
         log.info(f"Saving well images to {dirpath_folder}")
         for idx, well in enumerate(well_imgs):
             try:
                 io.imsave(
-                        fname=f"{dirpath_folder}{name_prepend}well({idx:03d}){filetype}",
+                        fname=f"{dirpath_folder}/{name_prepend}well({idx:03d}){filetype}",
                         arr=img_as_ubyte(well),
                         quality=100,
                         check_contrast=False

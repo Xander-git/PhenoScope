@@ -64,7 +64,7 @@ class PlateBlobs(PlateBase):
         # TODO: Integrate autorun
         super().run()
 
-    def normalize(self):
+    def _normalize(self):
         self._update_blobs()
 
     def _set_op(self, op_name, op_img, op_blobs):
@@ -80,9 +80,9 @@ class PlateBlobs(PlateBase):
 
     def _plotAx_failed_normalization(self, ax):
         if self._invalid_blobs is not None:
-            plot_plate_rows(self._invalid_op_img,
-                            self._invalid_blobs,
-                            ax)
+            plot_plate_rows(img=self._invalid_op_img,
+                            blobs_class=self._invalid_blobs,
+                            ax=ax)
             ax.set_title(self._invalid_op)
         else:
             ax.imshow(self._invalid_op_img)
