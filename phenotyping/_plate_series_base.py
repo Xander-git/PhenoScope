@@ -32,7 +32,7 @@ class PlateSeriesBase:
             results.append(_tmp.reset_index(drop=False))
 
         results = pd.concat(results, axis=0, ignore_index=True)
-        results.insert(0, "series_name", value=self.series_name)
+        results.insert(1, "series_name", value=self.series_name)
         results = results.set_index(["colony_name", "sampling_day"])
         return results
 
