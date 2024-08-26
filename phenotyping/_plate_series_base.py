@@ -45,8 +45,7 @@ class PlateSeriesBase:
 
     @property
     def plate_idx(self):
-        idx = [self._plates.keys()]
-        idx.sort()
+        idx = sorted(self._plates.keys())
         return idx
 
     @property
