@@ -19,9 +19,6 @@ class PlateSeriesBase:
         self.n_cols = n_cols
 
         self._plates = {}
-        self.invalid_imgs = []
-
-        self.status_analysis = False
 
     @property
     def results(self):
@@ -35,8 +32,16 @@ class PlateSeriesBase:
             results.append(_tmp.reset_index(drop=False))
 
         results = pd.concat(results, axis=0, ignore_index=True)
+        results.insert(0, "series_name", value=self.series_name)
         results = results.set_index(["colony_name", "sampling_day"])
         return results
+
+    @property
+    def status_analysis(self):
+        status = True
+        for plate in self.plates:
+            if plate.status_measure is False: status = False
+        return status
 
     @property
     def plate_idx(self):
@@ -51,13 +56,11 @@ class PlateSeriesBase:
         assert plate_profile._sampling_day != np.nan, "PlateProfile is missing a sampling day"
         self._plates[int(plate_profile._sampling_day)] = plate_profile
 
-    def add_plate_img(self, img: np.ndarray,
-                      plate_name: str,
-                      sampling_day: int,
-                      use_boost=True,
+    def add_plate_img(self, img: np.ndarray, plate_name: str, sampling_day: int,
                       align: bool = True,
                       fit: bool = True,
                       measure=True,
+                      use_boost=True,
                       **kwargs
                       ):
         plate = PlateProfile(
@@ -73,6 +76,10 @@ class PlateSeriesBase:
         if measure: plate.run(align=align, fit=fit)
         self.add_plate(plate)
 
+    def run_analysis(self):
+        for plate in self.plates:
+            plate.run()
+
     def get_results(self):
         return self.results
 
@@ -81,16 +88,4 @@ class PlateSeriesBase:
                 numeric_only=numeric_only,
                 include_adv=include_adv
         )
-
-        tmp.index = tmp.index.map(lambda x: self._remove_day_from_name(x))
         return tmp
-
-    @staticmethod
-    def _add_day_to_name(day, name):
-        return f"day({day})_{name}"
-
-    @staticmethod
-    def _remove_day_from_name(dayname):
-        name = dayname.split("_")[1:]
-        name = "_".join(name)
-        return name

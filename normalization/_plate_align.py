@@ -44,8 +44,7 @@ class PlateAlignment(PlateBlobs):
 
     def _normalize(self, align=True):
         super()._normalize()
-        if align:
-            self.align()
+        if align and self._status_alignment is False: self.align()
 
     def align(self):
         if self.blobs.empty: self._update_blobs()
@@ -103,7 +102,8 @@ class PlateAlignment(PlateBlobs):
         if self._status_alignment is False:
             self.align()
         with plt.ioff():
-            alignFit_fig, alignFit_ax = plt.subplots(nrows=1, ncols=2, figsize=(14, 10),
+            alignFit_fig, alignFit_ax = plt.subplots(nrows=1, ncols=2,
+                                                     figsize=(14, 10),
                                                      tight_layout=True)
 
             self.plotAx_alignment(alignFit_ax[0])

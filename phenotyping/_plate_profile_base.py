@@ -21,7 +21,7 @@ from .colony_profile import ColonyProfile, CellProfilerApiConnection
 
 METADATA_LABELS = [
     (STATUS_VALIDITY_LABEL := "status_valid_analysis"),
-    (ORIGIN_PLATE_ID_LABEL := "origin_plate_id")
+    (PLATE_NAME_LABEL := "plate_name")
 ]
 
 NUMERIC_METADATA_LABELS = [
@@ -84,7 +84,7 @@ class PlateProfileBase(PlateNormalization):
 
     def run(self, align=True, fit=True):
         super().run(align=align, fit=fit)
-        self.measure()
+        if self.status_measure is False: self.measure()
 
     def measure(self):
         self._measure()
@@ -174,12 +174,12 @@ class PlateProfileBase(PlateNormalization):
         }, index=col_idx).transpose()
         metadata.append(day)
 
-        origin_plate_id = np.full(shape=len(col_idx),
-                                  fill_value=self.plate_name)
-        origin_plate_id = pd.DataFrame({
-            f"{ORIGIN_PLATE_ID_LABEL}": origin_plate_id
+        PLATE_NAME_METADATA = np.full(shape=len(col_idx),
+                                      fill_value=self.plate_name)
+        PLATE_NAME_METADATA = pd.DataFrame({
+            f"{PLATE_NAME_LABEL}": PLATE_NAME_METADATA
         }, index=col_idx).transpose()
-        metadata.append(origin_plate_id)
+        metadata.append(PLATE_NAME_METADATA)
 
         return pd.concat(metadata, axis=0)
 
