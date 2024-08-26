@@ -55,7 +55,7 @@ class PlateFit(PlateAlignment):
                             ), axis=2
                     )
             )
-        self.padded_img = np.concatenate(arrays=self.padded_img, axis=2)
+        self.padded_img = np.concatenate(self.padded_img, axis=2)
         self._set_img(self.padded_img)
 
     def fit_plate(self):
