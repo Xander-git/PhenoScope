@@ -19,16 +19,16 @@ from ._plate_series_base import PlateSeriesBase
 
 class PlateSeriesChangeOverTime(PlateSeriesBase):
     def get_change_over_time(self):
-        if len(self._plates) > 1:
+        if len(self.plates) > 1:
             deltaMetric = []
-            for day in range(len(self.sampling_days) - 1):
+            for day_idx in range(len(self.sampling_days) - 1):
                 data_zero = self.get_plate_results(
-                        sampling_day=day,
+                        sampling_day=self.sampling_days[day_idx],
                         numeric_only=True
                 )
 
                 data_one = self.get_plate_results(
-                        sampling_day=(day + 1),
+                        sampling_day=self.sampling_days[(day_idx + 1)],
                         numeric_only=True
                 )
 
