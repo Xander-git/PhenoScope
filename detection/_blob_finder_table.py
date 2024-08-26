@@ -56,7 +56,10 @@ class BlobFinderTable(BlobFinderBase):
         return self.table
 
     def generate_table(self):
-        assert self._table is not None or len(self._table) != 0, "No blobs found in Image"
+        if self.empty is False: raise ArithmeticError(
+                "No blobs are found. Run on an image or boost the image's contrast"
+        )
+
         self._find_circle_info()
         self._cell_bounds_search()
         self._generate_bins()

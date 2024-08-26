@@ -47,7 +47,10 @@ class PlateGrid(PlateFit):
 
     def find_midpoints(self):
         if self.blobs.empty: self._update_blobs()
-        assert self.blobs.empty is False, "No blobs were found in the image"
+        if self.blobs.empty is False: raise ArithmeticError(
+                "No blobs were found in the image. Try increasing the contrast of the image or change preprocessing parameters"
+        )
+
 
         log.info("Starting calculation for blob edge midpoints")
         rows = self.blobs.rows

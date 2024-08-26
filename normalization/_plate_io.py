@@ -86,8 +86,11 @@ class PlateIO(PlateGrid):
                         quality=100,
                         check_contrast=False
                 )
-            except:
-                log.warning(f"Could not save well {idx}", exc_info=True)
+            except KeyboardInterrupt:
+                raise KeyboardInterrupt
+            except Exception as e:
+                log.warning(f"Could not save well {idx}\n", exc_info=True)
+                log.warning(f"Error: {e}")
 
     def _plot_invalid(self):
         with plt.ioff():

@@ -68,7 +68,6 @@ class PlateProfileBase(PlateNormalization):
                          use_boost=use_boost,
                          **kwargs)
 
-
     @property
     def plate_name(self):
         return self.__plate_name
@@ -150,7 +149,7 @@ class PlateProfileBase(PlateNormalization):
                     self.measurement_results.append(well_profile.get_results())
                     self.wells.append(well_profile)
                 except KeyboardInterrupt:
-                    sys.exit()
+                    raise KeyboardInterrupt
                 except:
                     log.warning(f"Failed to analyze well {idx} for plate {self.plate_name}")
             self.measurement_results = pd.concat(self.measurement_results, axis=1)

@@ -55,7 +55,7 @@ class ColonyProfileMeasureBase(ColonyProfilePlotObject):
         try:
             self._measure_colony()
         except KeyboardInterrupt:
-            sys.exit("...User terminated program")
+            raise KeyboardInterrupt
         except:
             log.warning(f"could not measure colony for sample: {self.sample_name}", exc_info=True)
             self.status_validity = False
@@ -69,9 +69,9 @@ class ColonyProfileMeasureBase(ColonyProfilePlotObject):
         self._measure_img_dims()
 
     def _measure_img_dims(self):
-        if len(self.input_img.shape)==3:
+        if len(self.input_img.shape) == 3:
             img_height, img_width, _ = self.input_img.shape
-        elif len(self.input_img.shape)==2:
+        elif len(self.input_img.shape) == 2:
             img_height, img_width = self.input_img.shape
         else:
             raise ValueError("Invalid image input")
