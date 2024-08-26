@@ -45,8 +45,9 @@ class PlateSeriesBase:
 
     @property
     def plate_idx(self):
-        idx = np.array([self._plates.keys()], dtype=int)
-        return np.sort(idx)
+        idx = [self._plates.keys()]
+        idx.sort()
+        return idx
 
     @property
     def plates(self):
