@@ -23,7 +23,6 @@ class PlateIO(PlateGrid):
                  n_rows: int = 8,
                  n_cols: int = 12,
                  border_padding: int = 50,
-                 auto_run: bool = True,
                  **kwargs
                  ):
         super().__init__(
@@ -33,8 +32,6 @@ class PlateIO(PlateGrid):
                 border_padding=border_padding,
                 **kwargs
         )
-        if auto_run:
-            self.run()
 
     def imsave(self, fname_save):
         if self.status_validity:

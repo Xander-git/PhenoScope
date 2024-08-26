@@ -68,7 +68,6 @@ class PlateProfileBase(PlateNormalization):
                          use_boost=use_boost,
                          **kwargs)
 
-        self._generate_well_profiles()
 
     @property
     def plate_name(self):

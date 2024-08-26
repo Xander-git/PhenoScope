@@ -11,7 +11,6 @@ class PlateBoost(PlateIO):
     def __init__(self, img: np.ndarray, n_rows: int = 8, n_cols: int = 12,
                  border_padding: int = 50,
                  use_boost: bool = True,
-                 auto_run=True,
                  **kwargs
                  ):
         self._use_boost = use_boost
@@ -23,11 +22,8 @@ class PlateBoost(PlateIO):
                 n_rows=n_rows,
                 n_cols=n_cols,
                 border_padding=border_padding,
-                auto_run=auto_run,
                 **kwargs
         )
-        if auto_run:
-            self.run()
 
     @property
     def boosted_img(self):
