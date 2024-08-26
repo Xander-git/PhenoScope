@@ -44,13 +44,12 @@ class PlateSeriesBase:
         return status
 
     @property
-    def plate_idx(self):
-        idx = sorted(self._plates.keys())
-        return idx
+    def sampling_days(self):
+        return sorted(self._plates.keys())
 
     @property
     def plates(self):
-        return [self.plates[key] for key in self.plate_idx]
+        return [self._plates[key] for key in self.sampling_days]
 
     def add_plate(self, plate_profile: PlateProfile):
         assert plate_profile._sampling_day != np.nan, "PlateProfile is missing a sampling day"
@@ -83,8 +82,8 @@ class PlateSeriesBase:
     def get_results(self):
         return self.results
 
-    def get_plate_results(self, plate_idx, numeric_only=False, include_adv=False):
-        tmp = self._plates[plate_idx].get_results(
+    def get_plate_results(self, sampling_day, numeric_only=False, include_adv=False):
+        tmp = self.plates[sampling_day].get_results(
                 numeric_only=numeric_only,
                 include_adv=include_adv
         )
