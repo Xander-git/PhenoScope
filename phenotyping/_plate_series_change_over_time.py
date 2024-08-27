@@ -26,11 +26,13 @@ class PlateSeriesChangeOverTime(PlateSeriesBase):
                         plate_idx=plate_idx,
                         numeric_only=True
                 )
+                data_zero.loc[:, "sampling_day"] = data_zero.loc[:, "sampling_day"].astype(int)
 
                 data_one = self.get_plate_results(
                         plate_idx=(plate_idx + 1),
                         numeric_only=True
                 )
+                data_one.loc[:, "sampling_day"] = data_one.loc[:, "sampling_day"].astype(int)
 
                 tmp = data_one - data_zero
                 tmp.columns = tmp.columns.map(lambda x: f"d({x})/dt")
