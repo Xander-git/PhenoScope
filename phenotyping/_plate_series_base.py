@@ -89,8 +89,7 @@ class PlateSeriesBase:
         return self.results
 
     def get_plate_results(self, plate_idx: int, numeric_only: bool = False, include_adv: bool = False):
-        tmp = self.plates[plate_idx].get_results(
+        return self.plates[plate_idx].get_results(
                 numeric_only=numeric_only,
                 include_adv=include_adv
         )
-        return tmp

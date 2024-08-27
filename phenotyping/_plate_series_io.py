@@ -24,7 +24,7 @@ class PlateSeriesIO(PlateSeriesPlotting):
 
     def save_analysis_segmentation(self, dirpath, figsize=(16, 24)):
         dirpath = Path(dirpath)
-        for plate in self._plates:
+        for plate in self.plates:
             fig, ax = plate.plot_analysis_segmentation(
                     figsize=figsize
             )
@@ -33,7 +33,9 @@ class PlateSeriesIO(PlateSeriesPlotting):
 
     def save_colony_segmentation(self, dirpath, figsize=(16, 12)):
         dirpath = Path(dirpath)
-        for plate in self._plates:
+        dirpath.mkdir(exist_ok=True, parents=True)
+        for plate in self.plates:
+            log.debug(f"plate: {plate}")
             try:
                 fig, ax = plate.plot_colony_segmentation(
                         figsize=figsize
@@ -48,7 +50,7 @@ class PlateSeriesIO(PlateSeriesPlotting):
     def save_plate_gridding_op(self, dirpath, figsize=(12, 8)):
         dirpath = Path(dirpath)
         dirpath.mkdir(parents=True, exist_ok=True)
-        for plate in self._plates:
+        for plate in self.plates:
             fig, ax = plate.plot_well_grid(figsize=figsize)
             ax.set_title(f"{plate.plate_name}")
             fig.savefig(dirpath / f"{plate.plate_name}.png")

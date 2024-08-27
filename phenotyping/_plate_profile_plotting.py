@@ -90,7 +90,7 @@ class PlateProfilePlotting(PlateProfileBase):
             fontsize_pass = fontsize_subtitle
         with plt.ioff():
             fig, axes = plt.subplots(
-                    nrows=(self.n_rows),
+                    nrows=self.n_rows,
                     ncols=self.n_cols,
                     figsize=figsize,
                     sharey=True,
