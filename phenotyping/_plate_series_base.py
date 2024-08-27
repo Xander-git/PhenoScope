@@ -51,8 +51,14 @@ class PlateSeriesBase:
     def plates(self):
         return [self._plates[key] for key in self.sampling_days]
 
+    @property
+    def plate_count(self):
+        return len(self._plates.values())
+
     def add_plate(self, plate_profile: PlateProfile):
-        assert plate_profile._sampling_day != np.nan, "PlateProfile is missing a sampling day"
+        """Add a plate to the plate_profile. Plates will be sorted by sampling day"""
+        if plate_profile._sampling_day == np.nan:
+            raise ValueError("PlateProfile is missing a sampling day")
         self._plates[int(plate_profile._sampling_day)] = plate_profile
 
     def add_plate_img(self, img: np.ndarray, plate_name: str, sampling_day: int,
@@ -82,8 +88,8 @@ class PlateSeriesBase:
     def get_results(self):
         return self.results
 
-    def get_plate_results(self, sampling_day, numeric_only=False, include_adv=False):
-        tmp = self.plates[sampling_day].get_results(
+    def get_plate_results(self, plate_idx, numeric_only=False, include_adv=False):
+        tmp = self.plates[plate_idx].get_results(
                 numeric_only=numeric_only,
                 include_adv=include_adv
         )
