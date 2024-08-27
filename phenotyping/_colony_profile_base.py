@@ -18,7 +18,7 @@ from skimage.color import rgb2gray
 
 class ColonyProfileBase:
     def __init__(self, img: np.ndarray, image_name: str,
-                 auto_run: bool = True
+                 auto_run: bool = False
                  ):
         self.__input_img = img
         self.__image_name = image_name
@@ -55,7 +55,7 @@ class ColonyProfileBase:
 
     @property
     def results(self):
-        if self.status_analysis is False:
+        if self.status_analysis is False and self.status_validity is True:
             self.run()
         # if self.status_validity is True:
         results = self._results

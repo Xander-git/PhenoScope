@@ -23,7 +23,7 @@ from ..detection import ClaheBoost
 
 class ColonyProfileObject(ColonyProfileBase):
     def __init__(self, img: np.ndarray, image_name: str,
-                 auto_run: bool = True,
+                 auto_run: bool = False,
                  use_boosted_mask: bool = True,
                  boost_kernel_size: bool = None,
                  boost_footprint_radius: bool = 5
@@ -97,14 +97,18 @@ class ColonyProfileObject(ColonyProfileBase):
         :param kwargs:
         :return:
         """
-        self.find_objects(threshold_method=threshold_method, use_boosted=use_boosted)
-        self.fill_object_holes(
-                hole_radius=kwargs.get("hole_radius", 10)
-        )
-        self.filter_particles(
-                particle_radius=kwargs.get("particle_radius", None)
-        )
-        self.filter_properties(property=filter_property, filter_type=filter_type)
+        try:
+            self.find_objects(threshold_method=threshold_method, use_boosted=use_boosted)
+            self.fill_object_holes(
+                    hole_radius=kwargs.get("hole_radius", 10)
+            )
+            self.filter_particles(
+                    particle_radius=kwargs.get("particle_radius", None)
+            )
+            self.filter_properties(property=filter_property, filter_type=filter_type)
+        except Exception as e:
+            self.status_object = False
+            raise e
 
     def find_objects(self, threshold_method="otsu", use_boosted=True):
         """
