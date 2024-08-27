@@ -105,11 +105,11 @@ class PlateProfileBase(PlateNormalization):
         if include_adv:
             return self._results
         else:
-            measurement_labels = NUMERIC_METADATA_LABELS
+            metadata = NUMERIC_METADATA_LABELS
             if numeric_only is False:
-                measurement_labels = METADATA_LABELS + measurement_labels
+                metadata = METADATA_LABELS + metadata
 
-            measurement_table = self._results.loc[measurement_labels, :]
+            metadata_table = self._results.loc[metadata, :]
 
             basic_table = []
             for metric in BASIC_CP_API_MEASUREMENT_LABELS:
@@ -117,7 +117,7 @@ class PlateProfileBase(PlateNormalization):
                         self._results.loc[self._results.index.to_series().str.contains(metric), :]
                 )
 
-            results = pd.concat([measurement_table, *basic_table], axis=0).transpose()
+            results = pd.concat([metadata_table, *basic_table], axis=0).transpose()
             if numeric_only is False:
                 results.loc[:, f"{STATUS_VALIDITY_LABEL}"] = results.loc[:, f"{STATUS_VALIDITY_LABEL}"].astype(bool)
 

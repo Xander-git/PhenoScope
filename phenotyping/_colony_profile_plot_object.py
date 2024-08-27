@@ -59,7 +59,7 @@ class ColonyProfilePlotObject(ColonyProfileObject):
                 ax.set_title("Segmented Colony")
             else:
                 ax.imshow(self.gray_img, cmap="YlOrRd")
-                ax.set_title(f"Err:{self.sample_name}")
+                ax.set_title(f"Err:{self.image_name}")
         return ax
 
     def plotAx_segmentation(self, ax, cmap="viridis"):

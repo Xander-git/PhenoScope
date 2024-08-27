@@ -22,7 +22,7 @@ from ..detection import ClaheBoost
 
 
 class ColonyProfileObject(ColonyProfileBase):
-    def __init__(self, img: np.ndarray, sample_name: str,
+    def __init__(self, img: np.ndarray, image_name: str,
                  auto_run: bool = True,
                  use_boosted_mask: bool = True,
                  boost_kernel_size: bool = None,
@@ -41,7 +41,7 @@ class ColonyProfileObject(ColonyProfileBase):
 
         self.colony = None
         self.status_object = False
-        super().__init__(img=img, sample_name=sample_name, auto_run=auto_run)
+        super().__init__(img=img, image_name=image_name, auto_run=auto_run)
 
     # TODO: Add a way to finetune boosted_img parameters
     @property

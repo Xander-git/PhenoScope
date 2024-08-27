@@ -17,11 +17,11 @@ from skimage.color import rgb2gray
 
 
 class ColonyProfileBase:
-    def __init__(self, img: np.ndarray, sample_name: str,
+    def __init__(self, img: np.ndarray, image_name: str,
                  auto_run: bool = True
                  ):
         self.__input_img = img
-        self.__sample_name = sample_name
+        self.__image_name = image_name
 
         self.status_validity = True
         self.status_analysis = False
@@ -33,16 +33,16 @@ class ColonyProfileBase:
         return self.__input_img
 
     @property
-    def sample_name(self):
-        return self.__sample_name
+    def image_name(self):
+        return self.__image_name
 
     @property
     def colony_name(self):
-        return f"{self.sample_name}_Colony"
+        return f"{self.image_name}_Colony"
 
     @property
     def background_name(self):
-        return f"{self.sample_name}_Background"
+        return f"{self.image_name}_Background"
 
     @property
     def gray_img(self):

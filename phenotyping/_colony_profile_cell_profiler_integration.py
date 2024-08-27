@@ -27,7 +27,7 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasureColor):
     """
 
     def __init__(self, img: np.ndarray,
-                 sample_name: str,
+                 image_name: str,
                  auto_run: bool = True,
                  use_boosted_mask: bool = True,
                  boost_kernel_size: bool = None,
@@ -36,7 +36,7 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasureColor):
         self._cp_results = None
         super().__init__(
                 img=img,
-                sample_name=sample_name,
+                image_name=image_name,
                 auto_run=auto_run,
                 use_boosted_mask=use_boosted_mask,
                 boost_kernel_size=boost_kernel_size,
@@ -62,26 +62,26 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasureColor):
     def run_cp_analysis(self):
         object_measurements = []
         bg_measurements = []
-        cp_connection.add_img(self.gray_img, self.sample_name)
+        cp_connection.add_img(self.gray_img, self.image_name)
 
         # Measure Colony
-        cp_connection.add_object(self.colony_mask, self.colony_name, self.sample_name)
+        cp_connection.add_object(self.colony_mask, self.colony_name, self.image_name)
         object_measurements.append(cp_connection.measure_areashape(self.colony_name))
         object_measurements.append(cp_connection.measure_intensity(
                 object_name=self.colony_name,
-                image_name=self.sample_name
+                image_name=self.image_name
         ))
         object_measurements.append(cp_connection.measure_texture(
                 object_name=self.colony_name,
-                image_name=self.sample_name
+                image_name=self.image_name
         ))
 
         # Measure Background
-        cp_connection.add_object(self.background_mask, self.background_name, self.sample_name)
+        cp_connection.add_object(self.background_mask, self.background_name, self.image_name)
         bg_measurements.append(cp_connection.measure_areashape(self.background_name))
         bg_measurements.append(cp_connection.measure_intensity(
                 object_name=self.background_name,
-                image_name=self.sample_name
+                image_name=self.image_name
         ))
 
         bg_series = pd.concat(bg_measurements, axis=0)

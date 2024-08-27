@@ -36,9 +36,9 @@ class PlateSeriesChangeOverTime(PlateSeriesBase):
                 tmp.columns = tmp.columns.map(lambda x: f"d({x})/dt")
 
                 reference_plates = ("day("
-                                    + data_one.loc[:, "sampling_day"].apply(lambda x: f"{x:.0f}")
+                                    + data_one.loc[:, "sampling_day"].apply(lambda x: f"{x}")
                                     + ") - day("
-                                    + data_zero.loc[:, "sampling_day"].apply(lambda x: f"{x:.0f}")
+                                    + data_zero.loc[:, "sampling_day"].apply(lambda x: f"{x}")
                                     + ")")
                 tmp.insert(0, "reference_plates", reference_plates)
 

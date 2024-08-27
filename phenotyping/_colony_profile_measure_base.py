@@ -17,7 +17,7 @@ from ._colony_profile_plot_object import ColonyProfilePlotObject
 
 
 class ColonyProfileMeasureBase(ColonyProfilePlotObject):
-    def __init__(self, img: np.ndarray, sample_name: str,
+    def __init__(self, img: np.ndarray, image_name: str,
                  auto_run: bool = True,
                  use_boosted_mask: bool = True,
                  boost_kernel_size: bool = None,
@@ -26,7 +26,7 @@ class ColonyProfileMeasureBase(ColonyProfilePlotObject):
         self._measurements = {}
         super().__init__(
                 img=img,
-                sample_name=sample_name,
+                image_name=image_name,
                 auto_run=auto_run,
                 use_boosted_mask=use_boosted_mask,
                 boost_kernel_size=boost_kernel_size,
@@ -57,7 +57,7 @@ class ColonyProfileMeasureBase(ColonyProfilePlotObject):
         except KeyboardInterrupt:
             raise KeyboardInterrupt
         except:
-            log.warning(f"could not measure colony for sample: {self.sample_name}", exc_info=True)
+            log.warning(f"could not measure colony for sample: {self.image_name}", exc_info=True)
             self.status_validity = False
 
     def _measure_colony(self):
