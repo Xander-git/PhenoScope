@@ -31,7 +31,7 @@ class BlobFinderBase:
 
     @property
     def table(self):
-        if self.empty is True: raise ArithmeticError(
+        if self.empty is True: raise ValueError(
                 "No blobs are found. Run on an image or boost the image's contrast"
         )
         return self._table.copy()

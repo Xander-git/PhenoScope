@@ -168,6 +168,8 @@ class ColonyProfileObject(ColonyProfileBase):
                                       "centroid"
                                   ])
         )
+        if self.segment_properties.empty: raise ValueError("No objects found in image")
+
         self.segment_properties = self.segment_properties.set_index("label")
         center_row = self.labeled_segmentation.shape[0] / 2
         center_col = self.labeled_segmentation.shape[1] / 2

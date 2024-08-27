@@ -154,7 +154,7 @@ class PlateProfileBase(PlateNormalization):
                     raise KeyboardInterrupt
 
                 except Exception as e:
-                    log.warning(f"Failed to analyze Plate({self.plate_name})_well({idx:03d}) : {e}")
+                    log.warning(f"Failed to analyze Plate({self.plate_name}_well({idx:03d})) : {e}")
                     well_profile.status_validity = False
 
                 finally:

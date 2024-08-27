@@ -60,7 +60,7 @@ class PlateFit(PlateAlignment):
 
     def fit_plate(self):
         if self.blobs.empty: self._update_blobs()
-        if self.blobs.empty is True: raise ArithmeticError(
+        if self.blobs.empty is True: raise ValueError(
                 "No blobs were found in the image. Try increasing the contrast of the image or change preprocessing parameters"
         )
 
