@@ -97,12 +97,8 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasureColor):
         bg_series.index = bg_series.index.map(lambda x: add_background_label(x))
 
         cp_connection.pipeline.end_run()
-        validity = pd.DataFrame({
-            f"{self.colony_name}": self.status_validity,
-        }, index=["status_valid_analysis"]
-        ).astype(int)
         self._cp_results = pd.concat(
-                objs=[validity, *object_measurements, bg_series],
+                objs=[*object_measurements, bg_series],
                 axis=0
         )
 

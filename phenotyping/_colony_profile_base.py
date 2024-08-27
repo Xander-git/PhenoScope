@@ -59,8 +59,10 @@ class ColonyProfileBase:
             self.run()
         # if self.status_validity is True:
         results = self._results
-        if self.status_validity is False:
+        if self.status_validity is False or self._results.empty:
             results.loc["status_valid_analysis"] = 0
+        else:
+            results.loc["status_valid_analysis"] = self.status_validity
         return results
 
     @property

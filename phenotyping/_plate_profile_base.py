@@ -140,18 +140,26 @@ class PlateProfileBase(PlateNormalization):
 
             self.measurement_results = []
             for idx, well_img in enumerate(well_imgs):
+                log.debug(f"Starting well analysis for {self.plate_name}_well({idx:03d})")
+
+                well_profile = ColonyProfile(
+                        img=well_img, image_name=f"well({idx:03d})"
+                )
                 try:
-                    log.debug(f"Starting well analysis for {self.plate_name}_well({idx:03d})")
-                    tmp_well_name = f"well({idx:03d})"
-                    well_profile = ColonyProfile(
-                            well_img, tmp_well_name, auto_run=True
-                    )
-                    self.measurement_results.append(well_profile.get_results())
-                    self.wells.append(well_profile)
+                    well_profile.run()
+
                 except KeyboardInterrupt:
                     raise KeyboardInterrupt
-                except:
-                    log.warning(f"Failed to analyze well {idx} for plate {self.plate_name}")
+
+                except Exception as e:
+                    log.warning(f"Failed to analyze Plate({self.plate_name})_well({idx:03d}) : {e}")
+                    well_profile.status_validity = False
+
+                finally:
+                    self.wells.append(well_profile)
+                    self.measurement_results.append(well_profile.get_results())
+
+            # TODO: See if possibile to remove this layer
             self.measurement_results = pd.concat(self.measurement_results, axis=1)
             self.measurement_results = self.measurement_results.loc[:, ~self.measurement_results.columns.duplicated()]
 
