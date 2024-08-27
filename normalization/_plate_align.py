@@ -121,10 +121,13 @@ class PlateAlignment(PlateBlobs):
         with plt.ioff():
             ax.grid(False)
             ax.imshow(self.input_img)
-            ax.plot(self.input_alignment_vector['x'], self.input_alignment_vector['y'], color='red')
-            ax.plot(
-                    self.alignment_vector['x'], self.alignment_vector['y'], color='white', linestyle='--'
-            )
+            ax.plot(self.input_alignment_vector['x'],
+                    self.input_alignment_vector['y'],
+                    color='red')
+            ax.plot(self.alignment_vector['x'],
+                    self.alignment_vector['y'],
+                    color='white', linestyle='--'
+                    )
             ax.set_title(f'Input Alignment Rotation {self.degree_of_rotation:.4f} | Red: Original | Yellow: New', fontsize=fontsize)
             for idx, row in self._unaligned_blobs.table.iterrows():
                 c = plt.Circle((row['x'], row['y']), row['radius'], color='red', fill=False)

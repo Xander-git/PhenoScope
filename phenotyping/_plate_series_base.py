@@ -64,8 +64,8 @@ class PlateSeriesBase:
     def add_plate_img(self, img: np.ndarray, plate_name: str, sampling_day: int,
                       align: bool = True,
                       fit: bool = True,
-                      measure=True,
-                      use_boost=True,
+                      measure: bool = True,
+                      use_boost: bool = True,
                       **kwargs
                       ):
         plate = PlateProfile(
@@ -88,7 +88,7 @@ class PlateSeriesBase:
     def get_results(self):
         return self.results
 
-    def get_plate_results(self, plate_idx, numeric_only=False, include_adv=False):
+    def get_plate_results(self, plate_idx: int, numeric_only: bool = False, include_adv: bool = False):
         tmp = self.plates[plate_idx].get_results(
                 numeric_only=numeric_only,
                 include_adv=include_adv
