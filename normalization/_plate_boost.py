@@ -7,7 +7,6 @@ from ..detection import BlobFinder
 
 
 class PlateBoost(PlateIO):
-
     def __init__(self, img: np.ndarray, n_rows: int = 8, n_cols: int = 12,
                  border_padding: int = 50,
                  use_boost: bool = True,

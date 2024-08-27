@@ -143,7 +143,9 @@ class PlateProfileBase(PlateNormalization):
                 log.debug(f"Starting well analysis for {self.plate_name}_well({idx:03d})")
 
                 well_profile = ColonyProfile(
-                        img=well_img, image_name=f"well({idx:03d})"
+                        img=well_img, image_name=f"well({idx:03d})",
+                        auto_run=False,
+                        use_boosted_mask=self._use_boost
                 )
                 try:
                     well_profile.run()

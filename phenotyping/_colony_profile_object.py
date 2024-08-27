@@ -83,10 +83,11 @@ class ColonyProfileObject(ColonyProfileBase):
         if self.status_object is False or self.colony_mask is None: self.find_colony()
         return ma.array(data=self.gray_img, mask=np.invert(self.background_mask))
 
+    # TODO: Automate the boosted parameters
     def find_colony(self, threshold_method="otsu", use_boosted=True,
-                     filter_property="distance_from_center", filter_type="min",
-                     **kwargs
-                     ):
+                    filter_property="distance_from_center", filter_type="min",
+                    **kwargs
+                    ):
         """
         Function implementation of find colony algorithm
         :param threshold_method:

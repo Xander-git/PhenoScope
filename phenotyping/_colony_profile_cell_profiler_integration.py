@@ -28,7 +28,7 @@ class ColonyProfileCellProfilerIntegration(ColonyProfileMeasureColor):
 
     def __init__(self, img: np.ndarray,
                  image_name: str,
-                 auto_run: bool = True,
+                 auto_run: bool = False,
                  use_boosted_mask: bool = True,
                  boost_kernel_size: bool = None,
                  boost_footprint_radius: bool = 5
