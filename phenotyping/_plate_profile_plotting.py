@@ -45,12 +45,12 @@ class PlateProfilePlotting(PlateProfileBase):
     def plot_analysis_segmentation(self, figsize=(18, 26), fontsize_title=26, fontsize_subtitle=16):
         with plt.ioff():
             fig, axes = plt.subplots(
-                nrows=(self.n_rows * 2) + 1,
-                ncols=self.n_cols,
-                figsize=figsize,
-                sharey=True,
-                sharex=True,
-                tight_layout=False
+                    nrows=(self.n_rows * 2) + 1,
+                    ncols=self.n_cols,
+                    figsize=figsize,
+                    sharey=True,
+                    sharex=True,
+                    tight_layout=False
             )
             ax_ravel = axes.ravel()
             count = 0
@@ -64,7 +64,7 @@ class PlateProfilePlotting(PlateProfileBase):
                 # self.validate_well_names()
             for idx in range(self.n_cols):
                 ax = ax_ravel[count]
-                if idx==0:
+                if idx == 0:
                     msg = f"Plate Name: {self.plate_name}"
                     xlim = ax.get_xlim()
                     ylim = ax.get_ylim()
@@ -82,25 +82,26 @@ class PlateProfilePlotting(PlateProfileBase):
 
     def plot_colony_segmentation(self, figsize=(18, 8),
                                  buffer_width=5,
-                                 fontsize_title=26, fontsize_subtitle=14):
+                                 fontsize_title=26, fontsize_subtitle=14
+                                 ):
         if fontsize_subtitle > 2:
             fontsize_pass = fontsize_subtitle - 2
         else:
             fontsize_pass = fontsize_subtitle
         with plt.ioff():
             fig, axes = plt.subplots(
-                nrows=(self.n_rows),
-                ncols=self.n_cols,
-                figsize=figsize,
-                sharey=True,
-                sharex=True,
-                tight_layout = True
+                    nrows=(self.n_rows),
+                    ncols=self.n_cols,
+                    figsize=figsize,
+                    sharey=True,
+                    sharex=True,
+                    tight_layout=True
             )
             fig.suptitle(f"Plate Name: {self.plate_name}", fontsize=fontsize_title)
             # self.validate_well_names()
             for idx, ax in enumerate(axes.ravel()):
                 img = self.wells[idx].input_img
-                buffer = np.full((img.shape[0], buffer_width, 3 ), 255)
+                buffer = np.full((img.shape[0], buffer_width, 3), 255)
                 if self.wells[idx].status_validity:
                     ax.set_title(f"Pass: {idx}", fontsize=fontsize_pass)
                     colony_img = self.wells[idx].masked_img.filled(0)

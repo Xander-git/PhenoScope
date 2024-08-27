@@ -142,7 +142,7 @@ class PlateProfileBase(PlateNormalization):
             for idx, well_img in enumerate(well_imgs):
                 try:
                     log.debug(f"Starting well analysis for {self.plate_name}_well({idx:03d})")
-                    tmp_well_name = f"{self.plate_name}_well({idx:03d})"
+                    tmp_well_name = f"well({idx:03d})"
                     well_profile = ColonyProfile(
                             well_img, tmp_well_name, auto_run=True
                     )
