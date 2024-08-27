@@ -183,6 +183,6 @@ class PlateProfileBase(PlateNormalization):
 
     @property
     def _results(self):
-        if self.status_well_analysis is False: self.measure()
+        if self.status_measure is False: self.measure()
         results = pd.concat([self._metadata, self.measurement_results], axis=0)
         return results
