@@ -19,7 +19,8 @@ import matplotlib.pyplot as plt
 # ----- Pkg Relative Import -----
 from ._plate_blobs import PlateBlobs
 
-
+# ----- Class Constants -----
+OPERATION_NAME = "PlateAlign"   # TODO: integrate image op stack
 # ----- Main Class Definition -----
 class PlateAlignment(PlateBlobs):
     def __init__(self, img: np.ndarray,

@@ -19,6 +19,12 @@ from ._plate_series_base import PlateSeriesBase
 
 class PlateSeriesChangeOverTime(PlateSeriesBase):
     def get_change_over_time(self):
+        """
+        Calculates and returns the change over time of the plate series.
+        This is done at method call in order to maintain flexibility of
+        adding more plates over time.
+        :return: pd.DataFrame
+        """
         if len(self.plates) > 1:
             deltaMetric = []
             for plate_idx in range(len(self._plates.values()) - 1):
@@ -52,6 +58,12 @@ class PlateSeriesChangeOverTime(PlateSeriesBase):
             return deltaMetric.sort_index()
 
     def get_avg_change_over_time(self):
+        """
+        Calculates and returns the average change over time of the plate series.
+        This is done at method call in order to maintain flexibility of
+        adding more plates over time.
+        :return: pd.DataFrame
+        """
         if len(self._plates) > 1:
             deltaMetric = self.get_change_over_time()
             avg_change = deltaMetric.groupby("colony_name").mean()
