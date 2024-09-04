@@ -21,6 +21,7 @@ dependencies:
   - mahotas
   - mysqlclient
   - psutil
+  - pytest
   - pyzmq
   - scipy
   - scyjava
