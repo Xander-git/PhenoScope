@@ -56,7 +56,7 @@ class PlateAlignment(PlateBlobs):
         log.info("Starting plate alignment")
         self._unaligned_blobs = self.blobs
 
-        max_row = self.blobs.table.groupby("row_num", observed=True)["mse"].mean()
+        max_row = self.blobs.results.groupby("row_num", observed=True)["mse"].mean()
         max_row = self.blobs.rows[max_row.idxmin()]
 
         # Sets normalization algorithm to use row with the most blobs found
@@ -130,10 +130,10 @@ class PlateAlignment(PlateBlobs):
                     color='white', linestyle='--'
                     )
             ax.set_title(f'Input Alignment Rotation {self.degree_of_rotation:.4f} | Red: Original | Yellow: New', fontsize=fontsize)
-            for idx, row in self._unaligned_blobs.table.iterrows():
+            for idx, row in self._unaligned_blobs.results.iterrows():
                 c = plt.Circle((row['x'], row['y']), row['radius'], color='red', fill=False)
                 ax.add_patch(c)
-            for idx, row in self._aligned_blobs.table.iterrows():
+            for idx, row in self._aligned_blobs.results.iterrows():
                 c = plt.Circle(
                         (row['x'], row['y']), row['radius'], color='yellow', alpha=0.8, fill=False
                 )

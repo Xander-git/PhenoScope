@@ -91,7 +91,7 @@ class PlateFit(PlateAlignment):
 
             alignFit_ax[1].imshow(self.img)
             alignFit_ax[1].set_title("Fitted Image")
-            for idx, row in self.blobs.table.iterrows():
+            for idx, row in self.blobs.results.iterrows():
                 c = plt.Circle((row['x'], row['y']), row['radius'], color='green', fill=False)
                 alignFit_ax[1].add_patch(c)
             alignFit_ax[1].grid(False)
@@ -115,5 +115,5 @@ class PlateFit(PlateAlignment):
             if self._status_fitted is False:
                 self.fit_plate()
 
-            fig, ax = plot_blobs(self.img, self.blobs.table, grayscale=False)
+            fig, ax = plot_blobs(self.img, self.blobs.results, grayscale=False)
         return fig, ax

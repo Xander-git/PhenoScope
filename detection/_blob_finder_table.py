@@ -21,34 +21,20 @@ class BlobFinderTable(BlobFinderBase):
                          search_threshold=search_threshold, max_overlap=max_overlap)
 
     @property
-    def row_idx(self):
-        return range(self.n_rows)
-
-    @property
-    def col_idx(self):
-        return range(self.n_cols)
-
-    @property
     def rows(self):
-        rows = []
-        for i in self.row_idx:
-            rows.append(
-                    self.table.loc[
-                    lambda row: row["row_num"] == i, :
-                    ]
-            )
-        return rows
+        return [
+            self.table.loc[
+            self.table.loc[:, "row_num"] == i, :]
+            for i in range(self.n_rows)
+        ]
 
     @property
     def cols(self):
-        cols = []
-        for i in self.col_idx:
-            cols.append(
-                    self.table.loc[
-                    lambda row: row["col_num"] == i, :
-                    ]
-            )
-        return cols
+        return [
+            self.table.loc[
+            self.table.loc[:, "col_num"] == i, :]
+            for i in range(self.n_cols)
+        ]
 
     def find_blobs(self, img):
         super().find_blobs(img)
@@ -84,12 +70,12 @@ class BlobFinderTable(BlobFinderBase):
         self._table.loc[:, 'row_num'] = pd.cut(
                 self._table['y'],
                 bins=self.n_rows,
-                labels=self.row_idx
+                labels=range(self.n_rows)
         )
         self._table.loc[:, 'col_num'] = pd.cut(
                 self._table['x'],
                 bins=self.n_cols,
-                labels=self.col_idx
+                labels=range(self.n_cols)
         )
         self._table['bin_set'] = "row" + self._table["row_num"].astype(str) \
                                  + "_" \
