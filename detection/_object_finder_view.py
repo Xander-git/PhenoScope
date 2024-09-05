@@ -10,17 +10,17 @@ class ObjectFinderView(ObjectFinderBins):
     @property
     def row_map(self):
         r_map = np.zeros(shape=self._obj_map.shape)
-        for idx, row_table in enumerate(self.rows):
+        for r_idx, row_table in enumerate(self.rows):
             row_labels = row_table.index.to_numpy()
-            r_map[np.isin(self._obj_map, row_labels)] = idx + 1
+            r_map[np.isin(self._obj_map, row_labels)] = r_idx + 1
         return r_map
 
     @property
     def col_map(self):
         c_map = np.zeros(shape=self._obj_map.shape)
-        for idx, col_table in enumerate(self.cols):
+        for c_idx, col_table in enumerate(self.cols):
             col_labels = col_table.index.to_numpy()
-            c_map[np.isin(self._table, col_labels)] = idx + 1
+            c_map[np.isin(self._obj_map, col_labels)] = c_idx + 1
         return c_map
 
     def get_row_img(self):

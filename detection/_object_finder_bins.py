@@ -60,9 +60,10 @@ class ObjectFinderBins(ObjectFinderMeasurementFilter):
 
     @property
     def cols(self):
+        table = self.results
         return [
-            self._table.loc[
-            self._table.loc[:, "col_num"] == i, :]
+            table.loc[
+            table.loc[:, "col_num"] == i, :]
             for i in range(self.n_cols)
         ]
 

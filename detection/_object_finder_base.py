@@ -5,10 +5,12 @@ import numpy as np
 from skimage.measure import regionprops_table
 from skimage.filters import threshold_triangle, threshold_otsu
 from skimage.measure import label
-from skimage.morphology import white_tophat, square
+from skimage.morphology import white_tophat, disk
 
 from .clahe_boost import ClaheBoost
 from ..util import check_grayscale
+
+
 class ObjectFinderBase:
     def __init__(self, img: np.ndarray, boost_segmentation: bool = True):
         self.__input_img = check_grayscale(img)
@@ -24,13 +26,12 @@ class ObjectFinderBase:
             "centroid",
             "bbox",
             "area_bbox",
+            "area",
             "eccentricity",
             "intensity_mean",
         ]
 
         self._basic_measurements = [
-            "area",
-            "area_bbox",
             "area_convex",
             "area_filled",
             "equivalent_diameter_area",
@@ -54,7 +55,8 @@ class ObjectFinderBase:
     def get_results(self):
         return self.results
 
-    def find_objects(self, threshold_method: str = "otsu",
+    def find_objects(self,
+                     threshold_method: str = "otsu",
                      measurements: str or List[str] = "basic",
                      **kwargs
                      ):
@@ -86,7 +88,7 @@ class ObjectFinderBase:
         binary_img = img > thresh
         res = white_tophat(
                 image=binary_img,
-                footprint=square(width=int(min(self.input_img.shape) * 0.01))
+                footprint=disk(radius=int(min(self.input_img.shape) * 0.01))
         )
         self._obj_map = label(binary_img & ~res)
 
