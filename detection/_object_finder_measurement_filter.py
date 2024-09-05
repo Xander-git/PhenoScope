@@ -6,23 +6,21 @@ from ._object_finder_base import ObjectFinderBase
 
 
 class ObjectFinderMeasurementFilter(ObjectFinderBase):
-    def __init__(self, img: np.ndarray,
-                 boost_segmentation: bool = True,
-                 **kwargs
+    def __init__(self,
+                 threshold_method: str = "otsu",
+                 enhance_contrast: bool = True,
+                 max_eccentricity: float = 0.85,
+                 min_area: int = None
                  ):
-        super().__init__(img, boost_segmentation)
-        self._max_eccentricity = kwargs.get("max_eccentricity", 0.85)
-        self._min_area = kwargs.get(
-                "min_area", int((min(self.input_img.shape) * 0.01) ** 2)
+        super().__init__(
+                threshold_method=threshold_method,
+                enhance_contrast=enhance_contrast
         )
+        self._max_eccentricity = max_eccentricity
+        self._min_area = min_area
 
-    def find_objects(self, threshold_method: str = "otsu",
-                     measurements: str or List[str] = "basic",
-                     **kwargs
-                     ):
-        super().find_objects(threshold_method=threshold_method,
-                             measurements=measurements,
-                             **kwargs)
+    def find_objects(self, image: np.ndarray):
+        super().find_objects(image=image)
         self.filter_objects()
 
     def filter_objects(self):
@@ -35,6 +33,9 @@ class ObjectFinderMeasurementFilter(ObjectFinderBase):
                       ]
 
     def _area_filter(self):
+        if self._min_area is None:
+            self._min_area = int((min(self._img_dims) * 0.01) ** 2)
+
         self._table = self._table.loc[
                       self._table.loc[:, "area"] > self._min_area, :
                       ]

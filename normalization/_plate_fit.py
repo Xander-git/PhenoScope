@@ -65,10 +65,10 @@ class PlateFit(PlateAlignment):
         )
 
         log.info("Starting plate fitting")
-        bound_L = math.floor(self.blobs.cols[0].x_minus.min() - self.border_padding)
-        bound_R = math.ceil(self.blobs.cols[-1].x_plus.max() + self.border_padding)
-        bound_T = math.floor(self.blobs.rows[0].y_minus.min() - self.border_padding)
-        bound_B = math.ceil(self.blobs.rows[-1].y_plus.max() + self.border_padding)
+        bound_L = math.floor(self.blobs.gridcols[0].x_minus.min() - self.border_padding)
+        bound_R = math.ceil(self.blobs.gridcols[-1].x_plus.max() + self.border_padding)
+        bound_T = math.floor(self.blobs.gridrows[0].y_minus.min() - self.border_padding)
+        bound_B = math.ceil(self.blobs.gridrows[-1].y_plus.max() + self.border_padding)
         self._set_img(self.img[bound_T:bound_B, bound_L:bound_R])
         with plt.ioff():
             self.cropping_rect = plt.Rectangle((bound_L, bound_T),

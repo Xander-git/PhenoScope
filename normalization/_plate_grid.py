@@ -52,8 +52,8 @@ class PlateGrid(PlateFit):
         )
 
         log.info("Starting calculation for blob edge midpoints")
-        rows = self.blobs.rows
-        cols = self.blobs.cols
+        rows = self.blobs.gridrows
+        cols = self.blobs.gridcols
 
         rows_yMinus = []
         rows_yPlus = []

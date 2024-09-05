@@ -57,7 +57,7 @@ class PlateAlignment(PlateBlobs):
         self._unaligned_blobs = self.blobs
 
         max_row = self.blobs.results.groupby("row_num", observed=True)["mse"].mean()
-        max_row = self.blobs.rows[max_row.idxmin()]
+        max_row = self.blobs.gridrows[max_row.idxmin()]
 
         # Sets normalization algorithm to use row with the most blobs found
         # Varied performance across different cases

@@ -86,7 +86,7 @@ def plot_plate_rows(img, blobs_class, ax=None, set_axis=False, grayscale=False):
             blobs_ax.imshow(img)
 
         blobs_ax.imshow(img)
-        for set_idx, row_set in enumerate(blobs_class.rows):
+        for set_idx, row_set in enumerate(blobs_class.gridrows):
             for idx, table_rows in row_set.iterrows():
                 c = plt.Circle((table_rows['x'], table_rows['y']), table_rows['radius'], color=cnames[set_idx], fill=False)
                 blobs_ax.add_patch(c)
@@ -118,7 +118,7 @@ def plot_plate_cols(img, blobs_class, ax=None, set_axis=False, grayscale=False):
             blobs_ax.imshow(img)
 
         blobs_ax.imshow(img)
-        for set_idx, col_set in enumerate(blobs_class.cols):
+        for set_idx, col_set in enumerate(blobs_class.gridcols):
             for idx, table_cols in col_set.iterrows():
                 c = plt.Circle((table_cols['x'], table_cols['y']), table_cols['radius'], color=cnames[set_idx], fill=False)
                 blobs_ax.add_patch(c)

@@ -5,18 +5,27 @@ import pandas as pd
 
 from ._object_finder_measurement_filter import ObjectFinderMeasurementFilter
 
+GRIDROW_LABEL = "gridrow_num"
+GRIDCOL_LABEL = "gridcol_num"
+BIN_SET_LABEL = "bin_set"
+
 
 class ObjectFinderBins(ObjectFinderMeasurementFilter):
-    def __init__(self, img: np.ndarray, n_rows: int, n_cols: int,
-                 boost_segmentation: bool = True,
-                 **kwargs
+    def __init__(self,
+                 threshold_method: str = "otsu",
+                 n_rows: int = 8,
+                 n_cols: int = 12,
+                 enhance_contrast: bool = True,
                  ):
-        super().__init__(img, boost_segmentation, **kwargs)
+        super().__init__(
+                threshold_method=threshold_method,
+                enhance_contrast=enhance_contrast
+        )
         self._n_rows = n_rows
         self._n_cols = n_cols
 
     @property
-    def n_rows(self):
+    def n_rows(self) -> int:
         return self._n_rows
 
     @n_rows.setter
@@ -26,7 +35,7 @@ class ObjectFinderBins(ObjectFinderMeasurementFilter):
             self.generate_bins()
 
     @property
-    def n_cols(self):
+    def n_cols(self) -> int:
         return self._n_cols
 
     @n_cols.setter
@@ -36,12 +45,12 @@ class ObjectFinderBins(ObjectFinderMeasurementFilter):
             self.generate_bins()
 
     @property
-    def bin_values(self):
+    def bin_values(self) -> np.ndarray:
         bin_values = np.array(self._table.loc[:, "bin_set"].unique())
         return np.sort(bin_values)
 
     @property
-    def bins(self):
+    def bins(self) -> List[pd.DataFrame]:
         table = self.results
         return [
             table.loc[
@@ -50,7 +59,7 @@ class ObjectFinderBins(ObjectFinderMeasurementFilter):
         ]
 
     @property
-    def rows(self):
+    def gridrows(self) -> List[pd.DataFrame]:
         table = self.results
         return [
             table.loc[
@@ -59,7 +68,7 @@ class ObjectFinderBins(ObjectFinderMeasurementFilter):
         ]
 
     @property
-    def cols(self):
+    def gridcols(self) -> List[pd.DataFrame]:
         table = self.results
         return [
             table.loc[
@@ -67,28 +76,31 @@ class ObjectFinderBins(ObjectFinderMeasurementFilter):
             for i in range(self.n_cols)
         ]
 
-    def find_objects(self, threshold_method: str = "otsu",
-                     measurements: str or List[str] = "basic",
-                     **kwargs
-                     ):
-        super().find_objects(threshold_method=threshold_method,
-                             measurements=measurements,
-                             **kwargs)
+    def find_objects(self, image: np.ndarray) -> None:
+        super().find_objects(image=image)
         self.generate_bins()
 
-    def generate_bins(self):
-        self._table.loc[:, "row_num"] = pd.cut(
-                self._table.loc[:, "centroid-row"],
+    def generate_bins(self) -> None:
+        error_msg = \
+            """
+            Failed to generate bins due to empty table. 
+            Try running find_objects() on an image first.
+            """
+
+        if self._table.empty: raise AttributeError(error_msg)
+
+        self._table.loc[:, GRIDROW_LABEL] = pd.cut(
+                x=self._table.loc[:, "centroid-row"],
                 bins=self.n_rows, labels=range(self.n_rows)
         )
 
-        self._table.loc[:, "col_num"] = pd.cut(
-                self._table.loc[:, "centroid-col"],
+        self._table.loc[:, GRIDCOL_LABEL] = pd.cut(
+                x=self._table.loc[:, "centroid-col"],
                 bins=self.n_cols, labels=range(self.n_cols)
         )
 
-        self._table.loc[:, "bin_set"] = \
-            "row" \
-            + self._table.loc[:, "row_num"].astype(str).str.zfill(3) \
-            + "_" + "col" \
-            + self._table.loc[:, "col_num"].astype(str).str.zfill(3)
+        self._table.loc[:, BIN_SET_LABEL] = \
+            "gridrow" \
+            + self._table.loc[:, GRIDROW_LABEL].astype(str).str.zfill(3) \
+            + "_" + "gridcol" \
+            + self._table.loc[:, GRIDCOL_LABEL].astype(str).str.zfill(3)

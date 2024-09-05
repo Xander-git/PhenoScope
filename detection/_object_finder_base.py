@@ -12,16 +12,20 @@ from ..util import check_grayscale
 
 
 class ObjectFinderBase:
-    def __init__(self, img: np.ndarray, boost_segmentation: bool = True):
-        self.__input_img = check_grayscale(img)
-        self._boost_segmentation = boost_segmentation
+    def __init__(self, threshold_method="otsu", measurements: List[str] = None, enhance_contrast: bool = True, **kwargs):
 
-        self._threshold_method = None
+        self._enhance_contrast = enhance_contrast
+        self._footprint_shape = kwargs.get("footprint_shape", "disk"),
+        self._footprint_radius = kwargs.get("footprint_radius", None),
+        self._kernel_size = kwargs.get("kernel_size", None)
 
+        self._threshold_method = threshold_method
+
+        self._img_dims = None
         self._obj_map = None
         self._table = pd.DataFrame()
 
-        self._essential_measurements = [
+        essential_measurements = [
             "label",
             "centroid",
             "bbox",
@@ -31,7 +35,7 @@ class ObjectFinderBase:
             "intensity_mean",
         ]
 
-        self._basic_measurements = [
+        basic_measurements = [
             "area_convex",
             "area_filled",
             "equivalent_diameter_area",
@@ -43,72 +47,58 @@ class ObjectFinderBase:
             "extent"
         ]
 
-    @property
-    def input_img(self):
-        return self.__input_img
+        if measurements is None:
+            self._measurements = essential_measurements + basic_measurements
+        elif type(measurements) == List[str]:
+            self._measurements = essential_measurements + measurements
+        else:
+            raise ValueError("Measurements must be a list of strings")
 
     @property
-    def results(self):
-        if self._table.empty: self.find_objects()
+    def results(self) -> pd.DataFrame:
+        if self._table.empty: raise AttributeError("Failed to get results. Try running find_objects() on an image first.")
         return self._table.copy(deep=True).set_index("label")
 
-    def get_results(self):
+    def get_results(self) -> pd.DataFrame:
         return self.results
 
-    def find_objects(self,
-                     threshold_method: str = "otsu",
-                     measurements: str or List[str] = "basic",
-                     **kwargs
-                     ):
-        self._segment_objects(
-                threshold_method=threshold_method,
-                **kwargs
-        )
-        self._measure_objects(measurements=measurements)
+    def find_objects(self, image: np.ndarray):
+        image = check_grayscale(image)
+        self._img_dims = image.shape
 
-    def _segment_objects(self, threshold_method="otsu", **kwargs):
-        if self._boost_segmentation:
-            img = ClaheBoost(
-                    img=self.input_img,
-                    footprint_shape=kwargs.get("footprint_shape", "square"),
-                    footprint_radius=kwargs.get("footprint_radius", None),
-                    kernel_size=kwargs.get("kernel_size", None),
+        self._segment_objects(image=image)
+        self._measure_objects(image=image)
+
+    def _segment_objects(self, image: np.ndarray) -> None:
+        image = check_grayscale(image)
+        if self._enhance_contrast:
+            image = ClaheBoost(
+                    img=image,
+                    footprint_shape=self._footprint_shape,
+                    footprint_radius=self._footprint_radius,
+                    kernel_size=self._kernel_size,
             ).get_boosted_img()
-        else:
-            img = self.input_img
 
-        self._threshold_method = threshold_method
         if self._threshold_method == "otsu":
-            thresh = threshold_otsu(img)
+            thresh = threshold_otsu(image)
         elif self._threshold_method == "triangle":
-            thresh = threshold_triangle(img)
+            thresh = threshold_triangle(image)
         else:
-            thresh = threshold_otsu(img)
+            thresh = threshold_otsu(image)
 
-        binary_img = img > thresh
+        binary_img = image > thresh
         res = white_tophat(
                 image=binary_img,
-                footprint=disk(radius=int(min(self.input_img.shape) * 0.01))
+                footprint=disk(radius=int(min(image.shape) * 0.01))
         )
         self._obj_map = label(binary_img & ~res)
 
-    def _measure_objects(self,
-                         measurements: str or List[str] = "basic"
-                         ):
-        region_props = self._essential_measurements
-        if measurements is None:
-            pass
-        elif measurements == "basic":
-            region_props += self._basic_measurements
-        elif type(measurements) == List[str]:
-            region_props += measurements
-        else:
-            ValueError("Invalid input for measurement")
+    def _measure_objects(self, image: np.ndarray) -> None:
 
         self._table = pd.DataFrame(data=regionprops_table(
                 label_image=self._obj_map,
-                intensity_image=self.input_img,
-                properties=region_props,
+                intensity_image=image,
+                properties=self._measurements,
                 cache=False
         ))
         self._table = self._table.rename(columns={
