@@ -12,7 +12,11 @@ from ..util import check_grayscale
 
 
 class ObjectFinderBase:
-    def __init__(self, threshold_method="otsu", measurements: List[str] = None, enhance_contrast: bool = True, **kwargs):
+    def __init__(self,
+                 threshold_method="otsu",
+                 measurements: List[str] = None,
+                 enhance_contrast: bool = True,
+                 **kwargs):
 
         self._enhance_contrast = enhance_contrast
         self._footprint_shape = kwargs.get("footprint_shape", "disk"),
@@ -62,7 +66,7 @@ class ObjectFinderBase:
     def get_results(self) -> pd.DataFrame:
         return self.results
 
-    def find_objects(self, image: np.ndarray):
+    def find_objects(self, image: np.ndarray) -> None:
         image = check_grayscale(image)
         self._img_dims = image.shape
 

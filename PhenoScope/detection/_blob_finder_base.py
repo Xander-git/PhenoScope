@@ -1,4 +1,5 @@
 # ----- Imports -----
+import numpy as np
 import pandas as pd
 from skimage.feature import blob_dog, blob_log, blob_doh
 import os
@@ -40,9 +41,9 @@ class BlobFinderBase:
     def empty(self):
         return self._table.empty
 
-    def find_blobs(self, img):
+    def find_blobs(self, img: np.ndarray):
         img = check_grayscale(img)
-        self._search_blobs(img, method=self.blob_search_method)
+        self._search_blobs(gray_img=img, method=self.blob_search_method)
 
     def _search_blobs(self, gray_img, method):
         if method == "log":
@@ -54,7 +55,7 @@ class BlobFinderBase:
         else:
             self._search_blobs_LoG(gray_img)
 
-    def _search_blobs_LoG(self, gray_img):
+    def _search_blobs_LoG(self, gray_img: np.ndarray):
         log.debug("Starting blob search using 'Laplacian of Gaussian'")
 
         self._table = pd.DataFrame(blob_log(
@@ -70,7 +71,7 @@ class BlobFinderBase:
                     "No blobs found in image using 'Laplacian of Gaussian'"
             )
 
-    def _search_blobs_DoG(self, gray_img):
+    def _search_blobs_DoG(self, gray_img: np.ndarray):
         self._table = pd.DataFrame(blob_dog(
                 image=gray_img,
                 min_sigma=self.min_sigma,

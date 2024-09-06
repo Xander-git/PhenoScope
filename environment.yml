@@ -25,8 +25,8 @@ dependencies:
   - pyzmq
   - scipy
   - scyjava
-  - bioconda::centrosome
   - seaborn
+  - bioconda::centrosome
   - bioconda::cellprofiler
   - bioconda::cellprofiler-core
   # Other dependencies:

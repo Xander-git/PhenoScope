@@ -10,11 +10,13 @@ class ObjectFinderMeasurementFilter(ObjectFinderBase):
                  threshold_method: str = "otsu",
                  enhance_contrast: bool = True,
                  max_eccentricity: float = 0.85,
-                 min_area: int = None
+                 min_area: int = None,
+                 **kwargs
                  ):
         super().__init__(
                 threshold_method=threshold_method,
-                enhance_contrast=enhance_contrast
+                enhance_contrast=enhance_contrast,
+                **kwargs
         )
         self._max_eccentricity = max_eccentricity
         self._min_area = min_area

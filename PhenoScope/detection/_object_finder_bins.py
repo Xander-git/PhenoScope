@@ -16,10 +16,12 @@ class ObjectFinderBins(ObjectFinderMeasurementFilter):
                  n_rows: int = 8,
                  n_cols: int = 12,
                  enhance_contrast: bool = True,
+                 **kwargs
                  ):
         super().__init__(
                 threshold_method=threshold_method,
-                enhance_contrast=enhance_contrast
+                enhance_contrast=enhance_contrast,
+                **kwargs
         )
         self._n_rows = n_rows
         self._n_cols = n_cols
