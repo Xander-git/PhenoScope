@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 DESCRIPTION = "A python package for high-throughput analysis of microorganism colonies on solid media plates"
 DEPENDENCIES = [
     "setuptools<60.0",
