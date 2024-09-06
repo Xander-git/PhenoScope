@@ -4,7 +4,7 @@ VERSION = "0.3.0"
 DESCRIPTION = "A python package for high-throughput analysis of microorganism colonies on solid media plates"
 
 setup(
-        name="PhenoScope",
+        name="phenoscope",
         version=VERSION,
         description=DESCRIPTION,
         long_description=open("README.md").read(),
