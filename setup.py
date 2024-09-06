@@ -14,6 +14,7 @@ setup(
         url="https://github.com/Xander-git/PhenoScope",
         packages=find_packages(),  # Automatically finds all packages
         install_requires=[
+            "setuptools<60.0",
             "numpy",
             "pandas",
             "scikit-image",
@@ -21,7 +22,6 @@ setup(
             "joblib",
             "boto3",
             "docutils",
-            "distutils",
             "h5py",
             "imageio",
             "inflect",
