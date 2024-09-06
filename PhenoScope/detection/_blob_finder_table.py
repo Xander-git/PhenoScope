@@ -8,6 +8,10 @@ from ._blob_finder_base import BlobFinderBase
 
 # ------ Main Class Definition -----
 class BlobFinderTable(BlobFinderBase):
+    _GRIDROW_LABEL = "gridrow_num"
+    _GRIDCOL_LABEL = "gridcol_num"
+    _BIN_SET_LABEL = "bin_set"
+
     def __init__(self, n_rows: int = 8, n_cols: int = 12,
                  blob_search_method: str = "log",
                  min_sigma: int = 2, max_sigma: int = 35, num_sigma: int = 45,
@@ -21,18 +25,18 @@ class BlobFinderTable(BlobFinderBase):
                          search_threshold=search_threshold, max_overlap=max_overlap)
 
     @property
-    def rows(self):
+    def gridrows(self):
         return [
             self.table.loc[
-            self.table.loc[:, "row_num"] == i, :]
+            self.table.loc[:, self._GRIDROW_LABEL] == i, :]
             for i in range(self.n_rows)
         ]
 
     @property
-    def cols(self):
+    def gridcols(self):
         return [
             self.table.loc[
-            self.table.loc[:, "col_num"] == i, :]
+            self.table.loc[:, self._GRIDCOL_LABEL] == i, :]
             for i in range(self.n_cols)
         ]
 
@@ -67,16 +71,16 @@ class BlobFinderTable(BlobFinderBase):
         self._table['y_plus'] = self._table.y + self._table.radius
 
     def _generate_bins(self):
-        self._table.loc[:, 'row_num'] = pd.cut(
+        self._table.loc[:, self._GRIDROW_LABEL] = pd.cut(
                 self._table['y'],
                 bins=self.n_rows,
                 labels=range(self.n_rows)
         )
-        self._table.loc[:, 'col_num'] = pd.cut(
+        self._table.loc[:, self._GRIDCOL_LABEL] = pd.cut(
                 self._table['x'],
                 bins=self.n_cols,
                 labels=range(self.n_cols)
         )
-        self._table['bin_set'] = "row" + self._table["row_num"].astype(str) \
-                                 + "_" \
-                                 + "col" + self._table["col_num"].astype(str)
+        self._table[self._BIN_SET_LABEL] = "gridrow" + self._table[self._GRIDROW_LABEL].astype(str) \
+                                           + "_" \
+                                           + "gridcol" + self._table[self._GRIDCOL_LABEL].astype(str)

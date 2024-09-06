@@ -5,6 +5,7 @@ import warnings
 from ._blob_finder_particle_filter import BlobFinderParticleFilter
 from ..util.image_analysis import check_grayscale
 
+
 class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
     def __init__(self, n_rows: int = 8, n_cols: int = 12,
                  blob_search_method="log",
@@ -36,12 +37,12 @@ class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
     @property
     def table(self):
         self._calculate_bin_mse()
-        min_mse_bin_idx = self._table.groupby("bin_set", as_index=True)[f"{self.bin_filter_method}"].idxmin()
+        min_mse_bin_idx = self._table.groupby(by=self._BIN_SET_LABEL, as_index=True)[f"{self.bin_filter_method}"].idxmin()
         return self._table.loc[min_mse_bin_idx, :]
 
     @property
     def mse(self):
-        err = self.table["mse"]
+        err = self.table.loc[:, "mse"]
         err = np.sum(err ** 2) / len(err)
         return err
 
@@ -64,11 +65,15 @@ class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
             mse = {}
             for idx in range(self._table.shape[0]):
                 blob = self._table.iloc[idx, :]
+
+                # get other members
                 other_row_members = self._table[
-                    self._table.loc[:, "row_num"] == blob["row_num"]
+                    self._table.loc[:, self._GRIDROW_LABEL] == blob[self._GRIDCOL_LABEL]
                     ]
+
+                # exclude other members in the same gridrow
                 other_row_members = other_row_members[
-                    other_row_members["bin_set"] != blob["bin_set"]
+                    other_row_members[self._BIN_SET_LABEL] != blob[self._BIN_SET_LABEL]
                     ]
                 row_x = np.array(
                         [blob["x"]] + other_row_members["x"].to_list()
@@ -79,12 +84,16 @@ class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
                 row_mse[blob.name] = self._get_linreg_mse(row_x, row_y)
                 row_residuals = self._get_linreg_residuals(row_x, row_y)
 
+                # get other members
                 other_col_members = self._table[
-                    self._table.loc[:, "col_num"] == blob["col_num"]
+                    self._table.loc[:, self._GRIDROW_LABEL] == blob[self._GRIDROW_LABEL]
                     ]
+
+                # exclude members in the same gridcol
                 other_col_members = other_col_members[
-                    other_col_members["bin_set"] != blob["bin_set"]
+                    other_col_members[self._BIN_SET_LABEL] != blob[self._BIN_SET_LABEL]
                     ]
+
                 col_x = np.array(
                         [blob["x"]] + other_col_members["x"].to_list()
                 )
