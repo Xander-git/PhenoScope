@@ -2,6 +2,30 @@ from setuptools import setup, find_packages
 
 VERSION = "0.3.0"
 DESCRIPTION = "A python package for high-throughput analysis of microorganism colonies on solid media plates"
+DEPENDENCIES = [
+    "setuptools<60.0",
+    "numpy",
+    "pandas",
+    "scikit-image",
+    "scikit-learn",
+    "joblib",
+    "boto3",
+    "docutils",
+    "h5py",
+    "imageio",
+    "inflect",
+    "mahotas",
+    "mysqlclient",
+    "psutil",
+    "pytest",
+    "pyzmq",
+    "scipy",
+    "scyjava",
+    "seaborn",
+    "centrosome",
+    "cellprofiler",
+    "cellprofiler-core"
+]
 
 setup(
         name="phenoscope",
@@ -13,30 +37,7 @@ setup(
         author_email="anguy344@ucr.edu",
         url="https://github.com/Xander-git/PhenoScope",
         packages=find_packages(),  # Automatically finds all packages
-        install_requires=[
-            "setuptools<60.0",
-            "numpy",
-            "pandas",
-            "scikit-image",
-            "scikit-learn",
-            "joblib",
-            "boto3",
-            "docutils",
-            "h5py",
-            "imageio",
-            "inflect",
-            "mahotas",
-            "mysqlclient",
-            "psutil",
-            "pytest",
-            "pyzmq",
-            "scipy",
-            "scyjava",
-            "seaborn",
-            "centrosome",
-            "cellprofiler",
-            "cellprofiler-core"
-        ],
+        # install_requires=DEPENDENCIES,
         classifiers=[
             "Programming Language :: Python :: 3",
             "License :: OSI Approved :: MIT License",

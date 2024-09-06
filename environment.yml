@@ -12,6 +12,7 @@ dependencies:
   - scikit-image
   - scikit-learn
   - jupyter
+  - dash
   - joblib
   - boto3
   - docutils
