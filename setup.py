@@ -21,6 +21,7 @@ setup(
             "joblib",
             "boto3",
             "docutils",
+            "distutils",
             "h5py",
             "imageio",
             "inflect",
