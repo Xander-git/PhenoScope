@@ -33,7 +33,7 @@ class PlateSeriesBase:
 
         results = pd.concat(results, axis=0, ignore_index=True)
         results.insert(1, "series_name", value=self.series_name)
-        results = results.set_index(["colony_name", "sampling_day"])
+        results = results.set_index(["colony_name", "SamplingDay"])
         return results
 
     @property

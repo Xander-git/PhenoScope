@@ -47,11 +47,26 @@ class PlateSeriesIO(PlateSeriesPlotting):
             except Exception as e:
                 log.warning(f"Could not save colony segmentation of plate {plate.plate_name}: {e}", exc_info=True)
 
-    def save_plate_grid_division(self, dirpath, figsize=(12, 8)):
-        dirpath = Path(dirpath)
-        dirpath.mkdir(parents=True, exist_ok=True)
+    def save_colony_segmentation_operations(self, dirpath, image_type=".png", buffer_width=10):
+        savepath = Path(dirpath)
+        savepath.mkdir(exist_ok=True, parents=True)
         for plate in self.plates:
-            fig, ax = plate.plot_well_grid(figsize=figsize)
-            ax.set_title(f"{plate.plate_name}")
-            fig.savefig(dirpath / f"{plate.plate_name}.png")
-            plt.close(fig)
+            log.debug(f"Saving colony segmentation operation images for plate: {plate}")
+            try:
+                plate_savepath = savepath / f"{plate.plate_name}"
+                plate.save_colony_segmentation_operations(dirpath=plate_savepath, image_type=image_type,
+                                                          buffer_width=buffer_width)
+            except KeyboardInterrupt:
+                raise KeyboardInterrupt
+            except Exception as e:
+                log.warning(f"Could not save colony segmentation of plate {plate.plate_name}: {e}", exc_info=True)
+
+
+def save_plate_grid_division(self, dirpath, figsize=(12, 8)):
+    dirpath = Path(dirpath)
+    dirpath.mkdir(parents=True, exist_ok=True)
+    for plate in self.plates:
+        fig, ax = plate.plot_well_grid(figsize=figsize)
+        ax.set_title(f"{plate.plate_name}")
+        fig.savefig(dirpath / f"{plate.plate_name}.png")
+        plt.close(fig)

@@ -1,4 +1,17 @@
+# ----- Logger ------
+import logging
+
+formatter = logging.Formatter(
+        fmt=f'[%(asctime)s|%(name)s] %(levelname)s - %(message)s',
+        datefmt='%m/%d/%Y %I:%M:%S'
+)
+console_handler = logging.StreamHandler()
+log = logging.getLogger(__name__)
+log.addHandler(console_handler)
+console_handler.setFormatter(formatter)
+# ----- Imports -----
 from skimage.color import rgb2gray
+import numpy as np
 from skimage.exposure import equalize_adapthist
 from skimage.morphology import white_tophat, disk, square
 from skimage.util import img_as_ubyte
@@ -12,21 +25,26 @@ class ClaheBoost:
     boosted to improve feature detection and segmentation.
     """
 
-    def __init__(self, img, footprint_shape="disk",
-                 footprint_radius=None,
-                 kernel_size=None
-                 ):
+    def __init__(
+            self, img, footprint_shape="disk",
+            footprint_radius=None,
+            kernel_size=None
+    ):
         self.img = check_grayscale(img)
 
+        log.debug(f"Setting property footprint_radius from parameter footprint_radius: {footprint_radius}")
         if footprint_radius is None:
-            self.footprint_radius = int(min(self.img.shape) * 0.01)
+            self.footprint_radius = int(np.min(self.img.shape) * 0.002)
         else:
             self.footprint_radius = footprint_radius
 
+        log.debug(f"Creating footprint with radius: {self.footprint_radius}")
         if footprint_shape == "square":
-            self.footprint = square(self.footprint_radius * 2)
+            self.footprint = square(width=(self.footprint_radius * 2))
         elif footprint_shape == "disk":
-            self.footprint = disk(self.footprint_radius * 2)
+            self.footprint = disk(radius=self.footprint_radius)
+        else:
+            self.footprint = disk(radius=self.footprint_radius)
 
         if kernel_size is None:
             self.kernel_size = int(min(self.img.shape) * (1.0 / 15.0))

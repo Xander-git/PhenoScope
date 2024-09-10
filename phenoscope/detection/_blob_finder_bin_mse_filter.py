@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import warnings
 
+from numpy.exceptions import RankWarning
+
 from ._blob_finder_particle_filter import BlobFinderParticleFilter
 from ..util.image_analysis import check_grayscale
 
@@ -132,7 +134,7 @@ class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
 
     @staticmethod
     def _get_linreg_residuals(x, y):
-        warnings.simplefilter('ignore', np.RankWarning)
+        warnings.simplefilter('ignore', RankWarning)
         m, b = np.polyfit(x, y, 1)
         y_pred = m * x + b
         error = y - y_pred
@@ -140,7 +142,7 @@ class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
 
     @staticmethod
     def _get_linreg_mse(x, y):
-        warnings.simplefilter('ignore', np.RankWarning)
+        warnings.simplefilter('ignore', RankWarning)
         m, b = np.polyfit(x, y, 1)
         y_pred = m * x + b
         error = np.sum((y - y_pred) ** 2) / len(y)

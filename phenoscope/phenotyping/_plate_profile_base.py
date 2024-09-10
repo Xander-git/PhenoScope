@@ -19,29 +19,8 @@ from typing import List
 from ..normalization.plate_normalization import PlateNormalization
 from .colony_profile import ColonyProfile, CellProfilerApiConnection
 
-METADATA_LABELS = [
-    (STATUS_VALIDITY_LABEL := "status_valid_analysis"),
-    (PLATE_NAME_LABEL := "plate_name")
-]
-
-NUMERIC_METADATA_LABELS = [
-    (SAMPLING_DAY_LABEL := "sampling_day"),
-]
-
-PHENOMICS_MEASUREMENTS = [
-    "Intensity_IntegratedColorIntensityRed",
-    "Intensity_IntegratedColorIntensityGreen",
-    "Intensity_IntegratedColorIntensityBlue",
-    "ImgHeight",
-    "ImgWidth"
-]
-
-BASIC_CP_API_MEASUREMENT_LABELS = [
-    "AreaShape",
-    "Intensity",
-    "Texture"
-]
-
+from ..util._labels import  METADATA_LABELS, NUMERIC_METADATA_LABELS, PHENOSCOPE_MEASUREMENTS, BASIC_CP_API_MEASUREMENT_LABELS
+from ..util._labels import  SAMPLING_DAY_LABEL, PLATE_NAME_LABEL, STATUS_VALIDITY_LABEL
 
 # ----- Main Class Definition -----
 class PlateProfileBase(PlateNormalization):

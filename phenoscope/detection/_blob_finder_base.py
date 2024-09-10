@@ -15,11 +15,12 @@ from ..util.image_analysis import check_grayscale
 
 # ------ Main Class Definition -----
 class BlobFinderBase:
-    def __init__(self,
-                 blob_search_method: str = "log",
-                 min_sigma: int = 2, max_sigma: int = 40, num_sigma: int = 30,
-                 search_threshold: float = 0.01, max_overlap: float = 0.1
-                 ):
+    def __init__(
+            self,
+            blob_search_method: str = "log",
+            min_sigma: int = 2, max_sigma: int = 40, num_sigma: int = 30,
+            search_threshold: float = 0.01, max_overlap: float = 0.1
+            ):
         self._table = pd.DataFrame()
 
         self.blob_search_method = blob_search_method
@@ -78,7 +79,7 @@ class BlobFinderBase:
                 max_sigma=self.max_sigma,
                 threshold=self.search_threshold,
                 overlap=self.max_overlap
-        ), columns=["y", 'x', 'sigma'])
+        ), columns=['y', 'x', 'sigma'])
         if self._table is None or len(self._table) == 0:
             raise RuntimeError(
                     "No blobs found in image using 'Difference of Gaussian'"

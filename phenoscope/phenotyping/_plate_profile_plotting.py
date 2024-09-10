@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from pathlib import Path
+from skimage.io import imsave
+from skimage.util import img_as_ubyte
 
 from ._plate_profile_base import PlateProfileBase
 
@@ -80,10 +83,11 @@ class PlateProfilePlotting(PlateProfileBase):
                 count += 1
         return fig, ax
 
-    def plot_colony_segmentation(self, figsize=(18, 8),
-                                 buffer_width=5,
-                                 fontsize_title=26, fontsize_subtitle=14
-                                 ):
+    def plot_colony_segmentation(
+            self, figsize=(18, 8),
+            buffer_width=5,
+            fontsize_title=26, fontsize_subtitle=14
+    ):
         if fontsize_subtitle > 2:
             fontsize_pass = fontsize_subtitle - 2
         else:
@@ -119,3 +123,23 @@ class PlateProfilePlotting(PlateProfileBase):
                 side_by_side = np.concatenate([img, buffer, colony_img], axis=1)
                 ax.imshow(side_by_side)
         return fig, ax
+
+    def get_colony_segmentation_operation(self, buffer_width: int = 10):
+        side_by_side_set = []
+        for well in self.wells:
+            _img = well.input_img
+            buffer = np.full((_img.shape[0], buffer_width, 3), fill_value=255)
+            if well.status_validity:
+                colony_img = well.masked_img.filled(0)
+            else:
+                colony_img = well.input_img
+            side_by_side_set.append(np.concatenate([_img, buffer, colony_img], axis=1))
+        return side_by_side_set
+
+    def save_colony_segmentation_operation(self, dirpath, image_type=".png", buffer_width: int = 10):
+        savepath = Path(dirpath)
+        savepath.mkdir(parents=True, exist_ok=True)
+        segmentation_operation_imgs = self.get_colony_segmentation_operation(buffer_width=buffer_width)
+        for idx, img in enumerate(segmentation_operation_imgs):
+            filename = self.plate_name + "+" + self.wells[idx].colony_name + image_type
+            imsave(fname=savepath / filename, arr=img, check_contrast=False)

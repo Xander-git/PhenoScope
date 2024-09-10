@@ -1,9 +1,9 @@
-from ._plate_series_change_over_time import PlateSeriesChangeOverTime
+from ._plate_series_growth import PlateSeriesGrowth
 
 
 # TODO: Add module logging
 
-class PlateSeriesPlotting(PlateSeriesChangeOverTime):
+class PlateSeriesPlotting(PlateSeriesGrowth):
     def plot_plate_unfiltered(self, plate_idx, fontsize=34):
         fig, ax = self.plates[plate_idx].plot_unfiltered()
         fig.suptitle(f"{self.series_name}_plate({plate_idx})", fontsize=fontsize)

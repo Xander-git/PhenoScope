@@ -12,16 +12,18 @@ from ..util import check_grayscale
 
 
 class ObjectFinderBase:
-    def __init__(self,
-                 threshold_method="otsu",
-                 measurements: List[str] = None,
-                 enhance_contrast: bool = True,
-                 **kwargs):
+    def __init__(
+            self,
+            threshold_method="otsu",
+            measurements: List[str] = None,
+            enhance_contrast: bool = True,
+            **kwargs
+    ):
 
         self._enhance_contrast = enhance_contrast
-        self._footprint_shape = kwargs.get("footprint_shape", "disk"),
-        self._footprint_radius = kwargs.get("footprint_radius", None),
-        self._kernel_size = kwargs.get("kernel_size", None)
+        self._footprint_shape = kwargs.get("footprint_shape", "disk")
+        self._footprint_radius = kwargs.get("footprint_radius") # Returns none by default if none specified
+        self._kernel_size = kwargs.get("kernel_size")
 
         self._threshold_method = threshold_method
 
@@ -29,12 +31,13 @@ class ObjectFinderBase:
         self._obj_map = None
         self._table = pd.DataFrame()
 
-        essential_measurements = [
+        self._essential_measurements = [
             "label",
             "centroid",
             "bbox",
             "area_bbox",
             "area",
+            "perimeter",
             "eccentricity",
             "intensity_mean",
         ]
@@ -52,15 +55,16 @@ class ObjectFinderBase:
         ]
 
         if measurements is None:
-            self._measurements = essential_measurements + basic_measurements
+            self._measurements = self._essential_measurements + basic_measurements
         elif type(measurements) == List[str]:
-            self._measurements = essential_measurements + measurements
+            self._measurements = self._essential_measurements + measurements
         else:
             raise ValueError("Measurements must be a list of strings")
 
     @property
     def results(self) -> pd.DataFrame:
-        if self._table.empty: raise AttributeError("Failed to get results. Try running find_objects() on an image first.")
+        if self._table.empty: raise AttributeError(
+                "Failed to get results. Try running find_objects() on an image first.")
         return self._table.copy(deep=True).set_index("label")
 
     def get_results(self) -> pd.DataFrame:
@@ -113,3 +117,16 @@ class ObjectFinderBase:
             "centroid-0": "centroid-row",
             "centroid-1": "centroid-col"
         })
+
+        cols = self._table.columns.tolist()
+        cols.insert(0, cols.pop(cols.index("centroid-row")))
+        cols.insert(0, cols.pop(cols.index("centroid-col")))
+        cols.insert(0, cols.pop(cols.index("label")))
+        self._table = self._table.loc[:, cols]
+
+        self._table.insert(
+                loc=4,
+                column="circularity",
+                value=(4 * np.pi * self._table.loc[:, "area"]) / (self._table.loc[:, "perimeter"] ** 2)
+        )
+

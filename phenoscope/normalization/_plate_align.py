@@ -20,14 +20,17 @@ import matplotlib.pyplot as plt
 from ._plate_blobs import PlateBlobs
 
 # ----- Class Constants -----
-OPERATION_NAME = "PlateAlign"   # TODO: integrate image op stack
+OPERATION_NAME = "PlateAlign"  # TODO: integrate image op stack
+
+
 # ----- Main Class Definition -----
 class PlateAlignment(PlateBlobs):
-    def __init__(self, img: np.ndarray,
-                 n_rows: int = 8,
-                 n_cols: int = 12,
-                 **kwargs
-                 ):
+    def __init__(
+            self, img: np.ndarray,
+            n_rows: int = 8,
+            n_cols: int = 12,
+            **kwargs
+            ):
         self._unaligned_blobs = None
         self._aligned_blobs = None
         self.input_alignment_vector = None
@@ -56,7 +59,7 @@ class PlateAlignment(PlateBlobs):
         log.info("Starting plate alignment")
         self._unaligned_blobs = self.blobs
 
-        max_row = self.blobs.results.groupby("row_num", observed=True)["mse"].mean()
+        max_row = self.blobs.results.groupby("gridrow_num", observed=True)["mse"].mean()
         max_row = self.blobs.gridrows[max_row.idxmin()]
 
         # Sets normalization algorithm to use row with the most blobs found
@@ -129,7 +132,8 @@ class PlateAlignment(PlateBlobs):
                     self.alignment_vector['y'],
                     color='white', linestyle='--'
                     )
-            ax.set_title(f'Input Alignment Rotation {self.degree_of_rotation:.4f} | Red: Original | Yellow: New', fontsize=fontsize)
+            ax.set_title(f'Input Alignment Rotation {self.degree_of_rotation:.4f} | Red: Original | Yellow: New',
+                         fontsize=fontsize)
             for idx, row in self._unaligned_blobs.results.iterrows():
                 c = plt.Circle((row['x'], row['y']), row['radius'], color='red', fill=False)
                 ax.add_patch(c)
