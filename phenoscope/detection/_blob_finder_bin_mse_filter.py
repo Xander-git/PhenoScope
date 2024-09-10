@@ -2,8 +2,6 @@ import numpy as np
 import pandas as pd
 import warnings
 
-from numpy.exceptions import RankWarning
-
 from ._blob_finder_particle_filter import BlobFinderParticleFilter
 from ..util.image_analysis import check_grayscale
 
