@@ -142,4 +142,4 @@ class PlateProfilePlotting(PlateProfileBase):
         segmentation_operation_imgs = self.get_colony_segmentation_operation(buffer_width=buffer_width)
         for idx, img in enumerate(segmentation_operation_imgs):
             filename = self.plate_name + "+" + self.wells[idx].colony_name + image_type
-            imsave(fname=savepath / filename, arr=img, check_contrast=False)
+            imsave(fname=savepath / filename, arr=img_as_ubyte(img), check_contrast=False)
