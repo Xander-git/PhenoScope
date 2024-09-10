@@ -54,7 +54,7 @@ class PlateSeriesIO(PlateSeriesPlotting):
             log.debug(f"Saving colony segmentation operation images for plate: {plate}")
             try:
                 plate_savepath = savepath / f"{plate.plate_name}"
-                plate.save_colony_segmentation_operations(dirpath=plate_savepath, image_type=image_type,
+                plate.save_colony_segmentation_operation(dirpath=plate_savepath, image_type=image_type,
                                                           buffer_width=buffer_width)
             except KeyboardInterrupt:
                 raise KeyboardInterrupt
