@@ -176,9 +176,13 @@ class ColonyProfileObject(ColonyProfileBase):
         self.segment_properties["distance_from_center"] = np.sqrt(
                 (self.segment_properties["centroid-0"] - center_row) ** 2 + (self.segment_properties["centroid-1"] - center_col) ** 2
         )
+
+        if self.segment_properties.empty: raise AttributeError("No object in image passed colony filters")
+
         if filter_type == "min":
             self.colony_mask = self.labeled_segmentation == self.segment_properties[f"{property}"].idxmin()
         elif filter_type == "max":
             self.colony_mask = self.labeled_segmentation == self.segment_properties[f"{property}"].idxmax()
         else:
             raise ValueError("Invalid filter_type. Currently implemented filter types are 'min' or 'max'")
+

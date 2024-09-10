@@ -10,7 +10,6 @@ log.addHandler(console_handler)
 console_handler.setFormatter(formatter)
 
 import pandas as pd
-import numpy as np
 
 from ._plate_series_base import PlateSeriesBase
 
@@ -28,32 +27,32 @@ class PlateSeriesGrowth(PlateSeriesBase):
         if len(self.plates) > 1:
             deltaMetric = []
             for plate_idx in range(len(self._plates.values()) - 1):
-                data_zero = self.get_plate_results(
+                plate_current = self.get_plate_results(
                         plate_idx=plate_idx,
                         numeric_only=True
                 ).copy()
-                data_zero.loc[:, "SamplingDay"] = data_zero.loc[:, "SamplingDay"].astype(int)
+                plate_current.loc[:, "SamplingDay"] = plate_current.loc[:, "SamplingDay"].astype(int)
 
-                data_one = self.get_plate_results(
+                plate_next = self.get_plate_results(
                         plate_idx=(plate_idx + 1),
                         numeric_only=True
                 ).copy()
-                data_one.loc[:, "SamplingDay"] = data_one.loc[:, "SamplingDay"].astype(int)
+                plate_next.loc[:, "SamplingDay"] = plate_next.loc[:, "SamplingDay"].astype(int)
 
-                tmp = data_one - data_zero
-                tmp.columns = tmp.columns.map(lambda x: f"d({x})/dt")
+                plate_change_table = plate_next - plate_current
+                plate_change_table.columns = plate_change_table.columns.map(lambda x: f"d({x})/dt")
 
                 reference_plates = ("day("
-                                    + data_one.loc[:, "SamplingDay"].apply(lambda x: f"{x}")
+                                    + plate_next.loc[:, "SamplingDay"].apply(lambda x: f"{x}")
                                     + ") - day("
-                                    + data_zero.loc[:, "SamplingDay"].apply(lambda x: f"{x}")
+                                    + plate_current.loc[:, "SamplingDay"].apply(lambda x: f"{x}")
                                     + ")")
-                tmp.insert(0, "reference_plates", reference_plates)
+                plate_change_table.insert(0, "reference_plates", reference_plates)
 
-                tmp.index.name = "colony_name"
-                tmp = tmp.reset_index(drop=False)
-                tmp = tmp.set_index(["colony_name", "reference_plates"])
-                deltaMetric.append(tmp)
+                plate_change_table.index.name = "colony_name"
+                plate_change_table = plate_change_table.reset_index(drop=False)
+                plate_change_table = plate_change_table.set_index(["colony_name", "reference_plates"])
+                deltaMetric.append(plate_change_table)
             deltaMetric = pd.concat(deltaMetric, axis=0)
             return deltaMetric.sort_index()
 
