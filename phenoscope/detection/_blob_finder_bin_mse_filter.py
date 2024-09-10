@@ -134,7 +134,8 @@ class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
 
     @staticmethod
     def _get_linreg_residuals(x, y):
-        warnings.simplefilter('ignore', RankWarning)
+        # warnings.simplefilter('ignore', RankWarning)
+        warnings.simplefilter('ignore', np.RankWarning)
         m, b = np.polyfit(x, y, 1)
         y_pred = m * x + b
         error = y - y_pred
@@ -142,7 +143,8 @@ class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
 
     @staticmethod
     def _get_linreg_mse(x, y):
-        warnings.simplefilter('ignore', RankWarning)
+        # warnings.simplefilter('ignore', RankWarning)
+        warnings.simplefilter('ignore', np.RankWarning)
         m, b = np.polyfit(x, y, 1)
         y_pred = m * x + b
         error = np.sum((y - y_pred) ** 2) / len(y)
