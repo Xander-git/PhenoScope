@@ -1,0 +1,34 @@
+name: phenomics-build
+channels:
+  - conda-forge
+  - bioconda
+  - r
+  - defaults
+dependencies:
+  - python=3.10
+  - matplotlib
+  - numpy
+  - pandas
+  - scikit-image
+  - scikit-learn
+  - jupyter
+  - dash
+  - joblib
+  - boto3
+  - docutils
+  - h5py
+  - imageio
+  - inflect
+  - mahotas
+  - mysqlclient
+  - psutil
+  - pytest
+  - pyzmq
+  - scipy
+  - scyjava
+  - seaborn
+# - bioconda::centrosome
+# - bioconda::cellprofiler
+# - bioconda::cellprofiler-core
+# Other dependencies:
+#   Jave Runtime Environment or Java Development Kit
