@@ -16,12 +16,13 @@ from ..util.plotting import plot_plate_rows
 
 # ----- Main Class Definition -----
 class PlateGrid(PlateFit):
-    def __init__(self, img: np.ndarray,
-                 n_rows: int = 8,
-                 n_cols: int = 12,
-                 border_padding: int = 50,
-                 **kwargs
-                 ):
+    def __init__(
+            self, img: np.ndarray,
+            n_rows: int = 8,
+            n_cols: int = 12,
+            border_padding: int = 50,
+            **kwargs
+    ):
 
         self.cols_midpoints = None
         self.rows_midpoints = None
@@ -58,8 +59,8 @@ class PlateGrid(PlateFit):
         rows_yMinus = []
         rows_yPlus = []
         for row in rows:
-            rows_yMinus.append(row.y_minus.min())
-            rows_yPlus.append(row.y_plus.max())
+            rows_yMinus.append(row.loc[:, 'y_minus'].min())
+            rows_yPlus.append(row.loc[:, 'y_plus'].max())
         rows_yMinus = np.array(rows_yMinus)
         rows_yPlus = np.array(rows_yPlus)
 
@@ -80,8 +81,8 @@ class PlateGrid(PlateFit):
         log.info(f"Getting well images from plate")
         well_imgs = []
 
-        y_start = np.insert(self.rows_midpoints, 0, 0).round().astype(int)
-        x_start = np.insert(self.cols_midpoints, 0, 0).round().astype(int)
+        y_start = np.insert(self.rows_midpoints, obj=0, values=0).round().astype(int)
+        x_start = np.insert(self.cols_midpoints, obj=0, values=0).round().astype(int)
         y_end = np.append(self.rows_midpoints, self.img.shape[0] - 1).round().astype(int)
         x_end = np.append(self.cols_midpoints, self.img.shape[1] - 1).round().astype(int)
 

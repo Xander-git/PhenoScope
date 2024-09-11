@@ -62,14 +62,14 @@ class PlateAlignment(PlateBlobs):
         max_row = self.blobs.results.groupby("gridrow_num", observed=True)["mse"].mean()
         max_row = self.blobs.gridrows[max_row.idxmin()]
 
-        # Sets normalization algorithm to use row with the most blobs found
+        # Sets normalization algorithm to use row with the least average error from the line of best fit
         # Varied performance across different cases
 
-        m, b = np.polyfit(max_row.x, max_row.y, 1)
+        m, b = np.polyfit(max_row.loc[:,'x'], max_row.loc[:,'y'], 1)
 
-        x0 = min(max_row.x)
+        x0 = min(max_row.loc[:, 'x'])
         y0 = m * x0 + b
-        x1 = max(max_row.x)
+        x1 = max(max_row.loc[:, 'x'])
         y1 = m * x1 + b
         x_align = x1
         y_align = y0

@@ -40,7 +40,7 @@ class PlateFit(PlateAlignment):
     def _normalize(self, align: bool = True, fit: bool = True):
         if fit and not self._status_pad_img: self._pad_img()
         super()._normalize(align=align)
-        if fit and not self._status_pad_img: self.fit_plate()
+        if fit and not self._status_fitted: self.fit_plate()
 
     def _pad_img(self):
         self.padded_img = []

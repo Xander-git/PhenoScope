@@ -26,7 +26,7 @@ class PlateIO(PlateGrid):
             n_cols: int = 12,
             border_padding: int = 50,
             **kwargs
-            ):
+    ):
         super().__init__(
                 img=img,
                 n_rows=n_rows,
@@ -82,7 +82,7 @@ class PlateIO(PlateGrid):
             except KeyboardInterrupt:
                 raise KeyboardInterrupt
             except Exception as e:
-                log.warning(f"Could not save well {idx}\n", exc_info=True)
+                log.warning(f"Could not save well {idx}\n - {e}", exc_info=True)
                 log.warning(f"Error: {e}")
 
     def _plot_invalid(self):
