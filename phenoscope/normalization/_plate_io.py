@@ -74,7 +74,7 @@ class PlateIO(PlateGrid):
         for idx, well in enumerate(well_imgs):
             try:
                 io.imsave(
-                        fname=dirpath_folder / f"/{name_prepend}well({idx:03d}){filetype}",
+                        fname=dirpath_folder / f"{name_prepend}well({idx:03d}){filetype}",
                         arr=img_as_ubyte(well),
                         quality=100,
                         check_contrast=False
