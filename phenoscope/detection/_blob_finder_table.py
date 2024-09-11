@@ -27,23 +27,23 @@ class BlobFinderTable(BlobFinderBase):
     @property
     def gridrows(self):
         return [
-            self.table.loc[
-            self.table.loc[:, self._GRIDROW_LABEL] == i, :]
+            self.results.loc[
+            self.results.loc[:, self._GRIDROW_LABEL] == i, :]
             for i in range(self.n_rows)
         ]
 
     @property
     def gridcols(self):
         return [
-            self.table.loc[
-            self.table.loc[:, self._GRIDCOL_LABEL] == i, :]
+            self.results.loc[
+            self.results.loc[:, self._GRIDCOL_LABEL] == i, :]
             for i in range(self.n_cols)
         ]
 
     def find_blobs(self, img):
         super().find_blobs(img)
         self.generate_table()
-        return self.table
+        return self.results
 
     def generate_table(self):
         if self.empty is True: raise ValueError(

@@ -22,3 +22,18 @@ BASIC_CP_API_MEASUREMENT_LABELS = [
     "Intensity",
     "Texture"
 ]
+
+class MetadataLabels:
+    STATUS_VALIDITY_LABEL = "Status_ValidSegmentation"
+    PLATE_NAME_LABEL = "PlateName"
+
+class NumericMetadataLabels:
+    SAMPLING_DAY_LABEL = "SamplingDay"
+
+class PhenoscopeMeasurementLabels:
+    INTEGRATED_INTENSITY_RED = "Intensity_IntegratedColorIntensityRed"
+    INTEGRATED_INTENSITY_BLUE = "Intensity_IntegratedColorIntensityBlue"
+    INTEGRATED_INTENSITY_GREEN = "Intensity_IntegratedColorIntensityGreen"
+    IMAGE_HEIGHT = "ImageHeight"
+    IMAGE_WIDTH = "ImageWidth"
+

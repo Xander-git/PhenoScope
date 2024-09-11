@@ -3,6 +3,7 @@ import numpy as np
 from pathlib import Path
 from skimage.io import imsave
 from skimage.util import img_as_ubyte
+from typing import List
 
 from ._plate_profile_base import PlateProfileBase
 
@@ -124,7 +125,7 @@ class PlateProfilePlotting(PlateProfileBase):
                 ax.imshow(side_by_side)
         return fig, ax
 
-    def get_colony_segmentation_operation(self, buffer_width: int = 10):
+    def get_colony_segmentation_operation(self, buffer_width: int = 10) -> List[np.ndarray]:
         side_by_side_set = []
         for well in self.wells:
             _img = well.input_img
@@ -136,10 +137,14 @@ class PlateProfilePlotting(PlateProfileBase):
             side_by_side_set.append(np.concatenate([_img, buffer, colony_img], axis=1))
         return side_by_side_set
 
-    def save_colony_segmentation_operation(self, dirpath, image_type=".png", buffer_width: int = 10):
+    def save_colony_segmentation_operation(self, dirpath, image_type=".png", buffer_width: int = 10) -> None:
         savepath = Path(dirpath)
         savepath.mkdir(parents=True, exist_ok=True)
         segmentation_operation_imgs = self.get_colony_segmentation_operation(buffer_width=buffer_width)
         for idx, img in enumerate(segmentation_operation_imgs):
             filename = self.plate_name + "+" + self.wells[idx].colony_name + image_type
-            imsave(fname=savepath / filename, arr=img_as_ubyte(img), check_contrast=False)
+
+            fpath = savepath / filename
+
+            imsave(fname=fpath, arr=img_as_ubyte(img), check_contrast=False)
+            if fpath.exists() is False: raise RuntimeError(f"Could not save {fpath}")

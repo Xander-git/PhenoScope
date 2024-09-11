@@ -35,14 +35,14 @@ class BlobFinderBinMSEFilter(BlobFinderParticleFilter):
         self.__status_update_mse = False
 
     @property
-    def table(self):
+    def results(self):
         self._calculate_bin_mse()
         min_mse_bin_idx = self._table.groupby(by=self._BIN_SET_LABEL, as_index=True)[f"{self.bin_filter_method}"].idxmin()
         return self._table.loc[min_mse_bin_idx, :]
 
     @property
     def mse(self):
-        err = self.table.loc[:, "mse"]
+        err = self.results.loc[:, "mse"]
         err = np.sum(err ** 2) / len(err)
         return err
 

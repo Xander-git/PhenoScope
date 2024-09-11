@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import skimage.io as io
 from skimage.util import img_as_ubyte
+from pathlib import Path
 
 import logging
 
@@ -19,12 +20,13 @@ from ._plate_grid import PlateGrid
 
 # ----- Main Class Definition -----
 class PlateIO(PlateGrid):
-    def __init__(self, img: np.ndarray,
-                 n_rows: int = 8,
-                 n_cols: int = 12,
-                 border_padding: int = 50,
-                 **kwargs
-                 ):
+    def __init__(
+            self, img: np.ndarray,
+            n_rows: int = 8,
+            n_cols: int = 12,
+            border_padding: int = 50,
+            **kwargs
+            ):
         super().__init__(
                 img=img,
                 n_rows=n_rows,
@@ -34,27 +36,18 @@ class PlateIO(PlateGrid):
         )
 
     def imsave(self, fname_save):
-        if self.status_validity:
-            log.info(f"Saving normalized plate img to {fname_save}")
-            io.imsave(fname_save, img_as_ubyte(self.img), check_contrast=False, quality=100)
-        else:
-            fig, ax = self._plot_invalid()
-            fname = fname_save.split(".")
-            fname_save = fname[0] + "_invalid_normalization" + fname[1]
-            fig.savefig(fname_save)
+        fname_save = Path(fname_save)
+        log.info(f"Saving normalized plate img to {fname_save}")
+        io.imsave(fname_save, img_as_ubyte(self.img), check_contrast=False, quality=100)
 
     def save_ops(self, fname_save):
         '''
         Saves operation figures to fname_save. This function changes depending on the amount of operations from the start to the endpoint
         '''
+        fname_save = Path(fname_save)
         log.info(f"Saving plate normalization operations to {fname_save}")
-        if self.status_validity:
-            fig, ax = self.plot_ops()
-            fig.savefig(fname_save)
-        else:
-            fig, ax = self._plot_invalid()
-            fname_split = fname_save.split(".")
-            fig.savefig(fname_split[0] + "_invalid_normalizaton" + fname_split[1])
+        fig, ax = self.plot_ops()
+        fig.savefig(fname_save)
         plt.close(fig)
 
     def plot_ops(self, plate_name=None, figsize=(18, 14), tight_layout=True, fontsize=16):
@@ -75,13 +68,13 @@ class PlateIO(PlateGrid):
         return fig, ax
 
     def save_wells(self, dirpath_folder, name_prepend="", filetype=".png"):
-        if dirpath_folder[-1] == "/": dirpath_folder = dirpath_folder[:-1]
+        dirpath_folder = Path(dirpath_folder)
         well_imgs = self.get_well_imgs()
         log.info(f"Saving well images to {dirpath_folder}")
         for idx, well in enumerate(well_imgs):
             try:
                 io.imsave(
-                        fname=f"{dirpath_folder}/{name_prepend}well({idx:03d}){filetype}",
+                        fname=dirpath_folder / f"/{name_prepend}well({idx:03d}){filetype}",
                         arr=img_as_ubyte(well),
                         quality=100,
                         check_contrast=False

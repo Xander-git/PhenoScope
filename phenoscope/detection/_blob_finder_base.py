@@ -32,7 +32,7 @@ class BlobFinderBase:
         self.max_overlap = max_overlap
 
     @property
-    def table(self):
+    def results(self):
         if self.empty is True: raise ValueError(
                 "No blobs are found. Run on an image or boost the image's contrast"
         )
