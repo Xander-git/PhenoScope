@@ -70,8 +70,6 @@ class ClaheBoost:
                                           kernel_size=self.kernel_size
                                           )
             self.status_clahe = True
-        else:
-            pass
 
     def _white_tophat(self):
         if self.status_white_tophat is False and self.use_white_tophat is True:
@@ -79,5 +77,3 @@ class ClaheBoost:
                                          footprint=self.footprint)
             self.img = self.img - tophat_result
             self.status_white_tophat = True
-        else:
-            pass

@@ -11,7 +11,7 @@ from .clahe_boost import ClaheBoost
 from ..util import check_grayscale
 
 
-class ObjectFinderBase:
+class ThresholdFinderBase:
     def __init__(
             self,
             threshold_method="otsu",
@@ -22,8 +22,8 @@ class ObjectFinderBase:
 
         self._enhance_contrast = enhance_contrast
         self._footprint_shape = kwargs.get("footprint_shape", "disk")
-        self._footprint_radius = kwargs.get("footprint_radius") # Returns none by default if none specified
-        self._kernel_size = kwargs.get("kernel_size")
+        self._footprint_radius = kwargs.get("footprint_radius", None)  # Returns none by default if none specified
+        self._kernel_size = kwargs.get("kernel_size", None)
 
         self._threshold_method = threshold_method
 
@@ -129,4 +129,3 @@ class ObjectFinderBase:
                 column="circularity",
                 value=(4 * np.pi * self._table.loc[:, "area"]) / (self._table.loc[:, "perimeter"] ** 2)
         )
-

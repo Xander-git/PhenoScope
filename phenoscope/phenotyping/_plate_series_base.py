@@ -85,6 +85,15 @@ class PlateSeriesBase:
         for plate in self.plates:
             plate.run()
 
+    def normalize(self, align=True, fit=True):
+        for plate in self.plates:
+            plate.normalize(align=align, fit=fit)
+
+    def measure(self):
+        for plate in self.plates:
+            plate.measure()
+        return self.results
+
     def get_results(self):
         return self.results
 

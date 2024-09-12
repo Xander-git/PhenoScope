@@ -3,14 +3,14 @@ from typing import List
 import numpy as np
 import pandas as pd
 
-from ._object_finder_measurement_filter import ObjectFinderMeasurementFilter
+from ._threshold_finder_measurement_filter import ThresholdFinderMeasurementFilter
 
 GRIDROW_LABEL = "gridrow_num"
 GRIDCOL_LABEL = "gridcol_num"
 BIN_SET_LABEL = "bin_set"
 
 
-class ObjectFinderBins(ObjectFinderMeasurementFilter):
+class ThresholdFinderBins(ThresholdFinderMeasurementFilter):
     def __init__(self,
                  threshold_method: str = "otsu",
                  n_rows: int = 8,

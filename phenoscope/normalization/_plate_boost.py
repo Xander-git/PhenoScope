@@ -13,9 +13,11 @@ class PlateBoost(PlateIO):
                  **kwargs
                  ):
         self._use_boost = use_boost
-        self.boost_footprint_radius = kwargs.get("boost_footprint_radius", 8)
-        self.boost_footprint_shape = kwargs.get("boost_footprint_shape", "disk")
-        self.boost_kernel_size = kwargs.get("boost_kernel_size", 150)
+        self.boost_settings = {
+            'footprint_radius':kwargs.get('footprint_radius', 8),
+            'footprint_shape':kwargs.get('footprint_shape', 'disk'),
+            'kernel_size':kwargs.get('kernel_size', 150),
+        }
         super().__init__(
                 img=img,
                 n_rows=n_rows,
@@ -27,9 +29,9 @@ class PlateBoost(PlateIO):
     @property
     def boosted_img(self):
         return ClaheBoost(img=self.img,
-                          footprint_shape=self.boost_footprint_shape,
-                          footprint_radius=self.boost_footprint_radius,
-                          kernel_size=self.boost_kernel_size
+                          footprint_shape=self.boost_settings['footprint_shape'],
+                          footprint_radius=self.boost_settings['footprint_radius'],
+                          kernel_size=self.boost_settings['kernel_size']
                           ).get_boosted_img()
 
     def _update_blobs(self):

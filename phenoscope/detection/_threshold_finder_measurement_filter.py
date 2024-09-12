@@ -2,10 +2,10 @@ from typing import List
 
 import numpy as np
 
-from ._object_finder_base import ObjectFinderBase
+from ._threshold_finder_base import ThresholdFinderBase
 
 
-class ObjectFinderMeasurementFilter(ObjectFinderBase):
+class ThresholdFinderMeasurementFilter(ThresholdFinderBase):
     def __init__(
             self,
             threshold_method: str = "otsu",

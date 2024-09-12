@@ -6,11 +6,11 @@ from skimage.color import label2rgb
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from ._object_finder_bins import ObjectFinderBins
+from ._threshold_finder_bins import ThresholdFinderBins
 from ..util.image_analysis import view_img_info
 
 
-class ObjectFinderView(ObjectFinderBins):
+class ThresholdFinderView(ThresholdFinderBins):
     @property
     def gridrow_map(self) -> np.ndarray:
         gridrow_map = np.zeros(shape=self._obj_map.shape)

@@ -26,31 +26,32 @@ class PlateBlobs(PlateBase):
                 n_cols=n_cols
         )
 
-        # Assign individual properties so blob finding can be redone. May remove in later iterations
-        self.blobs_detection_method = kwargs.get("blobs_detection_method", "log")
-        self.blobs_min_sigma = kwargs.get("blobs_min_sigma", 4)
-        self.blobs_max_sigma = kwargs.get("blobs_max_sigma", 40)
-        self.blobs_num_sigma = kwargs.get("blobs_num_sigma", 45)
-        self.blobs_threshold = kwargs.get("blobs_threshold", 0.01)
-        self.blobs_overlap = kwargs.get("blobs_overlap", 0.1)
-        self.blobs_min_size = kwargs.get("blobs_min_size", 180)
-        self.blobs_filter_threshold_method = kwargs.get("blobs_filter_threshold_method", "triangle")
-        self.blobs_tophat_radius = kwargs.get("blobs_tophat_radius", 15)
-        self.blobs_border_filter = kwargs.get("blobs_border_filter", 50)
+        self.blob_finder_settings = {
+            'detection_method': kwargs.get("detection_method", "log"),
+            'min_sigma': kwargs.get("min_sigma", 4),
+            'max_sigma': kwargs.get("max_sigma", 40),
+            'num_sigma': kwargs.get("num_sigma", 45),
+            'threshold': kwargs.get("threshold", 0.01),
+            'overlap': kwargs.get("overlap", 0.1),
+            'min_size': kwargs.get("min_size", 180),
+            'filter_threshold_method': kwargs.get("filter_threshold_method", "triangle"),
+            'tophat_radius': kwargs.get("tophat_radius", 15),
+            'border_filter': kwargs.get("border_filter", 50),
+        }
 
         self.blobs = BlobFinder(
                 n_rows=self.n_rows,
                 n_cols=self.n_cols,
-                blob_search_method=self.blobs_detection_method,
-                min_sigma=self.blobs_min_sigma,
-                max_sigma=self.blobs_max_sigma,
-                num_sigma=self.blobs_num_sigma,
-                threshold=self.blobs_threshold,
-                max_overlap=self.blobs_overlap,
-                min_size=self.blobs_min_size,
-                filter_threshold_method=self.blobs_filter_threshold_method,
-                tophat_radius=self.blobs_tophat_radius,
-                border_filter=self.blobs_border_filter
+                blob_search_method=self.blob_finder_settings['detection_method'],
+                min_sigma=self.blob_finder_settings['min_sigma'],
+                max_sigma=self.blob_finder_settings['max_sigma'],
+                num_sigma=self.blob_finder_settings['num_sigma'],
+                threshold=self.blob_finder_settings['threshold'],
+                max_overlap=self.blob_finder_settings['overlap'],
+                min_size=self.blob_finder_settings['min_size'],
+                filter_threshold_method=self.blob_finder_settings['filter_threshold_method'],
+                tophat_radius=self.blob_finder_settings['tophat_radius'],
+                border_filter=self.blob_finder_settings['border_filter'],
         )
 
         self.status_initial_blobs = False
