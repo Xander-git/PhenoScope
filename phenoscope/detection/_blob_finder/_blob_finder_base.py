@@ -5,16 +5,18 @@ from skimage.feature import blob_dog, blob_log, blob_doh
 import os
 import logging
 
-logger_name = "phenomics-normalization"
+logger_name = "phenomics-preprocessing"
 log = logging.getLogger(logger_name)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
 
 # ----- Pkg Relative Import -----
-from ..util.image_analysis import check_grayscale
-
+from ...util.image_analysis import check_grayscale
 
 # ------ Main Class Definition -----
 class BlobFinderBase:
+    _COL_COORD_LABEL = 'cc'
+    _ROW_COORD_LABEL = 'rr'
+
     def __init__(
             self,
             blob_search_method: str = "log",
@@ -58,7 +60,6 @@ class BlobFinderBase:
 
     def _search_blobs_LoG(self, gray_img: np.ndarray):
         log.debug("Starting blob search using 'Laplacian of Gaussian'")
-
         self._table = pd.DataFrame(blob_log(
                 image=gray_img,
                 min_sigma=self.min_sigma,
@@ -66,11 +67,9 @@ class BlobFinderBase:
                 num_sigma=self.num_sigma,
                 threshold=self.search_threshold,
                 overlap=self.max_overlap
-        ), columns=['y', 'x', 'sigma'])
+        ), columns=[self._COL_COORD_LABEL, self._ROW_COORD_LABEL, 'sigma'])
         if self._table is None or len(self._table) == 0:
-            raise RuntimeError(
-                    "No blobs found in image using 'Laplacian of Gaussian'"
-            )
+            raise RuntimeError("No blobs found in image using 'Laplacian of Gaussian'")
 
     def _search_blobs_DoG(self, gray_img: np.ndarray):
         self._table = pd.DataFrame(blob_dog(
@@ -79,11 +78,9 @@ class BlobFinderBase:
                 max_sigma=self.max_sigma,
                 threshold=self.search_threshold,
                 overlap=self.max_overlap
-        ), columns=['y', 'x', 'sigma'])
+        ), columns=[self._COL_COORD_LABEL, self._ROW_COORD_LABEL, 'sigma'])
         if self._table is None or len(self._table) == 0:
-            raise RuntimeError(
-                    "No blobs found in image using 'Difference of Gaussian'"
-            )
+            raise RuntimeError("No blobs found in image using 'Difference of Gaussian'")
 
     def _search_blobs_DoH(self, gray_img):
         self._table = pd.DataFrame(blob_doh(
@@ -93,8 +90,6 @@ class BlobFinderBase:
                 num_sigma=self.num_sigma,
                 threshold=self.search_threshold,
                 overlap=self.max_overlap
-        ), columns=['y', 'x', 'sigma'])
+        ), columns=[self._COL_COORD_LABEL, self._ROW_COORD_LABEL, 'sigma'])
         if self._table is None or len(self._table) == 0:
-            raise RuntimeError(
-                    "No blobs found in image using 'Determinant of Hessian'"
-            )
+            raise RuntimeError("No blobs found in image using 'Determinant of Hessian'")

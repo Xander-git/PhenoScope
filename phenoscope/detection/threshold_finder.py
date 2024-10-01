@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ._threshold_finder_view import ThresholdFinderView
+from ._threshold_finder._threshold_finder_view import ThresholdFinderView
 
 """
 End-point class for ObjectFinder

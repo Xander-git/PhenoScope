@@ -18,7 +18,7 @@ from skimage.morphology import white_tophat, disk
 from skimage.measure import label, regionprops_table
 
 from ._colony_profile_base import ColonyProfileBase
-from ..detection import ClaheBoost
+from ...detection import ClaheBoost
 
 
 class ColonyProfileObject(ColonyProfileBase):

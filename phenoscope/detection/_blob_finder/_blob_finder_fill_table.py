@@ -7,10 +7,10 @@ from ._blob_finder_base import BlobFinderBase
 
 
 # ------ Main Class Definition -----
-class BlobFinderTable(BlobFinderBase):
+class BlobFinderFillTable(BlobFinderBase):
     _GRIDROW_LABEL = "gridrow_num"
     _GRIDCOL_LABEL = "gridcol_num"
-    _BIN_SET_LABEL = "bin_set"
+    _GRID_SECTION_LABEL = 'grid_section'
 
     def __init__(self, n_rows: int = 8, n_cols: int = 12,
                  blob_search_method: str = "log",
@@ -81,6 +81,6 @@ class BlobFinderTable(BlobFinderBase):
                 bins=self.n_cols,
                 labels=range(self.n_cols)
         )
-        self._table[self._BIN_SET_LABEL] = "gridrow" + self._table[self._GRIDROW_LABEL].astype(str) \
-                                           + "_" \
-                                           + "gridcol" + self._table[self._GRIDCOL_LABEL].astype(str)
+        self._table[self._GRID_SECTION_LABEL] = "gridrow" + self._table[self._GRIDROW_LABEL].astype(str) \
+                                                + "_" \
+                                                + "gridcol" + self._table[self._GRIDCOL_LABEL].astype(str)

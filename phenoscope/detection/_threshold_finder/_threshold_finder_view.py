@@ -7,7 +7,7 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
 from ._threshold_finder_bins import ThresholdFinderBins
-from ..util.image_analysis import view_img_info
+from ...util.image_analysis import view_img_info
 
 
 class ThresholdFinderView(ThresholdFinderBins):
@@ -46,3 +46,4 @@ class ThresholdFinderView(ThresholdFinderBins):
         ax.clear()
         ax.imshow(self.get_gridcol_overlay(image=image))
         return fig, axes
+

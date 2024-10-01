@@ -25,17 +25,17 @@ BASIC_CP_API_MEASUREMENT_LABELS = [
 
 class MetadataLabels:
     STATUS_VALIDITY_LABEL = 'Status_ValidSegmentation'
-    PLATE_NAME_LABEL = 'PlateName'
+    PLATE_NAME_LABEL = 'Metadata_PlateName'
 
 class NumericMetadataLabels:
-    SAMPLING_DAY_LABEL = "SamplingDay"
+    SAMPLING_DAY_LABEL = "Metadata_SamplingDay"
 
 class PhenoscopeMeasurementLabels:
     INTEGRATED_INTENSITY_RED = 'Intensity_IntegratedColorIntensityRed'
     INTEGRATED_INTENSITY_BLUE = 'Intensity_IntegratedColorIntensityBlue'
     INTEGRATED_INTENSITY_GREEN = 'Intensity_IntegratedColorIntensityGreen'
-    IMAGE_HEIGHT = 'ImageHeight'
-    IMAGE_WIDTH = 'ImageWidth'
+    IMAGE_HEIGHT = 'Attribute_ImageHeight'
+    IMAGE_WIDTH = 'Attribute_ImageWidth'
 
 class FinderLabels:
     ROW_COORD = 'rr'
@@ -48,5 +48,12 @@ class FinderLabels:
 
     GRID_SECTION = 'grid_section'
     GRID_SECTION_MSE = 'grid_section_mse'
+
+class BlobFinderLabels(FinderLabels):
+    SEARCH_METHOD_LOG = 'log'
+    SEARCH_METHOD_DOG = 'dog'
+    SEARCH_METHOD_DOH = 'doh'
+    SIGMA = 'sigma'
+
 
 

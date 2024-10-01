@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 import os
 import logging
 
-logger_name = "phenomics-normalization"
+logger_name = "phenomics-preprocessing"
 log = logging.getLogger(logger_name)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
 # ----- Pkg Relative Import -----
 from ._plate_align import PlateAlignment
-from ..util.plotting import plot_blobs
+from phenoscope.util.plotting import plot_blobs
 
 
 # ----- Main Class Definition -----
@@ -38,9 +38,9 @@ class PlateFit(PlateAlignment):
         self._status_normalization = True
 
     def _normalize(self, align: bool = True, fit: bool = True):
-        if fit and not self._status_pad_img: self._pad_img()
+        if fit and self._status_pad_img is False: self._pad_img()
         super()._normalize(align=align)
-        if fit and not self._status_fitted: self.fit_plate()
+        if fit and self._status_fitted is False: self.fit_plate()
 
     def _pad_img(self):
         self.padded_img = []

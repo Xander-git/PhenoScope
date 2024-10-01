@@ -11,20 +11,21 @@ BIN_SET_LABEL = "bin_set"
 
 
 class ThresholdFinderBins(ThresholdFinderMeasurementFilter):
-    def __init__(self,
-                 threshold_method: str = "otsu",
-                 n_rows: int = 8,
-                 n_cols: int = 12,
-                 enhance_contrast: bool = True,
-                 **kwargs
-                 ):
+    def __init__(
+            self,
+            threshold_method: str = "otsu",
+            n_rows: int = 8,
+            n_cols: int = 12,
+            enhance_contrast: bool = True,
+            **kwargs
+            ):
         super().__init__(
                 threshold_method=threshold_method,
                 enhance_contrast=enhance_contrast,
                 **kwargs
         )
-        self._n_rows = n_rows
-        self._n_cols = n_cols
+        self._n_rows: int = n_rows
+        self._n_cols: int = n_cols
 
     @property
     def n_rows(self) -> int:
@@ -33,7 +34,7 @@ class ThresholdFinderBins(ThresholdFinderMeasurementFilter):
     @n_rows.setter
     def n_rows(self, value: int):
         self._n_rows = value
-        if "bin_set" in self._table.columns:
+        if BIN_SET_LABEL in self._table.columns:
             self.generate_bins()
 
     @property
@@ -43,12 +44,12 @@ class ThresholdFinderBins(ThresholdFinderMeasurementFilter):
     @n_cols.setter
     def n_cols(self, value: int):
         self._n_cols = value
-        if "bin_set" in self._table.columns:
+        if BIN_SET_LABEL in self._table.columns:
             self.generate_bins()
 
     @property
     def bin_values(self) -> np.ndarray:
-        bin_values = np.array(self._table.loc[:, "bin_set"].unique())
+        bin_values = np.array(self._table.loc[:, BIN_SET_LABEL].unique())
         return np.sort(bin_values)
 
     @property
@@ -56,7 +57,7 @@ class ThresholdFinderBins(ThresholdFinderMeasurementFilter):
         table = self.results
         return [
             table.loc[
-            table.loc[:, "bin_set"] == grid_bin, :]
+            table.loc[:, BIN_SET_LABEL] == grid_bin, :]
             for grid_bin in self.bin_values
         ]
 
@@ -65,7 +66,7 @@ class ThresholdFinderBins(ThresholdFinderMeasurementFilter):
         table = self.results
         return [
             table.loc[
-            table.loc[:, "row_num"] == i, :]
+            table.loc[:, GRIDROW_LABEL] == i, :]
             for i in range(self.n_rows)
         ]
 
@@ -74,7 +75,7 @@ class ThresholdFinderBins(ThresholdFinderMeasurementFilter):
         table = self.results
         return [
             table.loc[
-            table.loc[:, "col_num"] == i, :]
+            table.loc[:, GRIDCOL_LABEL] == i, :]
             for i in range(self.n_cols)
         ]
 
@@ -92,12 +93,12 @@ class ThresholdFinderBins(ThresholdFinderMeasurementFilter):
         if self._table.empty: raise AttributeError(error_msg)
 
         self._table.loc[:, GRIDROW_LABEL] = pd.cut(
-                x=self._table.loc[:, "centroid-row"],
+                x=self._table.loc[:, "center-rr"],
                 bins=self.n_rows, labels=range(self.n_rows)
         )
 
         self._table.loc[:, GRIDCOL_LABEL] = pd.cut(
-                x=self._table.loc[:, "centroid-col"],
+                x=self._table.loc[:, "center-cc"],
                 bins=self.n_cols, labels=range(self.n_cols)
         )
 

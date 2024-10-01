@@ -66,7 +66,7 @@ class PlateSeriesIO(PlateSeriesPlotting):
         dirpath = Path(dirpath)
         dirpath.mkdir(parents=True, exist_ok=True)
         for plate in self.plates:
-            fig, ax = plate.plot_well_grid(figsize=figsize)
+            fig, ax = plate.plot_plate_gridding(figsize=figsize)
             ax.set_title(f"{plate.plate_name}")
             fig.savefig(dirpath / f"{plate.plate_name}.png")
             plt.close(fig)

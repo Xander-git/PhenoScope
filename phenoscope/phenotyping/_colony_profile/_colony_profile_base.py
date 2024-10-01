@@ -12,7 +12,6 @@ log = logging.getLogger(__name__)
 log.addHandler(console_handler)
 console_handler.setFormatter(formatter)
 
-import matplotlib.pyplot as plt
 from skimage.color import rgb2gray
 
 

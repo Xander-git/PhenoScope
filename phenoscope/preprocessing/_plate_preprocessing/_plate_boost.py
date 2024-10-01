@@ -2,8 +2,8 @@ import numpy as np
 from skimage.color import rgb2gray
 
 from ._plate_io import PlateIO
-from ..detection.clahe_boost import ClaheBoost
-from ..detection import BlobFinder
+from phenoscope.detection.clahe_boost import ClaheBoost
+from phenoscope.detection import BlobFinder
 
 
 class PlateBoost(PlateIO):

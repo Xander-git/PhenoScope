@@ -59,7 +59,7 @@ class PlateIO(PlateGrid):
             opAx = ax.ravel()
             self.plotAx_alignment(ax=opAx[0], fontsize=fontsize)
             self.plotAx_fitting(ax=opAx[1], fontsize=fontsize)
-            self.plotAx_well_grid(ax=opAx[2], fontsize=fontsize)
+            self.plotAx_plate_gridding(ax=opAx[2], fontsize=fontsize)
             opAx[3].imshow(self.img)
             opAx[3].set_title("Final Image", fontsize=fontsize)
             opAx[3].grid(False)

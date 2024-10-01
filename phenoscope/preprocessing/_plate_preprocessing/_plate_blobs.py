@@ -13,8 +13,8 @@ console_handler.setFormatter(formatter)
 
 # ----- Pkg Relative Import -----
 from ._plate_base import PlateBase
-from ..detection.blob_finder import BlobFinder
-from ..util.plotting import plot_plate_rows
+from ...detection.blob_finder import BlobFinder
+from ...util.plotting import plot_plate_rows
 
 
 # ----- Main Class Definition -----

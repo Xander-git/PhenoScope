@@ -7,8 +7,8 @@ from skimage.filters import threshold_triangle, threshold_otsu
 from skimage.measure import label
 from skimage.morphology import white_tophat, disk
 
-from .clahe_boost import ClaheBoost
-from ..util import check_grayscale
+from ..clahe_boost import ClaheBoost
+from ...util import check_grayscale
 
 
 class ThresholdFinderBase:
@@ -114,13 +114,13 @@ class ThresholdFinderBase:
             "bbox-1"    : "bbox-col_min",
             "bbox-2"    : "bbox-row_max",
             "bbox-3"    : "bbox-col_max",
-            "centroid-0": "centroid-row",
-            "centroid-1": "centroid-col"
+            "centroid-0": "center-rr",
+            "centroid-1": "center-cc"
         })
 
         cols = self._table.columns.tolist()
-        cols.insert(0, cols.pop(cols.index("centroid-row")))
-        cols.insert(0, cols.pop(cols.index("centroid-col")))
+        cols.insert(0, cols.pop(cols.index("center-rr")))
+        cols.insert(0, cols.pop(cols.index("center-cc")))
         cols.insert(0, cols.pop(cols.index("label")))
         self._table = self._table.loc[:, cols]
 

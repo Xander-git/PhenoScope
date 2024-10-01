@@ -6,12 +6,12 @@ from typing import List
 import os
 import logging
 
-logger_name = "phenomics-normalization"
+logger_name = "phenomics-preprocessing"
 log = logging.getLogger(logger_name)
 logging.basicConfig(format=f'[%(asctime)s|%(levelname)s|{os.path.basename(__file__)}] %(message)s')
 # ----- Pkg Relative Import -----
 from ._plate_fit import PlateFit
-from ..util.plotting import plot_plate_rows
+from phenoscope.util.plotting import plot_plate_rows
 
 
 # ----- Main Class Definition -----
@@ -29,7 +29,7 @@ class PlateGrid(PlateFit):
         self.gridded_fig = None
         self.gridded_ax = None
 
-        self.status_midpoints = False
+        self._status_midpoints = False
 
         super().__init__(
                 img=img,
@@ -74,10 +74,10 @@ class PlateGrid(PlateFit):
 
         self.rows_midpoints = ((rows_yMinus[1:] - rows_yPlus[:-1]) / 2) + rows_yPlus[:-1]
         self.cols_midpoints = ((cols_xMinus[1:] - cols_xPlus[:-1]) / 2) + cols_xPlus[:-1]
-        self.status_midpoints = True
+        self._status_midpoints = True
 
     def get_well_imgs(self):
-        if self.status_midpoints is False: self.find_midpoints()
+        if self._status_midpoints is False: self.find_midpoints()
         log.info(f"Getting well images from plate")
         well_imgs = []
 
@@ -96,16 +96,16 @@ class PlateGrid(PlateFit):
                 )
         return well_imgs
 
-    def plot_well_grid(self, figsize=(12, 8)):
-        if self.status_midpoints is False:
+    def plot_plate_gridding(self, figsize=(12, 8)):
+        if self._status_midpoints is False:
             self.find_midpoints()
         with plt.ioff():
             fig, ax = plt.subplots(figsize=figsize)
-            ax = self.plotAx_well_grid(ax)
+            ax = self.plotAx_plate_gridding(ax)
         return fig, ax
 
-    def plotAx_well_grid(self, ax: plt.Axes, fontsize=24):
-        if self.status_midpoints is False:
+    def plotAx_plate_gridding(self, ax: plt.Axes, fontsize=24):
+        if self._status_midpoints is False:
             self.find_midpoints()
         with plt.ioff():
             plot_plate_rows(self.img, self.blobs, ax, set_axis=True)
@@ -113,7 +113,7 @@ class PlateGrid(PlateFit):
                 ax.axhline(point, linestyle="--")
             for point in self.cols_midpoints:
                 ax.axvline(point, linestyle='--')
-            ax.set_title("Well Isolation Grid", fontsize=fontsize)
+            ax.set_title("Plate Gridding", fontsize=fontsize)
         return ax
 
     def plot_well_imgs(self, figsize=(20, 18)):

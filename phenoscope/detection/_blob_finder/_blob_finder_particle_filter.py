@@ -4,23 +4,35 @@ from skimage.filters import threshold_otsu, threshold_triangle
 from skimage.morphology import white_tophat, disk, square
 from scipy.ndimage import binary_fill_holes
 # ----- Pkg Relative Import -----
-from ._blob_finder_table import BlobFinderTable
-from ..util.image_analysis import check_grayscale
+from ._blob_finder_fill_table import BlobFinderFillTable
+from ...util.image_analysis import check_grayscale
+
+# ----- Metadata Labels -----
+THRESHOLD_OTSU_LABEL = 'otsu'
+THRESHOLD_TRIANGLE_LABEL = 'triangle'
 
 
 # ----- Main Class Definition -----
 # TODO: Add more filters?
-class BlobFinderParticleFilter(BlobFinderTable):
-    def __init__(self, n_rows: int = 8, n_cols: int = 12,
-                 filter_threshold_method: str = "triangle",
-                 tophat_shape: str = "square",
-                 tophat_radius: int = 12,
-                 border_filter: int = 50,
-                 min_area: int = 180,
-                 blob_search_method: str = "log",
-                 min_sigma: int = 4, max_sigma: int = 40, num_sigma: int = 45,
-                 search_threshold: float = 0.01, max_overlap: float = 0.1,
-                 ):
+class BlobFinderParticleFilter(BlobFinderFillTable):
+    """
+    BlobFinderParticleFilter
+    ------
+    The filter methods written in this class are written in a way such that the image does not need to be saved to the
+    class in order to reduce memory usage
+    """
+
+    def __init__(
+            self, n_rows: int = 8, n_cols: int = 12,
+            filter_threshold_method: str = f'{THRESHOLD_TRIANGLE_LABEL}',
+            tophat_shape: str = "square",
+            tophat_radius: int = 12,
+            border_filter: int = 50,
+            min_area: int = 180,
+            blob_search_method: str = "log",
+            min_sigma: int = 4, max_sigma: int = 40, num_sigma: int = 45,
+            search_threshold: float = 0.01, max_overlap: float = 0.1,
+            ):
         self.min_area = min_area if min_area > 0 else 0
         self.border_filter = border_filter
         self.filter_threshold_method = filter_threshold_method
@@ -70,9 +82,9 @@ class BlobFinderParticleFilter(BlobFinderTable):
     def _filter_by_threshold(gray_img, threshold_method):
         if threshold_method is None:
             return gray_img
-        elif threshold_method == "triangle":
+        elif threshold_method == f'{THRESHOLD_TRIANGLE_LABEL}':
             thresh = threshold_triangle(gray_img)
-        elif threshold_method == "otsu":
+        elif threshold_method == f'{THRESHOLD_OTSU_LABEL}':
             thresh = threshold_otsu(gray_img)
         else:
             thresh = threshold_triangle(gray_img)

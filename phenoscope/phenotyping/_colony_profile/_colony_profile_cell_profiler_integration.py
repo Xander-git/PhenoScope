@@ -14,7 +14,7 @@ from copy import deepcopy
 import pandas as pd
 import numpy as np
 
-from ..cellprofiler_api import CellProfilerApi
+from ...cellprofiler_api import CellProfilerApi
 from ._colony_profile_measure_color import ColonyProfileMeasureColor
 
 ##############################################################################

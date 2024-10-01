@@ -16,7 +16,6 @@ from skimage.color import rgb2gray
 import numpy as np
 
 # ----- Pkg Relative Import -----
-from ..util.plotting import plot_plate_rows
 
 
 # ----- Main Class Definition -----
