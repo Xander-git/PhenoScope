@@ -1,0 +1,25 @@
+Metadata-Version: 2.1
+Name: phenoscope
+Version: 0.3.1
+Summary: A python package for high-throughput analysis of microorganism colonies on solid media plates
+Home-page: https://github.com/Xander-git/PhenoScope
+Author: Alexander Nguyen
+Author-email: anguy344@ucr.edu
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# Phenomics
+
+---
+
+## Sample Image Metadata
+
+---
+
+1. StandardDay1.jpg | Lactose 1_1Y_y
+2. StandardDay6.jpg | Lactose 6_1Y_5
+3. NoiseDay1.jpg | <Add Noisy dataset name> 1_3Y_10.jpg
