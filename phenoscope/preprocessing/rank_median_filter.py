@@ -1,6 +1,7 @@
 import numpy as np
 from skimage.filters.rank import median
 from skimage.morphology import disk, square, cube, ball
+from skimage.util import img_as_ubyte
 
 from ..interface import NoisePreprocessor
 
@@ -17,7 +18,7 @@ class RankMedianFilter(NoisePreprocessor):
 
     def preprocess(self, image: np.ndarray) -> np.ndarray:
         return median(
-                image=image,
+                image=img_as_ubyte(image),
                 footprint=self._get_footprint(self._get_footprint_radius(image))
         )
 
@@ -32,8 +33,8 @@ class RankMedianFilter(NoisePreprocessor):
             case 'disk':
                 return disk(radius=radius)
             case 'square':
-                return square(radius * 2)
-            case 'sphere':
-                return sphere(radius)
+                return square(int(radius * 2))
+            case 'ball':
+                return ball(radius)
             case 'cube':
-                return cube(radius * 2)
+                return cube(int(radius * 2))

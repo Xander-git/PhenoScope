@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 log.addHandler(console_handler)
 console_handler.setFormatter(formatter)
 
-from typing import Dict
+from typing import Dict, Any
 
 from ...interface._image_operation import ImageOperation
 
@@ -17,7 +17,7 @@ from ...interface.object_detector import ObjectDetector
 from ...interface.image_preprocessor import ImagePreprocessor
 from ...interface.morphology_morpher import MorphologyMorpher
 from ...interface.image_transformer import ImageTransformer
-from ...interface.table_filter import TableFilter
+from ...interface.measurement_filter import MeasurementFilter
 from ...interface.object_measurer import ObjectMeasurer
 
 from ...util.error_message import INTERFACE_ERROR_MSG
@@ -45,7 +45,7 @@ class ImagingPipeline(ImageOperation):
                 return operator.detect(input)
             case ObjectMeasurer():
                 return operator.measure(input)
-            case TableFilter():
+            case MeasurementFilter():
                 return operator.filter(input)
             case ObjectMeasurer():
                 return operator.measure(input)

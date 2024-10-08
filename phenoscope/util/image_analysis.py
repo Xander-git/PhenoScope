@@ -49,10 +49,10 @@ def compare_hist(img_one, img_two, figsize=(12, 8)):
     return fig, axes
 
 
-def view_img_info(img, stat="count", bins=256, sharey=False, sharex=False, figsize=(14, 8)):
+def view_img_info(img, cmap='viridis', stat="count", bins=256, sharey=False, sharex=False, figsize=(14, 8)):
     if len(img.shape) == 2:
         fig, axes = plt.subplots(ncols=2, figsize=figsize)
-        axes[0].imshow(img)
+        axes[0].imshow(img, cmap=cmap)
         axes[0].grid(False)
         axes[0].set_title("Image")
         histplot(data=img.ravel(),

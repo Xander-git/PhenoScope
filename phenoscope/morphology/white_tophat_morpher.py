@@ -19,7 +19,7 @@ class WhiteTophatMorpher(MorphologyMorpher):
 
     def _get_footprint_radius(self, image: np.ndarray) -> int:
         if self._footprint_radius is None:
-            return int(np.min(image.shape) * 0.002)
+            return int(np.min(image.shape) * 0.004)
         else:
             return self._footprint_radius
 

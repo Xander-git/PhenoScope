@@ -4,8 +4,8 @@ from .image_transformer import ImageTransformer
 from .image_preprocessor import ImagePreprocessor
 from .object_measurer import ObjectMeasurer
 from .morphology_morpher import MorphologyMorpher
-from .table_filter import TableFilter
+from .measurement_filter import MeasurementFilter
 from .threshold_detector import ThresholdDetector
 from .noise_preprocessor import NoisePreprocessor
 from ._image_operation import ImageOperation
-from phenoscope.pipeline.interface.imaging_pipeline import ImagingPipeline
+from .object_profiler import ObjectProfiler

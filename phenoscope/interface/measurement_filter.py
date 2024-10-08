@@ -5,7 +5,7 @@ from ..util.error_message import INTERFACE_ERROR_MSG
 
 
 # <<Interface>>
-class TableFilter(ImageOperation):
+class MeasurementFilter(ImageOperation):
     def __init__(self):
         raise NotImplementedError(INTERFACE_ERROR_MSG)
 

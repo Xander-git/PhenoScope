@@ -6,3 +6,6 @@ from ..util.error_message import INTERFACE_ERROR_MSG
 class ObjectDetector(ImageOperation):
     def __init__(self):
         raise NotImplementedError(INTERFACE_ERROR_MSG)
+
+    def detect(self, image):
+        raise NotImplementedError(INTERFACE_ERROR_MSG)
