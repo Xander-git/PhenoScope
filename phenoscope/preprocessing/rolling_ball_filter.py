@@ -1,6 +1,7 @@
 import numpy as np
 from skimage.restoration import rolling_ball
 
+from .. import Image
 from ..interface import ImagePreprocessor
 
 
@@ -11,9 +12,10 @@ class RollingBallFilter(ImagePreprocessor):
         self._nansafe: bool = nansafe
         self._num_threads: int = num_threads
 
-    def preprocess(self, image: np.ndarray):
-        return image - rolling_ball(image=image,
-                                    radius=self._radius,
-                                    kernel=self._kernel,
-                                    nansafe=self._nansafe,
-                                    num_threads=self._num_threads)
+    def _operate(self, image: Image):
+        image.enhanced_array -= rolling_ball(image=image.enhanced_array,
+                                             radius=self._radius,
+                                             kernel=self._kernel,
+                                             nansafe=self._nansafe,
+                                             num_threads=self._num_threads)
+        return image

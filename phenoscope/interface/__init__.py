@@ -1,4 +1,3 @@
-from .blob_detector import BlobDetector
 from .contrast_preprocessor import ContrastPreprocessor
 from .image_transformer import ImageTransformer
 from .image_preprocessor import ImagePreprocessor
@@ -9,3 +8,4 @@ from .threshold_detector import ThresholdDetector
 from .noise_preprocessor import NoisePreprocessor
 from ._image_operation import ImageOperation
 from .object_profiler import ObjectProfiler
+from .object_linker import ObjectLinker

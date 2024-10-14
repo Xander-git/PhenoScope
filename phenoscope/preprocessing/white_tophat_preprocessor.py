@@ -1,24 +1,24 @@
 import numpy as np
-from skimage.morphology import disk, square, white_tophat
+from skimage.morphology import disk, square, white_tophat, cube, ball
 
-from ..interface import MorphologyMorpher
+from ..interface import ImagePreprocessor
 from .. import Image
 
 
-class WhiteTophatMorpher(MorphologyMorpher):
+class WhiteTophatPreprocessor(ImagePreprocessor):
     def __init__(self, footprint_shape='disk', footprint_radius: int = None):
-
         self._footprint_shape = footprint_shape
         self._footprint_radius = footprint_radius
 
     def _operate(self, image: Image) -> Image:
         white_tophat_results = white_tophat(
-                image.object_mask,
+                image.enhanced_array,
                 footprint=self._get_footprint(
-                        self._get_footprint_radius(array=image.object_mask)
+                        self._get_footprint_radius(array=image.enhanced_array)
                 )
         )
-        image.mask = image.object_mask & ~white_tophat_results
+        image.enhanced_array = image.enhanced_array - white_tophat_results
+
         return image
 
     def _get_footprint_radius(self, array: np.ndarray) -> int:
@@ -33,5 +33,7 @@ class WhiteTophatMorpher(MorphologyMorpher):
                 return disk(radius=radius)
             case 'square':
                 return square(radius * 2)
-            case _:
-                raise ValueError('invalid footprint shape. White tophat morpher only supports two dimensional shapes')
+            case 'sphere':
+                return ball(radius)
+            case 'cube':
+                return cube(radius * 2)

@@ -19,6 +19,7 @@ from ...interface.morphology_morpher import MorphologyMorpher
 from ...interface.image_transformer import ImageTransformer
 from ...interface.measurement_filter import MeasurementFilter
 from ...interface.object_measurer import ObjectMeasurer
+from ...interface.object_linker import ObjectLinker
 
 from ...util.error_message import INTERFACE_ERROR_MSG
 
@@ -47,7 +48,11 @@ class ImagingPipeline(ImageOperation):
                 return operator.measure(input)
             case MeasurementFilter():
                 return operator.filter(input)
+            case ImageTransformer():
+                return operator.transform(input)
+            case ObjectLinker():
+                return operator.link(input)
             case ObjectMeasurer():
-                return operator.measure(input)
+                raise ValueError('Measurer objects cannot be a part of an imaging process pipeline. Place them in a measurer pipeline object instead.')
             case _:
                 raise TypeError(f'Operator {type(operator)} not recognized')

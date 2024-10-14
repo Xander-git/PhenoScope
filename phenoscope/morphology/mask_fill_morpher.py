@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.ndimage import binary_fill_holes
 
+from .. import Image
 from ..interface import MorphologyMorpher
 from ..util.type_checks import is_binary_mask
 
@@ -11,10 +12,11 @@ class MaskFillMorpher(MorphologyMorpher):
         self._structure = structure
         self._origin = origin
 
-    def morph(self, object_mask: np.ndarray) -> np.ndarray:
-        if not (is_binary_mask(object_mask)): raise ValueError('input object array must be a binary array')
-        return binary_fill_holes(
-                input=object_mask,
+    def _operate(self, image: Image) -> Image:
+        if not (is_binary_mask(image.object_mask)): raise ValueError('input object array must be a binary array')
+        image.object_mask = binary_fill_holes(
+                input=image.object_mask,
                 structure=self._structure,
                 origin=self._origin
         )
+        return image
