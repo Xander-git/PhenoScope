@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from skimage.measure import label
 
 from ..util.type_checks import is_binary_mask
+from ..util.error_message import INVALID_MASK_SHAPE_MSG, INVALID_MAP_SHAPE_MSG
 
 
 class Image:
@@ -44,11 +45,14 @@ class Image:
 
     @object_mask.setter
     def object_mask(self, mask: np.ndarray) -> None:
-        if is_binary_mask(mask) is False:
-            if mask is not None:
-                raise ValueError("Mask must be a binary array")
-        self.__object_mask = mask
-        self.__object_map = label(self.__object_mask)
+        if mask is not None:
+            if is_binary_mask(mask) is False:
+                raise ValueError("Mask must be a binary array.")
+            if mask.shape != self.__enhanced_image_array.shape: raise ValueError(INVALID_MASK_SHAPE_MSG)
+            self.__object_mask = mask
+            self.__object_map = label(self.__object_mask)
+        else:
+            self.__object_mask = None
 
     @property
     def object_map(self) -> np.ndarray:
@@ -56,13 +60,15 @@ class Image:
 
     @object_map.setter
     def object_map(self, object_map: np.ndarray) -> None:
-        self.__object_map = object_map
+        if object_map is not None:
+            if object_map.shape != self.__enhanced_image_array.shape: raise ValueError(INVALID_MAP_SHAPE_MSG)
+            self.__object_map = object_map
 
     def copy(self):
         new_image = self.__class__(self.array)
-        new_image.enhanced_array = self.enhanced_array
-        new_image.object_mask = self.object_mask
-        new_image.object_map = self.object_map
+        new_image.enhanced_array = self.__enhanced_image_array
+        new_image.object_mask = self.__object_mask
+        new_image.object_map = self.__object_map
         return new_image
 
     def show(self, ax=None, cmap='gray', figsize=(9, 10)) -> (plt.Figure, plt.Axes):

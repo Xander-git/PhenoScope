@@ -1,4 +1,4 @@
-name: phenomics
+name: phenoscope
 channels:
   - conda-forge
   - bioconda

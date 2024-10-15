@@ -11,7 +11,7 @@ class ImagePreprocessor(ImageOperation):
 
     def preprocess(self, image: Image) -> Image:
         input_image: Image = image.copy()
-        output = self._operate(input)
+        output = self._operate(image)
         if input_image.array != output.array: raise AttributeError(PREPROCESSOR_ARRAY_CHANGE_ERROR)
 
         return output

@@ -1,4 +1,4 @@
-name: phenomics-build
+name: phenoscope-build
 channels:
   - conda-forge
   - bioconda

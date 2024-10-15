@@ -1,0 +1,1 @@
+from rgb2grayscale_transformer import RGB2Grayscale

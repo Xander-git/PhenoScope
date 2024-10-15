@@ -1,4 +1,4 @@
-from ..interface import ImagePreprocessor
+from ..interface import ImageTransformer
 from .. import Image
 
 from skimage.color import rgb2gray

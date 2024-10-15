@@ -1,5 +1,8 @@
 
 INTERFACE_ERROR_MSG = "An interface method was called when it was not supposed to be. Make sure any subclasses don't call this method."
+INVALID_MASK_SHAPE_MSG = 'Object Mask shape should be the same as the image shape.'
+INVALID_MAP_SHAPE_MSG = 'Object map should be the same as the image shape.'
+
 
 PREPROCESSOR_ARRAY_CHANGE_ERROR='The image array of the input was changed. Preprocessors should not change the image array'
 
