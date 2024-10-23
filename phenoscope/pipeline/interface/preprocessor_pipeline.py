@@ -15,6 +15,6 @@ from ... import Image
 
 
 class PreprocessorPipeline(ImagingPipeline):
-    def preprocess(self, image: Image) -> Image:
-        output = self._execute_pipeline(input=image)
+    def preprocess(self, image: Image, inplace:bool=False) -> Image:
+        output = self._execute_pipeline(input=image, inplace=inplace)
         return output

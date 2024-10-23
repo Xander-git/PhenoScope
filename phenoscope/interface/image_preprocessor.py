@@ -1,7 +1,6 @@
 import numpy as np
-
 from ._image_operation import ImageOperation
-from ..util.error_message import INTERFACE_ERROR_MSG, PREPROCESSOR_ARRAY_CHANGE_ERROR
+from ..util.error_message import INTERFACE_ERROR_MSG, ARRAY_CHANGE_ERROR_MSG
 from .. import Image
 
 
@@ -9,10 +8,17 @@ class ImagePreprocessor(ImageOperation):
     def __init__(self):
         pass
 
-    def preprocess(self, image: Image) -> Image:
+    def preprocess(self, image: Image, inplace: bool = False) -> Image:
+
+        # Make a copy for post checking
         input_image: Image = image.copy()
-        output = self._operate(image)
-        if input_image.array != output.array: raise AttributeError(PREPROCESSOR_ARRAY_CHANGE_ERROR)
+
+        if inplace:
+            output = self._operate(image)
+        else:
+            output = self._operate(image.copy())
+
+        if not np.array_equal(input_image.array, output.array): raise AttributeError(ARRAY_CHANGE_ERROR_MSG)
 
         return output
 

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from skimage.measure import label, regionprops_table
 
-from ..interface import ObjectProfiler, ThresholdDetector, ImagePreprocessor, MorphologyMorpher, ObjectMeasurer, MeasurementFilter
+from ..interface import ObjectProfiler, ThresholdDetector, ImagePreprocessor, MorphologyMorpher, FeatureExtractor, ObjectFilter
 from ..detection import OtsuDetector
 
 
@@ -11,8 +11,8 @@ class ThresholdProfiler(ObjectProfiler):
                  detector: ThresholdDetector = None,
                  preprocessor: ImagePreprocessor = None,
                  morpher: MorphologyMorpher = None,
-                 measurer: ObjectMeasurer = None,
-                 measurement_filter: MeasurementFilter = None
+                 measurer: FeatureExtractor = None,
+                 measurement_filter: ObjectFilter = None
                  ):
         if detector is None: detector = OtsuDetector()
 
@@ -63,5 +63,5 @@ class ThresholdProfiler(ObjectProfiler):
         table.loc[:, 'Boundary_Radius'] = table.loc[:, 'Boundary_Radius'] / 2
 
         if self._measurer is not None:
-            self._object_map, self._object_table = self._measurer.measure(self._object_map, self._object_table)
+            self._object_map, self._object_table = self._measurer.extract(self._object_map, self._object_table)
         return table

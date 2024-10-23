@@ -16,11 +16,11 @@ from ...util.type_checks import is_binary_mask
 
 
 class ThresholdDetectorPipeline(ImagingPipeline):
-    def detect(self, image: np.ndarray) -> np.ndarray:
+    def detect(self, image: np.ndarray, inplace: bool = False) -> np.ndarray:
         if type(image) is not np.ndarray:
             raise ValueError("Input of a ThresholdPipeline must be a digitized image array")
 
-        output = self._execute_pipeline(input=image)
+        output = self._execute_pipeline(input=image, inplace=inplace)
 
         if is_binary_mask(output):
             return output

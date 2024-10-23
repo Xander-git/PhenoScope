@@ -4,9 +4,15 @@ from .. import Image
 
 
 class ImageTransformer(ImageOperation):
+    def __init__(self):
+        pass
 
-    def transform(self, image: Image) -> Image:
-        output = self._operate(image)
+    def transform(self, image: Image, inplace=False) -> Image:
+        if inplace:
+            output = self._operate(image)
+        else:
+            output = self._operate(image.copy())
+        return output
 
-    def _operate(self, input: Image) -> Image:
+    def _operate(self, image: Image) -> Image:
         raise NotImplementedError(INTERFACE_ERROR_MSG)

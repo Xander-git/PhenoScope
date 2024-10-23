@@ -1,5 +1,5 @@
 from phenoscope.pipeline.interface import PreprocessorPipeline
-from phenoscope.preprocessing import CLAHE, MedianFilter, WhiteTophatPreprocessor
+from phenoscope.preprocessing import CLAHE, WhiteTophatPreprocessor
 
 class ClaheBoostPreprocessor(PreprocessorPipeline):
     def __init__(self, kernel_size=None, tophat_shape='disk', tophat_radius=None):
@@ -9,5 +9,4 @@ class ClaheBoostPreprocessor(PreprocessorPipeline):
                     footprint_shape=tophat_shape,
                     footprint_radius=tophat_radius
             ),
-            'Median Filter': MedianFilter()
         })

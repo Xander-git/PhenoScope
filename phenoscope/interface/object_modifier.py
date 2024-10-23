@@ -3,14 +3,14 @@ import numpy as np
 from ._image_operation import ImageOperation
 
 from .. import Image
-from ..util.error_message import INTERFACE_ERROR_MSG, ENHANCED_ARRAY_CHANGE_ERROR_MSG, ARRAY_CHANGE_ERROR_MSG, MISSING_MASK_ERROR_MSG
+from ..util.error_message import INTERFACE_ERROR_MSG, ARRAY_CHANGE_ERROR_MSG, ENHANCED_ARRAY_CHANGE_ERROR_MSG, MISSING_MAP_ERROR_MSG
 
 
 # <<Interface>>
-class MorphologyMorpher(ImageOperation):
-    def morph(self, image: Image, inplace: bool = False) -> Image:
-        if image.object_mask is None: raise ValueError(MISSING_MASK_ERROR_MSG)
-        input_image: Image = image.copy()
+class ObjectModifier(ImageOperation):
+    def modify(self, image: Image, inplace: bool = False) -> Image:
+        if image.object_map is None: raise ValueError(MISSING_MAP_ERROR_MSG)
+        input_image = image.copy()
 
         if inplace:
             output = self._operate(image)

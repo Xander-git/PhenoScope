@@ -33,3 +33,9 @@ def FaintColony():
 
 def Colony():
     return imread(current_file_dir / 'StdDay6-Results/well_imgs/StdDay6_well005.png')
+
+def SmearPlateDay1():
+    return imread(current_file_dir/'difficult/1_1S_16.jpg')
+
+def SmearPlateDay2():
+    return imread(current_file_dir/'difficult/2_2Y_6.jpg')
